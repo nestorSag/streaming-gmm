@@ -1,0 +1,43 @@
+Implement non regularized version first:
+	- implement lineSearch
+	- implement GConcaveGaussian
+	- implement SGDGaussianMixtureModel update() method
+	
+	- document everything
+	- try gaussian distribution with cholesky
+	- initialization issues
+	- dynamic number of clusters
+
+	later:
+		- profiling
+		- logging
+		- benchmarking
+		- testing
+
+matrices:
+	- S_star
+	- S_j
+	- psi
+	- psi_prime
+	- S_update
+
+scalars:
+	- normal distribution density
+	- GMM log-likelihood
+	- reformulation
+	- w_k change of variable
+	- lowercase_psi
+	- phi
+
+parameters:
+	- mu (rand)
+	- sigma (rand)
+	- alpha  (rand)
+	- rho (in function of priors and penalizer)
+	- nu (Wishart)
+	- d (Wishart)
+	- beta (penalizer)
+	- lambda (mean prior)
+	- Lambda (Wishart)
+	- kappa (mean prior)
+	- zeta (dirichlet)

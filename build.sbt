@@ -12,8 +12,8 @@ scalaVersion := "2.11.8"
 
 // It's possible to define many kinds of settings, such as:
 
-name := "streamming-gmm"
-organization := "org.uoe.sgmm"
+name := "sgd_gmm"
+organization := "org.uoe.sgdgmm"
 version := "1.0"
 
 // Note, it's not required for you to define these three settings. These are
