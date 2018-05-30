@@ -168,55 +168,55 @@ class SGDGaussianMixture private (
 
 
 
-  private object GConcaveExpectationSum {
-    def zero(k: Int, d: Int): GConcaveExpectationSum = {
-      new GConcaveExpectationSum(0.0, Array.fill(k)(0.0),
-        Array.fill(k)(BDV.zeros(d)), Array.fill(k)(BreezeMatrix.zeros(d, d)))
-    }
+//   private object GConcaveExpectationSum {
+//     def zero(k: Int, d: Int): GConcaveExpectationSum = {
+//       new GConcaveExpectationSum(0.0, Array.fill(k)(0.0),
+//         Array.fill(k)(BDV.zeros(d)), Array.fill(k)(BreezeMatrix.zeros(d, d)))
+//     }
 
-    // compute cluster contributions for each input point
-    // (U, T) => U for aggregation
-    def add(
-        weights: Array[Double],
-        dists: Array[GConcaveMultivariateGaussian])
-        (sums: GConcaveExpectationSum, x: BV[Double]): GConcaveExpectationSum = {
-      val p = weights.zip(dists).map {
-        case (weight, dist) => MLUtils.EPSILON + weight * dist.gConcavePdf(x) // <--only real change
-      }
-      val pSum = p.sum
-      sums.logLikelihood += math.log(pSum)
-      var i = 0
-      while (i < sums.k) {
-        p(i) /= pSum
-        sums.weights(i) += p(i)
-        sums.means(i) += x * p(i)
-        BLAS.syr(p(i), Vectors.fromBreeze(x),
-          Matrices.fromBreeze(sums.sigmas(i)).asInstanceOf[DenseMatrix])
-        i = i + 1
-      }
-      sums
-    }
-}
+//     // compute cluster contributions for each input point
+//     // (U, T) => U for aggregation
+//     def add(
+//         weights: Array[Double],
+//         dists: Array[GConcaveMultivariateGaussian])
+//         (sums: GConcaveExpectationSum, x: BV[Double]): GConcaveExpectationSum = {
+//       val p = weights.zip(dists).map {
+//         case (weight, dist) => MLUtils.EPSILON + weight * dist.gConcavePdf(x) // <--only real change
+//       }
+//       val pSum = p.sum
+//       sums.logLikelihood += math.log(pSum)
+//       var i = 0
+//       while (i < sums.k) {
+//         p(i) /= pSum
+//         sums.weights(i) += p(i)
+//         sums.means(i) += x * p(i)
+//         BLAS.syr(p(i), Vectors.fromBreeze(x),
+//           Matrices.fromBreeze(sums.sigmas(i)).asInstanceOf[DenseMatrix])
+//         i = i + 1
+//       }
+//       sums
+//     }
+// }
 
-// Aggregation class for partial expectation results
-private class GConcaveExpectationSum(
-    var logLikelihood: Double,
-    val weights: Array[Double],
-    val means: Array[BDV[Double]],
-    val sigmas: Array[BreezeMatrix[Double]]) extends Serializable {
+// // Aggregation class for partial expectation results
+// private class GConcaveExpectationSum(
+//     var logLikelihood: Double,
+//     val weights: Array[Double],
+//     val means: Array[BDV[Double]],
+//     val sigmas: Array[BreezeMatrix[Double]]) extends Serializable {
 
-    val k = weights.length
+//     val k = weights.length
 
-    def +=(x: GConcaveExpectationSum): GConcaveExpectationSum = {
-      var i = 0
-      while (i < k) {
-        weights(i) += x.weights(i)
-        means(i) += x.means(i)
-        sigmas(i) += x.sigmas(i)
-        i = i + 1
-      }
-      logLikelihood += x.logLikelihood
-      this
-    }
+//     def +=(x: GConcaveExpectationSum): GConcaveExpectationSum = {
+//       var i = 0
+//       while (i < k) {
+//         weights(i) += x.weights(i)
+//         means(i) += x.means(i)
+//         sigmas(i) += x.sigmas(i)
+//         i = i + 1
+//       }
+//       logLikelihood += x.logLikelihood
+//       this
+//     }
 
-}
+// }

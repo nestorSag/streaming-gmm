@@ -1,54 +1,106 @@
 
+abstract class GMMLossTerm extends Serializable ={
+
+  def computeWeightGrad(currentWeight: Double, posteriorProb: Double): Double
+
+  def computeMeanGrad(x: Vector, mean:Vector, posteriorProb: Double): Vector
+
+  def computeSigmaGrad(x: Vector, sigma:Matrix, posteriorProb: Double): Matrix
+
+
+}
+
+abstract class GMMRegularizationTerm extends GMMLossTerm ={
+
+  def computeLogPenaltyLoss(weights: Array[Double], 
+                            dists: Array[GConcaveMultivariateGaussian]): Double
+
+
+}
+
+
 class GMMLossFunction(
-  val regularizer: Option[GMMLossTerm],
+  val regularizer: Option[GMMRegularizationTerm],
   var loss: Double,
   val weightGrads: Array[Double],
   val meanGrads: Array[Vector],
-  val sigmaGrads: Array[Matrix]){
+  val sigmaGrads: Array[Matrix]) extends Serializable{
+
+  val k = meanGrads.length
 
   private class GConcaveLoss() extends GMMLossTerm {
 
-    def updateWeightGrad(
+    def computeWeightGrad(
       currentWeight: Double, 
       posteriorProb: Double) = { posteriorProb - currentWeight }
 
-    def updateMeanGrad(
+    def computeMeanGrad(
       x: BDV, 
       mean: BDV, 
       posteriorProb: Double) = { posteriorProb*(x - mean)}
 
-    def updateWeightGrad(
+    def computeSigmaGrad(
       x: Vector, 
       sigma: Matrix, 
       posteriorProb: Double) = {-BLAS.syr(-posteriorProb, x, sigma)}
+
+    // def computeLogLoss(
+    //   x: Vector,
+    //   weights: Array[Double],
+    //   dists: Array[GConcaveMultivariateGaussian]): Double = {
+
+    //   val q = getPosteriorProbs(x,weights,dists)
+
+    //   val qSum = q.sum
+
+    //   math.log(qSum)
+    // }
+
+    // def getPosteriorProbs(
+    //   x: Vector,
+    //   weights: Array[Double],
+    //   dists: Array[GConcaveMultivariateGaussian]): Array[Double] = {
+
+    //   weights.zip(dists).map {
+    //     case (weight, dist) => MLUtils.EPSILON + weight * dist.gConcavePdf(x) // <--only real change
+    //   }
+
+    // }
+
   }
 
 
   val mainTerm = new GConcaveLoss()
-  val k = meanGrads.length
 
-  def updateWeightGrad(currentWeight: Double, posteriorProb: Double): Double = regularizer match {
+  def computeWeightGrad(currentWeight: Double, posteriorProb: Double): Double = regularizer match {
 
-    case None => mainTerm.updateWeightGrad(currentWeight,posteriorProb)
+    case None => mainTerm.computeWeightGrad(currentWeight,posteriorProb)
 
-    case _ => mainTerm.updateWeightGrad(currentWeight,posteriorProb) + 
-              regularizer.get.updateWeightGrad(currentWeight,posteriorProb)
+    case _ => mainTerm.computeWeightGrad(currentWeight,posteriorProb) + 
+              regularizer.get.computeWeightGrad(currentWeight,posteriorProb)
   }
 
-  def updateMeanGrad(x: Vector, mean:Vector, posteriorProb: Double): Double = regularizer match {
+  def computeMeanGrad(x: Vector, mean:Vector, posteriorProb: Double): Double = regularizer match {
 
-    case None => mainTerm.updateMeanGrad(x,mean,posteriorProb)
+    case None => mainTerm.computeMeanGrad(x,mean,posteriorProb)
 
-    case _ => mainTerm.updateMeanGrad(x,mean,posteriorProb) + 
-              regularizer.get.updateMeanGrad(x,mean,posteriorProb)
+    case _ => mainTerm.computeMeanGrad(x,mean,posteriorProb) + 
+              regularizer.get.computeMeanGrad(x,mean,posteriorProb)
   }
 
-  def updateSigmaGrad(x: Vector, sigma:Vector, posteriorProb: Double): Double = regularizer match {
+  def computeSigmaGrad(x: Vector, sigma:Vector, posteriorProb: Double): Double = regularizer match {
 
     case None => mainTerm.updateSigmaGrad(x,sigma,posteriorProb)
 
-    case _ => mainTerm.updateSigmaGrad(x,sigma,posteriorProb) + 
-              regularizer.get.updateSigmaGrad(x,sigma,posteriorProb)
+    case _ => mainTerm.computeSigmaGrad(x,sigma,posteriorProb) + 
+              regularizer.get.computeSigmaGrad(x,sigma,posteriorProb)
+  }
+
+  def computeRegularizationLoss(weights: Array[Double], 
+                           dists: Array[GConcaveMultivariateGaussian]): Double = regularizer match{
+
+    case None => 0
+    case _ => regularizer.get.computeLogPenaltyLoss(weights,dists)
   }
 
 
@@ -71,15 +123,15 @@ class GMMLossFunction(
                   posteriorProbs: Array[Double]): Unit = {
     
     for(j <- 0 to k-1){
-      weightGrads(j) += updateWeightGrad(weights(j),posteriorProbs(j))
-      meanGrads(j) += updateMeanGrad(x,dists(j).mean,posteriorProbs(j))
-      sigmaGrads(j) += updateSigmaGrad(x,dists(j).sigma,posteriorProbs(j))
+      weightGrads(j) += computeWeightGrad(weights(j),posteriorProbs(j))
+      meanGrads(j) += computeMeanGrad(x,dists(j).mean,posteriorProbs(j))
+      sigmaGrads(j) += computeSigmaGrad(x,dists(j).sigma,posteriorProbs(j))
     }
   }
 
 }
 
-object GMMLossFunction { 
+object GMMLossFunction extends Serializable{ 
 
   def zero(regularizer: GMMLossTerm, k: Int, d: Int): GMMLossFunction = {
     new GMMLossFunction(
@@ -105,24 +157,16 @@ object GMMLossFunction {
       weights: Array[Double],
       dists: Array[GConcaveMultivariateGaussian])
       (lossFunc: GMMLossFunction, x: BV[Double]): GMMLossFunction = {
+
     val q = weights.zip(dists).map {
-      case (weight, dist) => MLUtils.EPSILON + weight * dist.gConcavePdf(x) // <--only real change
+      case (weight, dist) => MLUtils.EPSILON + weight * dist.gConcavePdf(x)
     }
     val qSum = q.sum
-    lossFunc.logLikelihood += math.log(pSum)
-    lossFunc.updateGrad(x,weights,dists,q.map(x => x/qSum))
 
+    lossFunc.loss += math.log(qSum) + lossFunc.computeRegularizationLoss(weights,dists)
+    lossFunc.updateGrad(x,weights,dists,q.map(x => x/qSum))
     lossFunc
+
   }
 }
 
-
-abstract class GMMLossTerm ={
-
-  def updateWeightGrad(currentWeight: Double, posteriorProb: Double): Double
-
-  def updateMeanGrad(x: Vector, mean:Vector, posteriorProb: Double): Vector
-
-  def updateSigmaGrad(x: Vector, sigma:Matrix, posteriorProb: Double): Matrix
-
-}
