@@ -7,16 +7,38 @@ import org.apache.spark.mllib.linalg.{Matrices => SMS, Matrix => SM, DenseMatrix
 import org.apache.spark.mllib.util.MLUtils
 import org.apache.spark.mllib.stat.distribution.MultivariateGaussian
 
-class GConcaveMultivariateGaussian (
-	val s: Double,
-  val mu: BDV[Double],
-  val sigma: BDM[Double]) extends Serializable {
+class UpdatableMultivariateGaussian private(
+	private var s: Double,
+  private var mu: BDV[Double],
+  private var sigma: BDM[Double]) extends Serializable {
+
+  //var rootSigmaInv: BDM[Double]
+
+  //var u: Double
+
+  val d = mu.length
+
+  var momentum: Option[BDM[Double]] = None
+
+  private lazy val eps = {
+    var eps = 1.0
+    while ((1.0 + (eps / 2.0)) != 1.0) {
+      eps /= 2.0
+    }
+    eps
+  }
 
   require(sigma.cols == sigma.rows, "Covariance matrix must be square")
   require(mu.length == sigma.cols, "Mean vector length must match covariance matrix size")
   require(s > 0, s"s must be positive; got ${s}")
 
-  val (rootSigmaInv: BDM[Double], u: Double) = calculateCovarianceConstants
+  def getS: Double = this.s
+
+  def getMu: BDV[Double] = this.mu
+
+  def getSigma: BDM[Double] = this.sigma
+
+  var (rootSigmaInv: BDM[Double], u: Double) = calculateCovarianceConstants
 
   def pdf(x: SV): Double = {
     pdf(new BDV(x.toArray))
@@ -41,7 +63,7 @@ class GConcaveMultivariateGaussian (
   }
   
   def gConcavePdf(x: BV[Double]): Double = {
-    pdf(x) * math.exp(0.5*(1-1/s)) / math.sqrt(s)
+    pdf(x(0,d)) * math.exp(0.5*(1-1/s)) / math.sqrt(s)
   }
 
   def gConcaveLogPdf(x: BV[Double]): Double = {
@@ -56,12 +78,22 @@ class GConcaveMultivariateGaussian (
 
   }
 
-  private lazy val eps = {
-    var eps = 1.0
-    while ((1.0 + (eps / 2.0)) != 1.0) {
-      eps /= 2.0
-    }
-    eps
+  private def update(newParamsMat: BDM[Double]): Unit = {
+
+    this.s = newParamsMat(d-1,d-1)
+    this.mu = newParamsMat(0 to d-2,d-1)/this.s
+    this.sigma = newParamsMat(0 to d-2,0 to d-1) - this.mu*this.mu.t*s
+
+    var (rootSigmaInv_,u_) = calculateCovarianceConstants
+
+    this.rootSigmaInv = rootSigmaInv_
+
+    this.u = u_
+  }
+
+  def step(cov: BDM[Double], optimizer: GMMGradientAscent, n:Double): this.type = {
+    this.update(this.paramMat + optimizer.direction(this,cov)*optimizer.learningRate/n)
+    this
   }
 
   private def calculateCovarianceConstants: (BDM[Double], Double) = {
@@ -93,14 +125,14 @@ class GConcaveMultivariateGaussian (
 }
 
 
-object GConcaveMultivariateGaussian {
+object UpdatableMultivariateGaussian {
 
-  def apply(mu: SV, sigma: SDM): GConcaveMultivariateGaussian = {
-    GConcaveMultivariateGaussian(1.0,mu,sigma)
+  def apply(mu: SV, sigma: SDM): UpdatableMultivariateGaussian = {
+    UpdatableMultivariateGaussian(1.0,mu,sigma)
   }
 
   def apply(s: Double, mu: SV, sigma: SDM) = {
-    new GConcaveMultivariateGaussian(
+    new UpdatableMultivariateGaussian(
       s, 
       new BDV[Double](mu.toArray), 
       new BDM[Double](sigma.numRows,sigma.numCols,sigma.toArray))
@@ -111,7 +143,7 @@ object GConcaveMultivariateGaussian {
     val newS = s(s.rows-1,s.cols-1)
     val newMu = s(0 to s.rows-2,s.cols-1)/newS
 
-    new GConcaveMultivariateGaussian(
+    new UpdatableMultivariateGaussian(
       newS, 
       newMu,
       s(0 to s.rows-2,0 to s.cols-2) - newMu*newMu.t*newS)

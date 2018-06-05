@@ -16,16 +16,20 @@ import org.apache.spark.sql.{Row, SparkSession}
 
 class SGDGMM(
   private var weights: Array[Double],
-  private var gaussians: Array[GConcaveMultivariateGaussian],
-  private val optimizer: GMMGradientAscent) extends Serializable {
+  private var gaussians: Array[UpdatableMultivariateGaussian],
+  private var optimizer: GMMGradientAscent) extends Serializable {
 
   def getWeights: Array[Double] = weights
-  def getGaussians: Array[GConcaveMultivariateGaussian] = gaussians
+  def getGaussians: Array[UpdatableMultivariateGaussian] = gaussians
 
   var maxGradientIters = 100
   var convergenceTol = 1e-6
+  def k: Int = weights.length
 
   require(weights.length == gaussians.length, "Length of weight and Gaussian arrays must match")
+
+
+
 
   def getConvergenceTol: Double = convergenceTol
 
@@ -34,9 +38,8 @@ class SGDGMM(
     this.convergenceTol = x
   }
 
-  def getOptimizer(): GMMGradientAscent = {
-    this.optimizer
-  }
+
+
 
   def setmaxGradientIters(maxGradientIters: Int): this.type = {
     require(maxGradientIters > 0 ,s"maxGradientIters needs to be a positive integer; got ${maxGradientIters}")
@@ -48,6 +51,17 @@ class SGDGMM(
     this.maxGradientIters
   }
 
+
+
+
+  def setOptimizer(optim: GMMGradientAscent): Unit = {
+    this.optimizer = optim
+
+  }
+
+  def getOpimizer: GMMGradientAscent = this.optimizer
+
+
   def getLearningRate: Double = optimizer.learningRate
 
   def setLearningRate(alpha: Double): this.type = {
@@ -56,8 +70,6 @@ class SGDGMM(
     this.optimizer.setLearningRate(alpha)
     this
   }
-
-  def k: Int = weights.length
 
   def predict(points: RDD[SV]): RDD[Int] = {
     val responsibilityMatrix = predictSoft(points)
@@ -69,7 +81,6 @@ class SGDGMM(
     val r = predictSoft(point)
     r.indexOf(r.max)
   }
-
 
   def predict(points: JavaRDD[SV]): JavaRDD[java.lang.Integer] =
     predict(points.rdd).toJavaRDD().asInstanceOf[JavaRDD[java.lang.Integer]]
@@ -92,7 +103,7 @@ class SGDGMM(
 
   private def computeSoftAssignments(
       pt: BDV[Double],
-      dists: Array[GConcaveMultivariateGaussian],
+      dists: Array[UpdatableMultivariateGaussian],
       weights: Array[Double],
       k: Int): Array[Double] = {
     val p = weights.zip(dists).map {
@@ -105,91 +116,99 @@ class SGDGMM(
     p
   }
 
-  def fit(data: RDD[SV], iters: Int = 100): Unit = {
+  def step(data: RDD[SV], iters: Int = 100): Unit = {
 
     val sc = data.sparkContext
 
     val gconcaveData = data.map{x => new BDV[Double](x.toArray ++ Array[Double](1.0))} // y = [x 1]
  
-    // Get length of the input vectors
     val d = gconcaveData.first().length - 1
-
-    //require(d < GaussianMixture.MAX_NUM_FEATURES, s"GaussianMixture cannot handle more " +
-     // s"than ${GaussianMixture.MAX_NUM_FEATURES} features because the size of the covariance" +
-    //  s" matrix is quadratic in the number of features.")
 
     val shouldDistribute = shouldDistributeGaussians(k, d)
 
-    var llh = Double.MinValue // current log-likelihood
-    var llhp = 0.0            // previous log-likelihood
-
+    var newLL = 1.0   // current log-likelihood
+    var oldLL = 0.0  // previous log-likelihood
     var iter = 0
+    
 
-    while (iter < iters && math.abs(llh-llhp) > convergenceTol) {
-      // create and broadcast curried cluster contribution function
-      val compute = sc.broadcast(SampleAggregator.add(weights, gaussians,d)_)
+    var regVals = Array.fill(k)(0.0)
 
-      // aggregate the cluster contribution for all sample points
+    val bcOptim = sc.broadcast(this.optimizer)
+
+    while (iter < iters && math.abs(newLL-oldLL) > convergenceTol) {
+
+      val compute = sc.broadcast(SampleAggregator.add(weights, gaussians)_)
+
       val sampleStats = gconcaveData.treeAggregate(SampleAggregator.zero(k, d))(compute.value, _ += _)
 
       val n: Double = sampleStats.gConcaveCovariance.map{case x => x(d,d)}.sum // number of data points 
 
-      val softmaxWeights = weights.map{case x => math.log(x/weights.last)}
-
       val tuples =
           Seq.tabulate(k)(i => (sampleStats.gConcaveCovariance(i), 
-                                softmaxWeights(i),
-                                weights(i) ,
-                                gaussians(i),
-                                n))
+                                this.gaussians(i),
+                                this.weights(i)))
 
       if (shouldDistribute) {
+        // compute new gaussian parameters and regularization values in
+        // parallel
+
         val numPartitions = math.min(k, 1024)
 
-        val (ws, gs) = sc.parallelize(tuples, numPartitions).map { 
-          case (gConcaveCov,smWeight,weight,gaussian,n) =>
-          updateParams(gConcaveCov,smWeight,weight,gaussian,n)
+        val (rv,gs) = sc.parallelize(tuples, numPartitions).map { case (cov,g,w) => 
+          (bcOptim.value.penaltyValue(g,w),g.step(cov,bcOptim.value,n))
         }.collect().unzip
 
-        Array.copy(ws, 0, softmaxWeights, 0, ws.length)
-        Array.copy(gs, 0, gaussians, 0, gs.length)
+        Array.copy(rv, 0, regVals, 0, rv.length)
+        Array.copy(gs, 0, this.gaussians, 0, gs.length)
 
       } else {
 
-        val (softmaxWeights, gaussians) = tuples.map{ 
-          case (gConcaveCov,smWeight,weight,gaussian,n) =>
-          updateParams(gConcaveCov,smWeight,weight,gaussian,n)}.unzip
+        val (rv,gs) = tuples.map{ 
+          case (cov,g,w) => (this.optimizer.penaltyValue(g,w),g.step(cov,this.optimizer,n))
+        }.unzip
       }
 
-      val totalSoftmax = softmaxWeights.map{case w => math.exp(w)}.sum // BUG HERE
-      weights = softmaxWeights.map{case w => math.exp(w)/totalSoftmax}
+      oldLL = newLL // current becomes previous
+      newLL = sampleStats.qLoglikelihood + regVals.sum// this is the freshly computed log-likelihood plus regularization
 
-      llhp = llh // current becomes previous
-      llh = sampleStats.qLoglikelihood // this is the freshly computed log-likelihood
+      /// update weights in driver
+      val softmaxWeights = weights.map{case x => math.log(x/weights.last)}
+
+      // weight tuples
+      var weightTuples =
+          Seq.tabulate(k)(i => (softmaxWeights(i), 
+                                this.weights(i),
+                                sampleStats.gConcaveCovariance(i),
+                                (1 to k)(i)))
+
+      val updatedSMweights = weightTuples.map{ case (smw,w,cov,i) => 
+        smw + optimizer.learningRate/n*optimizer.weightGradient(cov,w,n,i==k)
+      }
+
+      val totalSoftmax = updatedSMweights.map{case w => math.exp(w)}.sum
+
+      Array.copy(updatedSMweights.map{case w => math.exp(w)/totalSoftmax},0,this.weights,0,this.weights.length)
+
       iter += 1
       compute.destroy()
     }
 
-
-    this.gaussians = gaussians
-    this.weights = weights
-  }
-
-  private def updateParams(
-    gConcaveCov: BDM[Double], 
-    smWeight:Double, 
-    weight: Double, 
-    gaussian: GConcaveMultivariateGaussian,
-    n: Double): (Double,GConcaveMultivariateGaussian) = {
-    
-    val paramMat = gaussian.paramMat
-    (smWeight + optimizer.weightGradient(gConcaveCov,weight,n)*optimizer.learningRate/n,
-     GConcaveMultivariateGaussian(paramMat + optimizer.direction(paramMat,gConcaveCov)*optimizer.learningRate/n))
+    //this.gaussians = gaussians
+    //this.weights = weights
   }
 
   def shouldDistributeGaussians(k: Int, d: Int): Boolean = ((k - 1.0) / k) * d > 25
 
 }
+
+// def getRegAndUpdatePars(
+//   cov: BDM[Double], 
+//   dist: UpdatableMultivariateGaussian,
+//   weight: Double): (Double,UpdatableMultivariateGaussian) = {
+
+//   (bcOptim.value.penaltyValue(dist,weight),dist.step(cov,))
+// }
+
 
 class SampleAggregator(
   var qLoglikelihood: Double,
@@ -219,12 +238,11 @@ object SampleAggregator {
   // (U, T) => U for aggregation
   def add(
       weights: Array[Double],
-      dists: Array[GConcaveMultivariateGaussian],
-      dataDim: Int)
+      dists: Array[UpdatableMultivariateGaussian])
       (agg: SampleAggregator, y: BDV[Double]): SampleAggregator = {
 
     val q = weights.zip(dists).map {
-      case (weight, dist) =>  weight * dist.gConcavePdf(y.slice(0,dataDim)) // <--q-logLikelihood
+      case (weight, dist) =>  weight * dist.gConcavePdf(y) // <--q-logLikelihood
     }
     val qSum = q.sum
     agg.qLoglikelihood += math.log(qSum)
