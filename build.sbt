@@ -12,7 +12,7 @@ scalaVersion := "2.11.8"
 
 // It's possible to define many kinds of settings, such as:
 
-name := "sgd_gmm"
+name := "streamingGmm"
 organization := "org.uoe.sgdgmm"
 version := "1.0"
 
@@ -25,28 +25,40 @@ version := "1.0"
 // You can define other libraries as dependencies in your build like this:
 libraryDependencies += "org.typelevel" %% "cats-core" % "1.0.1"
 
+//test dependencies
+libraryDependencies += "org.scalatest" % "scalatest_2.11" % "3.0.5" % "test"
 
 libraryDependencies  ++= Seq(
 
   "org.typelevel" %% "cats-core" % "1.0.1",
   // other dependencies here
-  "org.scalanlp" % "breeze_2.11" % "0.13",
+  "org.scalanlp" % "breeze_2.11" % "0.13.2",
   // native libraries are not included by default. add this if you want them (as of 0.7)
   // native libraries greatly improve performance, but increase jar sizes. 
   // It also packages various blas implementations, which have licenses that may or may not
   // be compatible with the Apache License. No GPL code, as best I know.
-  "org.scalanlp" % "breeze-natives_2.11" % "0.13",
+  "org.scalanlp" % "breeze-natives_2.11" % "0.13.2",
   // the visualization library is distributed separately as well. 
   // It depends on LGPL code.
 
-  "org.scalanlp" % "breeze-viz_2.11" % "0.13",
+  "org.scalanlp" % "breeze-viz_2.11" % "0.13.2",
 
   // spark dependencies
   "org.apache.spark" % "spark-mllib_2.11" % "2.2.1",
 
   "org.apache.spark" % "spark-core_2.11" % "2.2.1"
 
+)
 
+dependencyOverrides ++= Seq(
+  
+  "io.netty" % "netty" % "3.9.9.Final",
+
+  "commons-net" % "commons-net" % "2.2",
+
+  "commons-io" % "commons-io" % "2.4",
+
+  "com.google.guava" % "guava" % "11.0.2"
 )
 
 

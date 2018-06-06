@@ -18,7 +18,7 @@ class UpdatableMultivariateGaussian private(
 
   val d = mu.length
 
-  var momentum: Option[BDM[Double]] = None
+  private[streamingGmm] var momentum: Option[BDM[Double]] = None
 
   private lazy val eps = {
     var eps = 1.0
@@ -126,6 +126,14 @@ class UpdatableMultivariateGaussian private(
 
 
 object UpdatableMultivariateGaussian {
+
+  def apply(s: Double, mu: BDV[Double], sigma: BDM[Double]): UpdatableMultivariateGaussian = {
+    new UpdatableMultivariateGaussian(s,mu,sigma)
+  }
+
+  def apply(mu: BDV[Double], sigma: BDM[Double]): UpdatableMultivariateGaussian = {
+    UpdatableMultivariateGaussian(1.0,mu,sigma)
+  }
 
   def apply(mu: SV, sigma: SDM): UpdatableMultivariateGaussian = {
     UpdatableMultivariateGaussian(1.0,mu,sigma)

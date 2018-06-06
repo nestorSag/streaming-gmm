@@ -135,6 +135,8 @@ class SGDGMM(
 
     val bcOptim = sc.broadcast(this.optimizer)
 
+   // var rv: Array[Double]
+     
     while (iter < iters && math.abs(newLL-oldLL) > convergenceTol) {
 
       val compute = sc.broadcast(SampleAggregator.add(weights, gaussians)_)
@@ -163,10 +165,16 @@ class SGDGMM(
 
       } else {
 
-        val (rv,gs) = tuples.map{ 
+        val (regVals,gs) = tuples.map{ 
           case (cov,g,w) => (this.optimizer.penaltyValue(g,w),g.step(cov,this.optimizer,n))
         }.unzip
+
+        Array.copy(gs, 0, this.gaussians, 0, gs.length)
       }
+
+      //Array.copy(rv, 0, regVals, 0, rv.length)
+      //Array.copy(gs, 0, this.gaussians, 0, gs.length)
+      //this.gaussians = gs
 
       oldLL = newLL // current becomes previous
       newLL = sampleStats.qLoglikelihood + regVals.sum// this is the freshly computed log-likelihood plus regularization
@@ -200,14 +208,6 @@ class SGDGMM(
   def shouldDistributeGaussians(k: Int, d: Int): Boolean = ((k - 1.0) / k) * d > 25
 
 }
-
-// def getRegAndUpdatePars(
-//   cov: BDM[Double], 
-//   dist: UpdatableMultivariateGaussian,
-//   weight: Double): (Double,UpdatableMultivariateGaussian) = {
-
-//   (bcOptim.value.penaltyValue(dist,weight),dist.step(cov,))
-// }
 
 
 class SampleAggregator(

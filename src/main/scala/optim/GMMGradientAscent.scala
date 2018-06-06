@@ -15,14 +15,29 @@ class GMMGradientAscent(
 		this.learningRate
 	}
 
-	def basicLossGradient(paramMat: BDM[Double], sampleInfo: BDM[Double]): BDM[Double] = {
+	def direction(dist: UpdatableMultivariateGaussian, sampleInfo: BDM[Double]): BDM[Double] = {
+
+		lossGradient(dist,sampleInfo)
+
+	}
+
+	def penaltyValue(dist: UpdatableMultivariateGaussian,weight: Double): Double = {
+
+		regularizer match{
+			case None => 0
+			case Some(_) => regularizer.get.evaluate(dist,weight)
+		}
+
+	}
+
+	private def basicLossGradient(paramMat: BDM[Double], sampleInfo: BDM[Double]): BDM[Double] = {
 
 		val posteriorProb = paramMat(paramMat.rows-1,paramMat.cols-1)
 
 		(sampleInfo - paramMat*posteriorProb)*0.5
 	}
 
-	def basicWeightGradient(paramMat: BDM[Double], weight: Double, n: Double): Double = {
+	private def basicWeightGradient(paramMat: BDM[Double], weight: Double, n: Double): Double = {
 
 		paramMat(paramMat.rows-1,paramMat.cols-1) - n*weight
 	}
@@ -47,21 +62,6 @@ class GMMGradientAscent(
 			case None => basicLossGradient(dist.paramMat,sampleInfo) 
 			case Some(_) => basicLossGradient(dist.paramMat,sampleInfo) +
 				regularizer.get.gradient(dist)
-		}
-
-	}
-
-	def direction(dist: UpdatableMultivariateGaussian, sampleInfo: BDM[Double]): BDM[Double] = {
-
-		lossGradient(dist,sampleInfo)
-
-	}
-
-	def penaltyValue(dist: UpdatableMultivariateGaussian,weight: Double): Double = {
-
-		regularizer match{
-			case None => 0
-			case Some(_) => regularizer.get.evaluate(dist,weight)
 		}
 
 	}
