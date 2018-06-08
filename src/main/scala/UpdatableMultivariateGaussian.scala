@@ -58,8 +58,12 @@ class UpdatableMultivariateGaussian private(
     u + v.t * v * -0.5
   }
 
+  def logDetSigma(): Double = {
+  	-2.0*u - mu.size * math.log(2.0 * math.Pi)
+  }
+
   def detSigma(): Double = {
-  	math.exp(-0.5*u - mu.size * math.log(2.0 * math.Pi))
+    math.exp(logDetSigma)
   }
   
   def gConcavePdf(x: BV[Double]): Double = {
@@ -74,7 +78,17 @@ class UpdatableMultivariateGaussian private(
     // build S matrix
     val lastRow = new BDV[Double](mu.toArray ++ Array[Double](1))
 
-    BDM.vertcat(BDM.horzcat(sigma/s + mu*mu.t,mu.asDenseMatrix.t),lastRow.asDenseMatrix) * s
+    BDM.vertcat(BDM.horzcat(sigma + mu*mu.t*s,mu.asDenseMatrix.t*s),lastRow.asDenseMatrix*s)
+
+  }
+
+  def invParamMat: BDM[Double] = {
+    // build S inv matrix
+
+    val x = this.rootSigmaInv.t*this.rootSigmaInv*mu
+    val lastRow = new BDV[Double](x.toArray ++ Array[Double](-1/s - mu.t*x))
+    
+    BDM.vertcat(BDM.horzcat(this.rootSigmaInv.t*this.rootSigmaInv,-x.asDenseMatrix.t),-lastRow.asDenseMatrix)
 
   }
 
@@ -107,9 +121,9 @@ class UpdatableMultivariateGaussian private(
     try {
       // log(pseudo-determinant) is sum of the logs of all non-zero singular values
 
-      //val logPseudoDetSigma = d.activeValuesIterator.filter(_ > tol).map(math.log).sum
+      val logPseudoDetSigma = d.activeValuesIterator.filter(_ > tol).map(math.log).sum
 
-      val logPseudoDetSigma = d.map(math.log).sum
+      //val logPseudoDetSigma = d.map(math.log).sum
 
 
       // calculate the root-pseudo-inverse of the diagonal matrix of singular values

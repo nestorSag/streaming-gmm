@@ -1,6 +1,6 @@
 import org.scalatest.FlatSpec
 import streamingGmm.{UpdatableMultivariateGaussian}
-import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, norm}
+import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, norm, trace, det}
 
 import org.apache.spark.mllib.stat.distribution.MultivariateGaussian
 import org.apache.spark.mllib.linalg.{Matrices => SMS, Matrix => SM, DenseMatrix => SDM, Vector => SV, Vectors => SVS, DenseVector => SDV}
@@ -12,10 +12,10 @@ class UMGTest extends FlatSpec {
   val errorTol = 1e-8
   val covdim = 20
 
-  //get random SPD (covariance) matrix
+  //get random matrix
 
   val randA = BDM.rand(covdim,covdim)
-  val cov = randA.t * randA + BDM.eye[Double](covdim)
+  val cov = randA.t * randA + BDM.eye[Double](covdim) // form SPD covariance matrix
 
   //get random mean vector 
 
@@ -36,21 +36,33 @@ class UMGTest extends FlatSpec {
 
   "for a breeze vector x, pdf(x)" should "give the same result thant MLlib's MultivariateGaussian (up to some rounding error)" in {
   	val dif = math.abs(umgdist.pdf(btp) - mldist.pdf(stp))
-  	assert(dif < errorTol)
+  	assert(math.pow(dif,2) < errorTol)
   }
   "for a Spark vector x, pdf(x)" should "give the same result thant MLlib's MultivariateGaussian (up to some rounding error)" in {
   	val dif = math.abs(umgdist.pdf(stp) - mldist.pdf(stp))
-  	assert(dif < errorTol)
+  	assert(math.pow(dif,2) < errorTol)
   }
 
   "for a breeze vector x, logpdf(x)" should "give the same result thant MLlib's MultivariateGaussian (up to some rounding error)" in {
   	val dif = math.abs(umgdist.logpdf(btp) - mldist.logpdf(stp))
-  	assert(dif < errorTol)
+  	assert(math.pow(dif,2) < errorTol)
   }
 
   "for a Spark vector x, logpdf(x)" should "give the same result thant MLlib's MultivariateGaussian (up to some rounding error)" in {
   	val dif = math.abs(umgdist.logpdf(stp) - mldist.logpdf(stp))
-  	assert(dif < errorTol)
+  	assert(math.pow(dif,2) < errorTol)
+  }
+
+  "logDetSigma" should "give the same result than Breeze's det function" in { 
+    val dif = math.abs(umgdist.logDetSigma - math.log(det(umgdist.getSigma)))
+    assert(math.pow(dif,2) < errorTol)
+
+  }
+
+  "detSigma" should "give the same result than Breeze's det function" in { 
+    val dif = math.abs(umgdist.detSigma - det(umgdist.getSigma))
+    assert(math.pow(dif,2) < errorTol)
+
   }
 
   "the parameter matrix" should "be well-formed" in {
@@ -84,6 +96,14 @@ class UMGTest extends FlatSpec {
     vecdiff = (reshaper.t * paramMat * lcv) - umgdist.getMu
 
   	assert(math.pow(norm(vecdiff),2) < errorTol)
+  }
+
+  "invParamMat" should "give paramMat inverse" in {
+    
+    var shouldBeZeroMat = umgdist.paramMat*umgdist.invParamMat - BDM.eye[Double](covdim+1)
+
+    assert(trace(shouldBeZeroMat.t*shouldBeZeroMat) < errorTol)
+    
   }
 
   // the step() method will be tested in the integration testing stage
