@@ -1,6 +1,6 @@
 import org.scalatest.FlatSpec
 import streamingGmm.{UpdatableMultivariateGaussian,ConjugatePrior}
-import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, norm}
+import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, norm, det}
 
 import org.apache.spark.mllib.stat.distribution.MultivariateGaussian
 import org.apache.spark.mllib.linalg.{Matrices => SMS, Matrix => SM, DenseMatrix => SDM, Vector => SV, Vectors => SVS, DenseVector => SDV}
@@ -70,11 +70,11 @@ class ConjugatePriorTest extends FlatSpec {
 
     var testdist = UpdatableMultivariateGaussian(covdim,mu,cov) // when paramMat = regularizingMatrix
 
-    var shouldBeZero = prior.evaluate(testdist,1.0) - (-0.5*prior.df*(testdist.logDetSigma + math.log(testdist.getS)) - 0.5*(covdim+1))
+    var shouldBeZero = prior.evaluate(testdist,1.0) - (-0.5*prior.df*math.log(det(testdist.paramMat)) - 0.5*(covdim+1))
     assert(math.pow(shouldBeZero,2) < errorTol)
 
     // try moving the weight 
-    shouldBeZero = prior.evaluate(testdist,0.5) - (-0.5*prior.df*(math.log(testdist.getS) + testdist.logDetSigma) - 0.5*(covdim+1) + prior.weightPrior*math.log(0.5))
+    shouldBeZero = prior.evaluate(testdist,0.5) - (-0.5*prior.df*math.log(det(testdist.paramMat)) - 0.5*(covdim+1) + prior.weightPrior*math.log(0.5))
     assert(math.pow(shouldBeZero,2) < errorTol)
 
     // when paramMat = identity
