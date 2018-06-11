@@ -3,7 +3,8 @@ import streamingGmm.{UpdatableMultivariateGaussian,LogBarrier}
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, det, trace}
 
 
-// tests for UpdatableMultivariateGaussian class
+// tests for LogBarrier class
+// only testing for shift = 0
 
 class LogBarrierTest extends FlatSpec {
   

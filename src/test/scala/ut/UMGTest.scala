@@ -21,7 +21,7 @@ class UMGTest extends FlatSpec {
 
   val mu = BDV.rand(covdim)
 
-  val umgdist = UpdatableMultivariateGaussian(mu,cov)
+  var umgdist = UpdatableMultivariateGaussian(mu,cov)
   val mldist = new MultivariateGaussian(SVS.dense(mu.toArray),SMS.dense(covdim,covdim,cov.toArray))
 
   "getS" should "return 1.0" in {assert(umgdist.getS == 1.0)}
@@ -38,6 +38,7 @@ class UMGTest extends FlatSpec {
   	val dif = math.abs(umgdist.pdf(btp) - mldist.pdf(stp))
   	assert(math.pow(dif,2) < errorTol)
   }
+
   "for a Spark vector x, pdf(x)" should "give the same result thant MLlib's MultivariateGaussian (up to some rounding error)" in {
   	val dif = math.abs(umgdist.pdf(stp) - mldist.pdf(stp))
   	assert(math.pow(dif,2) < errorTol)
@@ -53,6 +54,11 @@ class UMGTest extends FlatSpec {
   	assert(math.pow(dif,2) < errorTol)
   }
 
+  "for y = [x 1], gConcavePdf(y)" should "give the same result thant MLlib's MultivariateGaussian pdf(x) (up to some rounding error)" in {
+    val dif = math.abs(umgdist.gConcavePdf(BDV(stp.toArray ++ Array(1.0)) - mldist.pdf(stp)))
+    assert(math.pow(dif,2) < errorTol)
+  }
+
   "logDetSigma" should "give the same result than Breeze's det function" in { 
     val dif = math.abs(umgdist.logDetSigma - math.log(det(umgdist.getSigma)))
     assert(math.pow(dif,2) < errorTol)
@@ -64,6 +70,7 @@ class UMGTest extends FlatSpec {
     assert(math.pow(dif,2) < errorTol)
 
   }
+
 
   "the parameter matrix" should "be well-formed" in {
   	val paramMat = umgdist.paramMat
@@ -103,6 +110,19 @@ class UMGTest extends FlatSpec {
     var shouldBeZeroMat = umgdist.paramMat*umgdist.invParamMat - BDM.eye[Double](covdim+1)
 
     assert(trace(shouldBeZeroMat.t*shouldBeZeroMat) < errorTol)
+    
+  }
+
+  "update()" should "correctly map updated matrix to new params" in {
+    
+    val paramMat = umgdist.paramMat.copy
+    // var newdist = umgdist.update(paramMat)
+
+    // val shouldBeZeroMat = paramMat - newdist.paramMat
+    umgdist.update(paramMat)
+    val dif = paramMat - umgdist.paramMat
+    //assert(true)
+    assert(trace(dif.t*dif) < errorTol)
     
   }
 

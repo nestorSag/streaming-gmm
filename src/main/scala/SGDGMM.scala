@@ -1,7 +1,7 @@
 package streamingGmm
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
-
+  
 import org.json4s.DefaultFormats
 import org.json4s.JsonDSL._
 import org.json4s.jackson.JsonMethods._
@@ -47,7 +47,7 @@ class SGDGMM(
     this
   }
 
-  def getmaxGradientIters(): Int = {
+  def getmaxGradientIters: Int = {
     this.maxGradientIters
   }
 
@@ -62,8 +62,6 @@ class SGDGMM(
   def getOpimizer: GMMGradientAscent = this.optimizer
 
 
-  def getLearningRate: Double = optimizer.learningRate
-
   def setLearningRate(alpha: Double): this.type = {
     require(alpha > 0,
       s"learning rate must be positive; got ${alpha}")
@@ -71,6 +69,11 @@ class SGDGMM(
     this
   }
 
+  def getLearningRate: Double = optimizer.learningRate
+
+
+
+  // Spark vector predict methods
   def predict(points: RDD[SV]): RDD[Int] = {
     val responsibilityMatrix = predictSoft(points)
     responsibilityMatrix.map(r => r.indexOf(r.max))
@@ -100,6 +103,30 @@ class SGDGMM(
     computeSoftAssignments(new BDV[Double](point.toArray), gaussians, weights, k)
   }
 
+  // BV predict methods
+
+  // def predict(points: RDD[BDV[Double]]): RDD[Int] = {
+  //   val responsibilityMatrix = predictSoft(points)
+  //   responsibilityMatrix.map(r => r.indexOf(r.max))
+  // }
+
+  def predict(point: BDV[Double]): Int = {
+    val r = predictSoft(point)
+    r.indexOf(r.max)
+  }
+
+  def predictSoft(point: BDV[Double]): Array[Double] = {
+    computeSoftAssignments(point, gaussians, weights, k)
+  }
+
+  // def predictSoft(points: RDD[BDV[Double]]): RDD[Array[Double]] = {
+  //   val sc = points.sparkContext
+  //   val bcDists = sc.broadcast(gaussians)
+  //   val bcWeights = sc.broadcast(weights)
+  //   points.map { x =>
+  //     computeSoftAssignments(x, bcDists.value, bcWeights.value, k)
+  //   }
+  // }
 
   private def computeSoftAssignments(
       pt: BDV[Double],
@@ -156,8 +183,13 @@ class SGDGMM(
 
         val numPartitions = math.min(k, 1024)
 
-        val (rv,gs) = sc.parallelize(tuples, numPartitions).map { case (cov,g,w) => 
-          (bcOptim.value.penaltyValue(g,w),g.step(cov,bcOptim.value,n))
+        val (rv,gs) = sc.parallelize(tuples, numPartitions).map { case (cov,g,w) =>
+
+          val regVal =  bcOptim.value.penaltyValue(g,w)
+          g.update(g.paramMat + bcOptim.value.direction(g,cov) * bcOptim.value.learningRate/n)
+
+          (regVal,g)
+
         }.collect().unzip
 
         Array.copy(rv, 0, regVals, 0, rv.length)
@@ -166,7 +198,13 @@ class SGDGMM(
       } else {
 
         val (regVals,gs) = tuples.map{ 
-          case (cov,g,w) => (this.optimizer.penaltyValue(g,w),g.step(cov,this.optimizer,n))
+          case (cov,g,w) => 
+
+          val regVal = optimizer.penaltyValue(g,w)
+          g.update(g.paramMat + optimizer.direction(g,cov) * optimizer.learningRate/n)
+
+          (regVal, g)
+
         }.unzip
 
         Array.copy(gs, 0, this.gaussians, 0, gs.length)

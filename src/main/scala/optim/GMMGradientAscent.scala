@@ -11,7 +11,7 @@ class GMMGradientAscent(
 		this.learningRate = learningRate
 	}
 
-	def getLearningRate(learningRate: Double): Double = { 
+	def getLearningRate: Double = { 
 		this.learningRate
 	}
 
@@ -32,7 +32,7 @@ class GMMGradientAscent(
 
 	private def basicLossGradient(paramMat: BDM[Double], sampleInfo: BDM[Double]): BDM[Double] = {
 
-		val posteriorProb = paramMat(paramMat.rows-1,paramMat.cols-1)
+		val posteriorProb = sampleInfo(sampleInfo.rows-1,sampleInfo.cols-1)
 
 		(sampleInfo - paramMat*posteriorProb)*0.5
 	}

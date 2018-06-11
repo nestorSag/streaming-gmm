@@ -5,7 +5,7 @@ import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV,
 import org.apache.spark.mllib.stat.distribution.MultivariateGaussian
 import org.apache.spark.mllib.linalg.{Matrices => SMS, Matrix => SM, DenseMatrix => SDM, Vector => SV, Vectors => SVS, DenseVector => SDV}
 
-// tests for UpdatableMultivariateGaussian class
+// tests for ConjugatePrior class
 
 class ConjugatePriorTest extends FlatSpec {
   
@@ -22,8 +22,12 @@ class ConjugatePriorTest extends FlatSpec {
   val mu = BDV.rand(covdim)
   val k = 10
 
+  def logdet(m: BDM[Double]): Double = {math.log(det(m))}
+
   "regularizingMatrix" should "be well-formed" in { 
 
+    // same kind of structure as un dist.ParamMat
+    
     val prior = new ConjugatePrior(
     df = covdim,
     priorMu = mu,
@@ -70,16 +74,19 @@ class ConjugatePriorTest extends FlatSpec {
 
     var testdist = UpdatableMultivariateGaussian(covdim,mu,cov) // when paramMat = regularizingMatrix
 
-    var shouldBeZero = prior.evaluate(testdist,1.0) - (-0.5*prior.df*math.log(det(testdist.paramMat)) - 0.5*(covdim+1))
+    //Tr(regMat*paramMat) = dim(regMat) = dim(paramMat) = covdim + 1
+    //weightGrad(1.0) = 0
+    var shouldBeZero = prior.evaluate(testdist,1.0) - (-0.5*prior.df*logdet(testdist.paramMat) - 0.5*(covdim+1))
     assert(math.pow(shouldBeZero,2) < errorTol)
 
     // try moving the weight 
-    shouldBeZero = prior.evaluate(testdist,0.5) - (-0.5*prior.df*math.log(det(testdist.paramMat)) - 0.5*(covdim+1) + prior.weightPrior*math.log(0.5))
+    shouldBeZero = prior.evaluate(testdist,0.5) - (-0.5*prior.df*logdet(testdist.paramMat) - 0.5*(covdim+1) + prior.weightPrior*math.log(0.5))
     assert(math.pow(shouldBeZero,2) < errorTol)
 
-    // when paramMat = identity
+    // when paramMat = identity, logdet should cancel out
     testdist = UpdatableMultivariateGaussian(BDV.zeros[Double](covdim),BDM.eye[Double](covdim))
 
+    //logdet(paramMat) = log(1) = 0
     shouldBeZero = prior.evaluate(testdist,1.0) - (- 0.5*trace(prior.regularizingMatrix))
     assert(math.pow(shouldBeZero,2) < errorTol)
 

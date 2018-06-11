@@ -20,6 +20,8 @@ class UpdatableMultivariateGaussian private(
 
   private[streamingGmm] var momentum: Option[BDM[Double]] = None
 
+  private[streamingGmm] var rsmge: Option[BDM[Double]] = None //raw second moment gradient estimate (for Adam optimizer)
+
   private lazy val eps = {
     var eps = 1.0
     while ((1.0 + (eps / 2.0)) != 1.0) {
@@ -66,12 +68,8 @@ class UpdatableMultivariateGaussian private(
     math.exp(logDetSigma)
   }
   
-  def gConcavePdf(x: BV[Double]): Double = {
-    pdf(x(0,d)) * math.exp(0.5*(1-1/s)) / math.sqrt(s)
-  }
-
-  def gConcaveLogPdf(x: BV[Double]): Double = {
-    math.log(gConcavePdf(x))
+  def gConcavePdf(x: BDV[Double]): Double = {
+    pdf(x.slice(0,d)) * math.exp(0.5*(1-1/s)) / math.sqrt(s)
   }
 
   def paramMat: BDM[Double] = {
@@ -80,6 +78,30 @@ class UpdatableMultivariateGaussian private(
 
     BDM.vertcat(BDM.horzcat(sigma + mu*mu.t*s,mu.asDenseMatrix.t*s),lastRow.asDenseMatrix*s)
 
+  }
+
+  private[streamingGmm] def initializeMomentum: Unit = {
+    momentum = Option(BDM.zeros[Double](d+1,d+1))
+  }
+
+  def removeMomentum: Unit = {
+    momentum = None
+  }
+
+  private[streamingGmm] def updateMomentum(mat: BDM[Double]): Unit = {
+    momentum = Option(mat)
+  }
+
+  private[streamingGmm] def initializeRsmge: Unit = {
+    rsmge = Option(BDM.zeros[Double](d+1,d+1))
+  }
+
+  def removeRsmge: Unit = {
+    rsmge = None
+  }
+
+  private[streamingGmm] def updateRsmge(mat: BDM[Double]): Unit = {
+    rsmge = Option(mat)
   }
 
   def invParamMat: BDM[Double] = {
@@ -92,22 +114,31 @@ class UpdatableMultivariateGaussian private(
 
   }
 
-  private def update(newParamsMat: BDM[Double]): Unit = {
+  def update(newParamsMat: BDM[Double]): Unit = {
 
-    this.s = newParamsMat(d-1,d-1)
-    this.mu = newParamsMat(0 to d-2,d-1)/this.s
-    this.sigma = newParamsMat(0 to d-2,0 to d-1) - this.mu*this.mu.t*s
+    // var s_ = newParamsMat(d,d)
+    // var mu_ = newParamsMat(0 to d-1,d)/s_
+    // var sigma_ = newParamsMat(0 to d-1,0 to d-1) - (mu_)*(mu_).t*s_
+
+    // var (rootSigmaInv_,u_) = calculateCovarianceConstants
+
+
+    // rootSigmaInv = rootSigmaInv_
+    // u = u_
+    // s = s_
+    // mu = mu_
+    // sigma = sigma_
+    // this
+
+    s = newParamsMat(d,d)
+    mu = newParamsMat(0 to d-1,d)/s
+    sigma = newParamsMat(0 to d-1,0 to d-1) - (mu)*(mu).t*s
 
     var (rootSigmaInv_,u_) = calculateCovarianceConstants
 
-    this.rootSigmaInv = rootSigmaInv_
 
-    this.u = u_
-  }
-
-  def step(cov: BDM[Double], optimizer: GMMGradientAscent, n:Double): this.type = {
-    this.update(this.paramMat + optimizer.direction(this,cov)*optimizer.learningRate/n)
-    this
+    rootSigmaInv = rootSigmaInv_
+    u = u_
   }
 
   private def calculateCovarianceConstants: (BDM[Double], Double) = {
