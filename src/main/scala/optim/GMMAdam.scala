@@ -11,6 +11,7 @@ class GMMAdam(
 	var beta2: Double) extends GMMGradientAscent(learningRate,regularizer) {
 
 	var t: Int = 0 //timestep
+	var eps = 1e-8
 
 	def setBeta1(beta1: Double): Unit = { 
 		require(beta1 > 0 , "beta1 must be positive")
@@ -30,6 +31,15 @@ class GMMAdam(
 		this.beta2
 	}
 
+	def reset: Unit = {
+		t = 0
+	}
+
+	def setEps(x: Double): Unit = {
+		require(x>=0,"x should me nonnegative")
+		eps = x
+	}
+
 
 	override def direction(dist: UpdatableMultivariateGaussian, sampleInfo: BDM[Double]): BDM[Double] = {
 
@@ -45,13 +55,13 @@ class GMMAdam(
 
 		val grad = lossGradient(dist, sampleInfo)
 
-		dist.updateMomentum(dist.momentum.get*beta1 + grad*(1-beta1))
+		dist.updateMomentum(dist.momentum.get*beta1 + grad*(1.0-beta1))
 		
-		dist.updateRsmge(dist.rsmge.get*beta2 + (grad *:* grad)*(1-beta2))
+		dist.updateRsmge(dist.rsmge.get*beta2 + (grad *:* grad)*(1.0-beta2))
 
-		val alpha_t = learningRate*math.sqrt(1 - math.pow(beta2,t))/(1 - math.pow(beta1,t))
+		val alpha_t = math.sqrt(1.0 - math.pow(beta2,t))/(1.0 - math.pow(beta1,t))
 
-		alpha_t * dist.momentum.get /:/ sqrt(dist.rsmge.get)
+		alpha_t * dist.momentum.get /:/ (sqrt(dist.rsmge.get) + eps)
 	}
 
 }

@@ -5,7 +5,7 @@ import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV,
 // This test checks convergence in expectation on a single gaussian component 
 class GradientAscentTest extends OptimTestSpec{
 
-	"GradientAscent w/o reg" should "make current dist converge to target dist" in {
+	"GradientAscent w/o reg" should "make current dist converge to target dist in expectation" in {
 		var lr = 0.5
 		var current = UpdatableMultivariateGaussian(BDV.rand(dim),BDM.eye[Double](dim))
 		var optim = new GMMGradientAscent(lr,None)

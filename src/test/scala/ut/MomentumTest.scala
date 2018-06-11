@@ -5,7 +5,7 @@ import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV,
 // This test checks convergence in expectation on a single gaussian component 
 class MomentumTest extends OptimTestSpec{
 
-	"MomentumGradientAscent w/o reg" should "make current dist converge to target dist" in {
+	"MomentumGradientAscent w/o reg" should "make current dist converge to target dist in expectation" in {
 		var lr = 0.5
 		var current = UpdatableMultivariateGaussian(BDV.rand(dim),BDM.eye[Double](dim))
 		var optim = new GMMMomentumGradientAscent(lr,None,0.9)
@@ -13,7 +13,6 @@ class MomentumTest extends OptimTestSpec{
 
 		var expectedRes = current.paramMat.copy
 
-		var niter = 1
 		// deterministic formula for Momentum descent in expectation
 		for(i <- 0 to (niter-1)){
 
