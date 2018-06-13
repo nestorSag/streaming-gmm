@@ -2,12 +2,12 @@ import streamingGmm.{GMMAdam, UpdatableMultivariateGaussian}
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace}
 
-// This test checks convergence of the Adam optimizer for a single gaussian component
+// This test checks convergence of the Adam optimizer for a single gaussian component in expectation
 class AdamTest extends OptimTestSpec{
 
 	// since there is no simple formula to calculate the expected result externally
 	// the test just makes sure that the optimizer progress steadily toward the solution
-	// i.e. it doesn't diverge or oscilates wildly
+	// i.e. it doesn't diverge or oscilate wildly
 	"Adam w/o reg" should "make steady progress toward target parameters" in {
 
 		var lr = 1

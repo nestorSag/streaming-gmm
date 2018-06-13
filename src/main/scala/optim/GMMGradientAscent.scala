@@ -6,6 +6,13 @@ class GMMGradientAscent(
 	var learningRate: Double,
 	val regularizer: Option[GMMRegularizer]) extends Serializable{ 
 
+	var weightLearningRate = 0.8
+
+	def setWeightLearningRate(x: Double): Unit = {
+		require(x>0,"x should be positive")
+		weightLearningRate = x
+	}
+
 	def setLearningRate(learningRate: Double): Unit = { 
 		require(learningRate > 0 , "learning rate must be positive")
 		this.learningRate = learningRate

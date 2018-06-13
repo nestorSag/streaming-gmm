@@ -36,7 +36,7 @@ class GMMAdam(
 	}
 
 	def setEps(x: Double): Unit = {
-		require(x>=0,"x should me nonnegative")
+		require(x>=0,"x should be nonnegative")
 		eps = x
 	}
 
