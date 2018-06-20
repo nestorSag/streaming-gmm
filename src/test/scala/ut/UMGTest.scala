@@ -24,6 +24,13 @@ class UMGTest extends FlatSpec {
   var umgdist = UpdatableMultivariateGaussian(mu,cov)
   val mldist = new MultivariateGaussian(SVS.dense(mu.toArray),SMS.dense(covdim,covdim,cov.toArray))
 
+  "getS" should "return 1.0" in {assert(umgdist.getS == 1.0)}
+
+  "getMu" should "return mu" in {assert(umgdist.getMu == mu)}
+
+  "getSigma" should "return sigma" in {assert(umgdist.getSigma == cov)}
+
+
   val btp = BDV.rand(covdim) //breeze test point
   val stp = SVS.dense(btp.toArray) //spark test point
 

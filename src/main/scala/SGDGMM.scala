@@ -1,8 +1,7 @@
 package streamingGmm
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
-import breeze.stats.distributions.RandBasis
-
+  
 import org.json4s.DefaultFormats
 import org.json4s.JsonDSL._
 import org.json4s.jackson.JsonMethods._
@@ -14,7 +13,8 @@ import org.apache.spark.mllib.util.{Loader, MLUtils, Saveable}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{Row, SparkSession}
 
-class SGDGMM private(
+
+class SGDGMM(
   private var weights: Array[Double],
   private var gaussians: Array[UpdatableMultivariateGaussian],
   private var optimizer: GMMGradientAscent) extends Serializable {
@@ -24,29 +24,10 @@ class SGDGMM private(
 
   var maxGradientIters = 100
   var convergenceTol = 1e-6
-
-  var learningRateShrinkage = 1.0
-  var minLearningRate = 1e-2
-
   def k: Int = weights.length
 
   require(weights.length == gaussians.length, "Length of weight and Gaussian arrays must match")
 
-  def getLearningShrinkage: Double = learningRateShrinkage
-
-  def setLearningShrinkage(x: Double): this.type = {
-    require(x>0 && x<=1,"shrinkage must be in [0,1]")
-    learningRateShrinkage = x
-    this
-  }
-
-  def getMinLearningRate: Double = minLearningRate
-
-  def setMinLearningRate(x: Double): this.type = {
-    require(x>0 && x < optimizer.learningRate,"minLearningRate must be in [0,learningRate]")
-    minLearningRate = x
-    this
-  }
 
 
 
@@ -61,21 +42,21 @@ class SGDGMM private(
 
 
 
-  def setmaxGradientIters(x: Int): this.type = {
-    require(x > 0 ,s"maxGradientIters needs to be a positive integer; got ${x}")
-    maxGradientIters = x
+  def setmaxGradientIters(maxGradientIters: Int): this.type = {
+    require(maxGradientIters > 0 ,s"maxGradientIters needs to be a positive integer; got ${maxGradientIters}")
+    this.maxGradientIters = maxGradientIters
     this
   }
 
   def getmaxGradientIters: Int = {
-    maxGradientIters
+    this.maxGradientIters
   }
 
 
 
 
   def setOptimizer(optim: GMMGradientAscent): this.type = {
-    optimizer = optim
+    this.optimizer = optim
     this
   }
 
@@ -85,7 +66,7 @@ class SGDGMM private(
   def setLearningRate(alpha: Double): this.type = {
     require(alpha > 0,
       s"learning rate must be positive; got ${alpha}")
-    optimizer.learningRate = alpha
+    this.optimizer.setLearningRate(alpha)
     this
   }
 
@@ -104,46 +85,22 @@ class SGDGMM private(
 
 
 
-
-
-  // Multiple point prediction SV
+  // Spark vector predict methods
   def predict(points: RDD[SV]): RDD[Int] = {
     val responsibilityMatrix = predictSoft(points)
     responsibilityMatrix.map(r => r.indexOf(r.max))
   }
 
-  // Multiple point prediction BDV
-  // def predict(points: RDD[BDV[Double]]): RDD[Int] = {
-  //   val responsibilityMatrix = predictSoft(points)
-  //   responsibilityMatrix.map(r => r.indexOf(r.max))
-  // }
 
-
-
-
-
-
-  // single point prediction BDV
-  // def predict(point: BDV[Double]): Int = {
-  //   val r = predictSoft(point)
-  //   r.indexOf(r.max)
-  // }
-
-  // single point prediction SV
   def predict(point: SV): Int = {
     val r = predictSoft(point)
     r.indexOf(r.max)
   }
 
-  // single point prediction JavaRDD
   def predict(points: JavaRDD[SV]): JavaRDD[java.lang.Integer] =
     predict(points.rdd).toJavaRDD().asInstanceOf[JavaRDD[java.lang.Integer]]
 
 
-
-
-
-  // multiple point predictSoft SV
   def predictSoft(points: RDD[SV]): RDD[Array[Double]] = {
     val sc = points.sparkContext
     val bcDists = sc.broadcast(gaussians)
@@ -154,29 +111,18 @@ class SGDGMM private(
   }
 
 
-  // multiple point predictSoft SV
-  // def predictSoft(points: RDD[BDV[Double]]): RDD[Array[Double]] = {
-  //   val sc = points.sparkContext
-  //   val bcDists = sc.broadcast(gaussians)
-  //   val bcWeights = sc.broadcast(weights)
-  //   points.map { case x =>
-  //     computeSoftAssignments(x, bcDists.value, bcWeights.value, k)
-  //   }
-  // }
-
-
-
-
-  // single point predictSoft SV
   def predictSoft(point: SV): Array[Double] = {
     computeSoftAssignments(new BDV[Double](point.toArray), gaussians, weights, k)
   }
 
+  def predict(point: BDV[Double]): Int = {
+    val r = predictSoft(point)
+    r.indexOf(r.max)
+  }
 
-  // // single point predictSoft bdv
-  // def predictSoft(point: BDV[Double]): Array[Double] = {
-  //   computeSoftAssignments(point, gaussians, weights, k)
-  // }
+  def predictSoft(point: BDV[Double]): Array[Double] = {
+    computeSoftAssignments(point, gaussians, weights, k)
+  }
 
 
   private def computeSoftAssignments(
@@ -196,16 +142,9 @@ class SGDGMM private(
 
   def step(data: RDD[SV]): Unit = {
 
-    val initialLearningRate = optimizer.learningRate
-
     val sc = data.sparkContext
 
-    val gconcaveData = if(maxGradientIters>1){
-      //if iters>1 cache data
-      data.map{x => new BDV[Double](x.toArray ++ Array[Double](1.0))}.cache() // y = [x 1]
-    }else{
-      data.map{x => new BDV[Double](x.toArray ++ Array[Double](1.0))} // y = [x 1]
-    }
+    val gconcaveData = data.map{x => new BDV[Double](x.toArray ++ Array[Double](1.0))} // y = [x 1]
  
     val d = gconcaveData.first().length - 1
 
@@ -249,8 +188,6 @@ class SGDGMM private(
           val regVal =  bcOptim.value.penaltyValue(g,w)
           g.update(g.paramMat + bcOptim.value.direction(g,cov) * bcOptim.value.learningRate/n)
 
-          bcOptim.value.learningRate *= learningRateShrinkage
-
           (regVal,g)
 
         }.collect().unzip
@@ -263,8 +200,6 @@ class SGDGMM private(
 
           val regVal = optimizer.penaltyValue(g,w)
           g.update(g.paramMat + optimizer.direction(g,cov) * optimizer.learningRate/n)
-
-          optimizer.learningRate *= learningRateShrinkage
 
           (regVal, g)
 
@@ -286,17 +221,13 @@ class SGDGMM private(
 
       iter += 1
       compute.destroy()
-
-
     }
-
-    optimizer.learningRate = initialLearningRate
 
     //this.gaussians = gaussians
     //this.weights = weights
   }
 
-  private def getUpdatedWeights(sampleStats:SampleAggregator, n:Double): Array[Double] = {
+  def getUpdatedWeights(sampleStats:SampleAggregator, n:Double): Array[Double] = {
     val softmaxWeights = weights.map{case x => math.log(x/weights.last)}
 
     // weight tuples
@@ -320,56 +251,49 @@ class SGDGMM private(
 
 }
 
-object SGDGMM{
 
-  def apply(
-    weights: Array[Double],
-    gaussians: Array[UpdatableMultivariateGaussian],
-    optimizer: GMMGradientAscent): SGDGMM = {
-    new SGDGMM(weights,gaussians,optimizer)
+private[streamingGmm] class SampleAggregator(
+  var qLoglikelihood: Double,
+  val gConcaveCovariance: Array[BDM[Double]]) extends Serializable{
+
+  val k = gConcaveCovariance.length
+
+  def +=(x: SampleAggregator): SampleAggregator = {
+    var i = 0
+    while (i < k) {
+      gConcaveCovariance(i) += x.gConcaveCovariance(i)
+      i += 1
+    }
+    qLoglikelihood += x.qLoglikelihood
+    this
   }
 
-  def apply(
-    k: Int,
-    d: Int,
-    optimizer: GMMGradientAscent): SGDGMM = {
+}
 
-    new SGDGMM(
-      (1 to k).map{x => 1.0/k}.toArray,
-      (1 to k).map{x => UpdatableMultivariateGaussian(BDV.rand(d),BDM.eye[Double](d))}.toArray,
-      optimizer)
+private[streamingGmm] object SampleAggregator {
 
+  def zero(k: Int, d: Int): SampleAggregator = {
+    new SampleAggregator(0.0,Array.fill(k)(BDM.zeros[Double](d+1, d+1)))
   }
 
-  def apply(
-    k: Int,
-    optimizer: GMMGradientAscent,
-    data: RDD[SV],
-    seed: Long = 0): SGDGMM = {
-    
-    val nSamples = 5
-    val samples = data.map{x => new BDV[Double](x.toArray)}.takeSample(withReplacement = true, k * nSamples, seed)
+  //compute cluster contributions for each input point
+  // (U, T) => U for aggregation
+  def add(
+      weights: Array[Double],
+      dists: Array[UpdatableMultivariateGaussian])
+      (agg: SampleAggregator, y: BDV[Double]): SampleAggregator = {
 
-    new SGDGMM(
-      Array.fill(k)(1.0 / k), 
-      Array.tabulate(k) { i =>
-      val slice = samples.view(i * nSamples, (i + 1) * nSamples)
-      UpdatableMultivariateGaussian(vectorMean(slice), initCovariance(slice))
-      },
-      optimizer)
-
-  }
-
-  private def initCovariance(x: IndexedSeq[BDV[Double]]): BDM[Double] = {
-    val mu = vectorMean(x)
-    val ss = BDV.zeros[Double](x(0).length)
-    x.foreach(xi => ss += (xi - mu) ^:^ 2.0)
-    diag(ss / x.length.toDouble)
-  }
-
-  private def vectorMean(x: IndexedSeq[BV[Double]]): BDV[Double] = {
-    val v = BDV.zeros[Double](x(0).length)
-    x.foreach(xi => v += xi)
-    v / x.length.toDouble
+    val q = weights.zip(dists).map {
+      case (weight, dist) =>  weight * dist.gConcavePdf(y) // <--q-logLikelihood
+    }
+    val qSum = q.sum
+    agg.qLoglikelihood += math.log(qSum)
+    var i = 0
+    while (i < agg.k) {
+      q(i) /= qSum 
+      agg.gConcaveCovariance(i) += y*y.t*q(i)
+      i = i + 1
+    }
+    agg
   }
 }

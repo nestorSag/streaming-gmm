@@ -3,19 +3,23 @@ package streamingGmm
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 
 class GMMGradientAscent(
-	private[streamingGmm] var learningRate: Double,
-	private[streamingGmm] val regularizer: Option[GMMRegularizer]) extends Serializable{ 
-
-	require(learningRate>=0, "learningRate can't be negative")
+	var learningRate: Double,
+	val regularizer: Option[GMMRegularizer]) extends Serializable{ 
 
 	var weightLearningRate = 0.8
 
-	var learningRateDecay = 1.0
-	var minLearningRate = 1e-3
-	
 	def setWeightLearningRate(x: Double): Unit = {
 		require(x>0,"x should be positive")
 		weightLearningRate = x
+	}
+
+	def setLearningRate(learningRate: Double): Unit = { 
+		require(learningRate > 0 , "learning rate must be positive")
+		this.learningRate = learningRate
+	}
+
+	def getLearningRate: Double = { 
+		this.learningRate
 	}
 
 	def direction(dist: UpdatableMultivariateGaussian, sampleInfo: BDM[Double]): BDM[Double] = {
