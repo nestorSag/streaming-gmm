@@ -32,7 +32,7 @@ class ConjugatePriorTest extends FlatSpec {
     df = covdim,
     priorMu = mu,
     priorSigma = cov,
-    weightPrior = 1.0/k,
+    weightConcentration = 1.0/k,
     numClusters = k
     )
 
@@ -68,7 +68,7 @@ class ConjugatePriorTest extends FlatSpec {
     df = covdim,
     priorMu = mu,
     priorSigma = cov,
-    weightPrior = 1.0/k,
+    weightConcentration = 1.0/k,
     numClusters = k
     )
 
@@ -80,7 +80,7 @@ class ConjugatePriorTest extends FlatSpec {
     assert(math.pow(shouldBeZero,2) < errorTol)
 
     // try moving the weight 
-    shouldBeZero = prior.evaluate(testdist,0.5) - (-0.5*prior.df*logdet(testdist.paramMat) - 0.5*(covdim+1) + prior.weightPrior*math.log(0.5))
+    shouldBeZero = prior.evaluate(testdist,0.5) - (-0.5*prior.df*logdet(testdist.paramMat) - 0.5*(covdim+1) + prior.weightConcentration*math.log(0.5))
     assert(math.pow(shouldBeZero,2) < errorTol)
 
     // when paramMat = identity, logdet should cancel out
@@ -97,7 +97,7 @@ class ConjugatePriorTest extends FlatSpec {
     df = covdim,
     priorMu = BDV.zeros[Double](covdim),
     priorSigma = BDM.eye[Double](covdim),
-    weightPrior = 1.0/k,
+    weightConcentration = 1.0/k,
     numClusters = k
     )
 

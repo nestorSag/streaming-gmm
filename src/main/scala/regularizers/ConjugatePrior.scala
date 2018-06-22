@@ -26,7 +26,7 @@ class ConjugatePrior(
 	}
 
 	def softWeightsGradient(weights: BDV[Double]): BDV[Double] = {
-		BDV.ones[Double](numClusters)*weightConcentration - weights*numClusters.toDouble*weightConcentration
+		(BDV.ones[Double](numClusters) - weights*numClusters.toDouble)*weightConcentration
 	}
 
 	def evaluate(dist: UpdatableMultivariateGaussian, weight: Double): Double = {

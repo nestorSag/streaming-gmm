@@ -288,13 +288,12 @@ object SGDGMM{
   }
 }
 
-private[streamingGmm] class SGDWeights(var weights: Array[Double]) {
+class SGDWeights(var weights: Array[Double]) {
 
-  var momentum: Option[BDV[Double]] = None
-  var adamInfo: Option[BDV[Double]] = None
+  private[streamingGmm]  var momentum: Option[BDV[Double]] = None
+  private[streamingGmm]  var adamInfo: Option[BDV[Double]] = None
   var length = weights.length
 
-  def toBDV: BDV[Double] = new BDV(weights)
   def soft: BDV[Double] = {
     new BDV(weights.map{case w => math.log(w/weights.last)})
   }
@@ -310,19 +309,19 @@ private[streamingGmm] class SGDWeights(var weights: Array[Double]) {
     expsw.map{case w => w/expsw.sum}
   }
 
-  def updateMomentum(x: BDV[Double]): Unit = {
+  private[streamingGmm] def updateMomentum(x: BDV[Double]): Unit = {
     momentum = Option(x)
   }
 
-  def updateAdamInfo(x: BDV[Double]): Unit = {
+  private[streamingGmm] def updateAdamInfo(x: BDV[Double]): Unit = {
     adamInfo = Option(x)
   }
 
-  def initializeMomentum: Unit = {
+  private[streamingGmm] def initializeMomentum: Unit = {
     momentum = Option(BDV.zeros[Double](weights.length))
   }
 
-  def initializeAdamInfo: Unit = {
+  private[streamingGmm] def initializeAdamInfo: Unit = {
      adamInfo = Option(BDV.zeros[Double](weights.length))
   }
 

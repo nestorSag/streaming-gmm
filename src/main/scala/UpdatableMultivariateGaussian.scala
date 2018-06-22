@@ -201,4 +201,12 @@ object UpdatableMultivariateGaussian {
       newMu,
       s(0 to s.rows-2,0 to s.cols-2) - newMu*newMu.t*newS)
   }
+
+  def apply(g: MultivariateGaussian) = {
+
+    new UpdatableMultivariateGaussian(
+      1.0, 
+      new BDV(g.mu.toArray),
+      new BDM(g.mu.size,g.mu.size,g.sigma.toArray))
+  }
 }

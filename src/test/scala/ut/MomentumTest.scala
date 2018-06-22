@@ -1,6 +1,6 @@
 import streamingGmm.{GMMMomentumGradientAscent, UpdatableMultivariateGaussian}
 
-import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace}
+import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, norm}
 
 // This test checks convergence in expectation on a single gaussian component 
 class MomentumTest extends OptimTestSpec{
@@ -16,7 +16,7 @@ class MomentumTest extends OptimTestSpec{
 		// deterministic formula for Momentum descent in expectation
 		for(i <- 0 to (niter-1)){
 
-			expectedRes += (targetParamMat-expectedRes) * 0.5 * (1.0-math.pow(optim.decayRate,niter-i))/(1.0-optim.decayRate)*optim.learningRate
+			expectedRes += (targetParamMat-expectedRes) * 0.5 * (1.0-math.pow(optim.decayRate,niter-i))/(1.0-optim.decayRate)*optim.getLearningRate
 			// (targetParamMat - expectedRes) * 0.5 = gradient
 		}
 
@@ -31,6 +31,30 @@ class MomentumTest extends OptimTestSpec{
 
 		var diff =  expectedRes - current.paramMat
 		assert(trace(diff.t * diff) < errorTol)
+	
+	}
+
+	it should "make current weights converge to target weights in expectation" in {
+
+		// deterministic formula for Momentum descent in expectation
+		var expectedWeights = targetWeightsObj.weights.copy
+		for(i <- 0 to (niter-1)){
+
+			expectedWeights += (targetWeights-expectedWeights) * 0.5 * (1.0-math.pow(optim.decayRate,niter-i))/(1.0-optim.decayRate)*optim.getLearningRate
+			// (targetParamMat - expectedRes) * 0.5 = gradient
+		}
+
+		for(i <- 1 to niter){
+
+			targetWeightsObj.update(targetWeightsObj.soft + optim.direction(targetWeights,targetWeightsObj) * optim.learningRate)
+
+		}
+
+		// result should be 
+		// S_0 + alpha*sum((1-beta^(niters+1-i)/(1-beta))*grad(S_i))
+
+		var vecdiff =  expectedRes - toBDV(targetWeightsObj.weights)
+		assert(norm(vecdiff) < errorTol)
 	
 	}
 

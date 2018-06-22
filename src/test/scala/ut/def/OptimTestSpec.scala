@@ -1,3 +1,5 @@
+
+import streamingGmm.SGDWeights
 import org.scalatest.FlatSpec
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace}
 
@@ -24,5 +26,17 @@ trait OptimTestSpec extends FlatSpec{
 	    BDM.vertcat(BDM.horzcat(tcov + mu*mu.t,mu.asDenseMatrix.t),lastRow.asDenseMatrix)
 
   	}
+
+  	def toBDV(x: Array[Double]): BDV[Double] = {
+  		new BDV(x)
+  	}
+
+  	val targetWeights = BDV.rand(dim)
+	targetWeights /= targetWeights.toArray.sum
+
+	val initialWeights = (1 to dim).map{ case x => 1.0/dim}
+
+	var targetWeightsObj = new SGDWeights(initialWeights.toArray)
+
 
 }
