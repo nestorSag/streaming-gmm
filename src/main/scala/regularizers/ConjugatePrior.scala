@@ -6,16 +6,16 @@ class ConjugatePrior(
 	val df: Double, 
 	priorMu: BDV[Double], 
 	priorSigma: BDM[Double], 
-	val weightPrior: Double, 
+	val weightConcentration: Double, 
 	val numClusters: Int) extends GMMRegularizer {
 
 	// val df = degFreedom
-	// val weightPrior = dirichletParam
+	// val weightConcentration = dirichletParam
 	// val numClusters = nClust
 	val regularizingMatrix = buildRegMatrix(df,priorMu,priorSigma)
 
 	require(df>priorSigma.cols-1,"degrees of freedom must me greater than dim(priorSigma)")
-	require(weightPrior>0,"Dirichlet prior concentration parameter must be positive")
+	require(weightConcentration>0,"Dirichlet prior concentration parameter must be positive")
 
 	require(priorSigma == priorSigma.t,"priorSigma must be symmetric")
 
@@ -25,8 +25,8 @@ class ConjugatePrior(
 		//updateRegularizer(paramMat)
 	}
 
-	def weightGradient(weight: Double): Double = {
-		weightPrior - numClusters*weightPrior*weight
+	def softWeightsGradient(weights: BDV[Double]): BDV[Double] = {
+		BDV.ones[Double](numClusters)*weightConcentration - weights*numClusters.toDouble*weightConcentration
 	}
 
 	def evaluate(dist: UpdatableMultivariateGaussian, weight: Double): Double = {
@@ -38,7 +38,7 @@ class ConjugatePrior(
 	}
 
 	private def evaluateWeight(weight: Double): Double = {
-		weightPrior*math.log(weight)
+		weightConcentration*math.log(weight)
 	}
 	
 	private def buildRegMatrix(df: Double, priorMu: BDV[Double], priorSigma: BDM[Double]): BDM[Double] = {
@@ -53,6 +53,7 @@ class ConjugatePrior(
 	}
 
 	private def symProdTrace(x: BDM[Double], y: BDM[Double]): Double = { // faster computation of Tr(A*B) for symmetric matrices
+		
 		x.toArray.zip(y.toArray).foldLeft(0.0){case (s,(a,b)) => s + a*b}
 	}
 }

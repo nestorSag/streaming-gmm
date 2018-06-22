@@ -15,15 +15,18 @@ import org.apache.spark.sql.{Row, SparkSession}
 
 
 class SGDGMM(
-  private var weights: Array[Double],
+  private var weights: SGDWeights,
   private var gaussians: Array[UpdatableMultivariateGaussian],
-  private var optimizer: GMMGradientAscent) extends Serializable {
+  private var optimizer: GMMOptimizer) extends Serializable {
 
-  def getWeights: Array[Double] = weights
+
+  def getWeights: Array[Double] = weights.weights
   def getGaussians: Array[UpdatableMultivariateGaussian] = gaussians
 
   var maxGradientIters = 100
+
   var convergenceTol = 1e-6
+
   def k: Int = weights.length
 
   require(weights.length == gaussians.length, "Length of weight and Gaussian arrays must match")
@@ -49,39 +52,29 @@ class SGDGMM(
   }
 
   def getmaxGradientIters: Int = {
-    this.maxGradientIters
+    maxGradientIters
   }
 
 
 
 
   def setOptimizer(optim: GMMGradientAscent): this.type = {
-    this.optimizer = optim
+    optimizer = optim
     this
   }
 
-  def getOpimizer: GMMGradientAscent = this.optimizer
+  def getOpimizer: GMMOptimizer = optimizer
 
 
   def setLearningRate(alpha: Double): this.type = {
     require(alpha > 0,
       s"learning rate must be positive; got ${alpha}")
-    this.optimizer.setLearningRate(alpha)
+    optimizer.setLearningRate(alpha)
     this
   }
 
   def getLearningRate: Double = optimizer.learningRate
 
-
-
-  def setWeightLearningRate(alpha: Double): this.type = {
-    require(alpha > 0,
-      s"weight learning rate must be positive; got ${alpha}")
-    this.optimizer.setWeightLearningRate(alpha)
-    this
-  }
-
-  def getWeightLearningRate: Double = optimizer.weightLearningRate
 
 
 
@@ -104,7 +97,7 @@ class SGDGMM(
   def predictSoft(points: RDD[SV]): RDD[Array[Double]] = {
     val sc = points.sparkContext
     val bcDists = sc.broadcast(gaussians)
-    val bcWeights = sc.broadcast(weights)
+    val bcWeights = sc.broadcast(weights.weights)
     points.map { x =>
       computeSoftAssignments(new BDV[Double](x.toArray), bcDists.value, bcWeights.value, k)
     }
@@ -112,7 +105,7 @@ class SGDGMM(
 
 
   def predictSoft(point: SV): Array[Double] = {
-    computeSoftAssignments(new BDV[Double](point.toArray), gaussians, weights, k)
+    computeSoftAssignments(new BDV[Double](point.toArray), gaussians, weights.weights, k)
   }
 
   def predict(point: BDV[Double]): Int = {
@@ -121,7 +114,7 @@ class SGDGMM(
   }
 
   def predictSoft(point: BDV[Double]): Array[Double] = {
-    computeSoftAssignments(point, gaussians, weights, k)
+    computeSoftAssignments(point, gaussians, weights.weights, k)
   }
 
 
@@ -139,6 +132,8 @@ class SGDGMM(
     }
     p
   }
+
+
 
   def step(data: RDD[SV]): Unit = {
 
@@ -159,11 +154,12 @@ class SGDGMM(
 
     val bcOptim = sc.broadcast(this.optimizer)
 
+    val initialRate = optimizer.learningRate
    // var rv: Array[Double]
      
     while (iter < maxGradientIters && math.abs(newLL-oldLL) > convergenceTol) {
 
-      val compute = sc.broadcast(SampleAggregator.add(weights, gaussians)_)
+      val compute = sc.broadcast(SampleAggregator.add(weights.weights, gaussians)_)
 
       val sampleStats = gconcaveData.treeAggregate(SampleAggregator.zero(k, d))(compute.value, _ += _)
 
@@ -171,8 +167,8 @@ class SGDGMM(
 
       val tuples =
           Seq.tabulate(k)(i => (sampleStats.gConcaveCovariance(i), 
-                                this.gaussians(i),
-                                this.weights(i)))
+                                gaussians(i),
+                                weights.weights(i)))
 
 
 
@@ -187,6 +183,8 @@ class SGDGMM(
 
           val regVal =  bcOptim.value.penaltyValue(g,w)
           g.update(g.paramMat + bcOptim.value.direction(g,cov) * bcOptim.value.learningRate/n)
+
+          bcOptim.value.updateLearningRate
 
           (regVal,g)
 
@@ -208,92 +206,124 @@ class SGDGMM(
         (rv.toArray,gs.toArray)
 
       }
-
-
-
       gaussians = newDists
-      weights = getUpdatedWeights(sampleStats,n)
 
+      val posteriorResps = sampleStats.gConcaveCovariance.map{case x => x(d,d)}
+
+      //update weights in the driver
+      weights.update(weights.soft + optimizer.learningRate/n*optimizer.softWeightsDirection(toBDV(posteriorResps),weights))
 
       oldLL = newLL // current becomes previous
       newLL = sampleStats.qLoglikelihood + newRegVal.sum// this is the freshly computed log-likelihood plus regularization
 
-
+      optimizer.updateLearningRate
       iter += 1
       compute.destroy()
     }
 
-    //this.gaussians = gaussians
-    //this.weights = weights
-  }
-
-  def getUpdatedWeights(sampleStats:SampleAggregator, n:Double): Array[Double] = {
-    val softmaxWeights = weights.map{case x => math.log(x/weights.last)}
-
-    // weight tuples
-    var weightTuples =
-        Seq.tabulate(k)(i => (softmaxWeights(i), 
-                              this.weights(i),
-                              sampleStats.gConcaveCovariance(i),
-                              (1 to k)(i)))
-
-    val updatedSMweights = weightTuples.map{ case (smw,w,cov,i) => 
-      smw + optimizer.weightLearningRate*optimizer.weightGradient(cov,w,n,i==k)/n
-    }
-
-    val totalSoftmax = updatedSMweights.map{case w => math.exp(w)}.sum
-
-    updatedSMweights.map{case w => math.exp(w)/totalSoftmax}.toArray
+    bcOptim.destroy()
+    optimizer.learningRate = initialRate
 
   }
 
   private def shouldDistributeGaussians(k: Int, d: Int): Boolean = ((k - 1.0) / k) * d > 25
 
-}
-
-
-private[streamingGmm] class SampleAggregator(
-  var qLoglikelihood: Double,
-  val gConcaveCovariance: Array[BDM[Double]]) extends Serializable{
-
-  val k = gConcaveCovariance.length
-
-  def +=(x: SampleAggregator): SampleAggregator = {
-    var i = 0
-    while (i < k) {
-      gConcaveCovariance(i) += x.gConcaveCovariance(i)
-      i += 1
-    }
-    qLoglikelihood += x.qLoglikelihood
-    this
+  private def toBDV(x: Array[Double]): BDV[Double] = {
+    new BDV(x)
   }
 
 }
 
-private[streamingGmm] object SampleAggregator {
+object SGDGMM{
 
-  def zero(k: Int, d: Int): SampleAggregator = {
-    new SampleAggregator(0.0,Array.fill(k)(BDM.zeros[Double](d+1, d+1)))
+  def apply(
+    weights: Array[Double],
+    gaussians: Array[UpdatableMultivariateGaussian],
+    optimizer: GMMOptimizer): SGDGMM = {
+    new SGDGMM(new SGDWeights(weights),gaussians,optimizer)
   }
 
-  //compute cluster contributions for each input point
-  // (U, T) => U for aggregation
-  def add(
-      weights: Array[Double],
-      dists: Array[UpdatableMultivariateGaussian])
-      (agg: SampleAggregator, y: BDV[Double]): SampleAggregator = {
+  def apply(
+    k: Int,
+    d: Int,
+    optimizer: GMMOptimizer): SGDGMM = {
 
-    val q = weights.zip(dists).map {
-      case (weight, dist) =>  weight * dist.gConcavePdf(y) // <--q-logLikelihood
-    }
-    val qSum = q.sum
-    agg.qLoglikelihood += math.log(qSum)
-    var i = 0
-    while (i < agg.k) {
-      q(i) /= qSum 
-      agg.gConcaveCovariance(i) += y*y.t*q(i)
-      i = i + 1
-    }
-    agg
+    new SGDGMM(
+      new SGDWeights((1 to k).map{x => 1.0/k}.toArray),
+      (1 to k).map{x => UpdatableMultivariateGaussian(BDV.rand(d),BDM.eye[Double](d))}.toArray,
+      optimizer)
+
   }
+
+  def apply(
+    k: Int,
+    optimizer: GMMOptimizer,
+    data: RDD[SV],
+    seed: Long = 0): SGDGMM = {
+    
+    val nSamples = 5
+    val samples = data.map{x => new BDV[Double](x.toArray)}.takeSample(withReplacement = true, k * nSamples, seed)
+
+    new SGDGMM(
+      new SGDWeights(Array.fill(k)(1.0 / k)), 
+      Array.tabulate(k) { i =>
+      val slice = samples.view(i * nSamples, (i + 1) * nSamples)
+      UpdatableMultivariateGaussian(vectorMean(slice), initCovariance(slice))
+      },
+      optimizer)
+
+  }
+
+  private def initCovariance(x: IndexedSeq[BDV[Double]]): BDM[Double] = {
+    val mu = vectorMean(x)
+    val ss = BDV.zeros[Double](x(0).length)
+    x.foreach(xi => ss += (xi - mu) ^:^ 2.0)
+    diag(ss / x.length.toDouble)
+  }
+
+  private def vectorMean(x: IndexedSeq[BV[Double]]): BDV[Double] = {
+    val v = BDV.zeros[Double](x(0).length)
+    x.foreach(xi => v += xi)
+    v / x.length.toDouble
+  }
+}
+
+private[streamingGmm] class SGDWeights(var weights: Array[Double]) {
+
+  var momentum: Option[BDV[Double]] = None
+  var adamInfo: Option[BDV[Double]] = None
+  var length = weights.length
+
+  def toBDV: BDV[Double] = new BDV(weights)
+  def soft: BDV[Double] = {
+    new BDV(weights.map{case w => math.log(w/weights.last)})
+  }
+
+  def update(newWeights: BDV[Double]): Unit = {
+    weights = softmax(newWeights)
+  }
+
+  def softmax(sw: BDV[Double]): Array[Double] = {
+
+    val expsw = sw.toArray.map{ case w => math.exp(w)}
+
+    expsw.map{case w => w/expsw.sum}
+  }
+
+  def updateMomentum(x: BDV[Double]): Unit = {
+    momentum = Option(x)
+  }
+
+  def updateAdamInfo(x: BDV[Double]): Unit = {
+    adamInfo = Option(x)
+  }
+
+  def initializeMomentum: Unit = {
+    momentum = Option(BDV.zeros[Double](weights.length))
+  }
+
+  def initializeAdamInfo: Unit = {
+     adamInfo = Option(BDV.zeros[Double](weights.length))
+  }
+
 }

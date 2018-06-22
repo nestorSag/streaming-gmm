@@ -20,7 +20,7 @@ class UpdatableMultivariateGaussian private(
 
   private[streamingGmm] var momentum: Option[BDM[Double]] = None
 
-  private[streamingGmm] var rsmge: Option[BDM[Double]] = None //raw second moment gradient estimate (for Adam optimizer)
+  private[streamingGmm] var adamInfo: Option[BDM[Double]] = None //raw second moment gradient estimate (for Adam optimizer)
 
   private lazy val eps = {
     var eps = 1.0
@@ -92,16 +92,16 @@ class UpdatableMultivariateGaussian private(
     momentum = Option(mat)
   }
 
-  private[streamingGmm] def initializeRsmge: Unit = {
-    rsmge = Option(BDM.zeros[Double](d+1,d+1))
+  private[streamingGmm] def initializeAdamInfo: Unit = {
+    adamInfo = Option(BDM.zeros[Double](d+1,d+1))
   }
 
-  def removeRsmge: Unit = {
-    rsmge = None
+  def removeAdamInfo: Unit = {
+    adamInfo = None
   }
 
-  private[streamingGmm] def updateRsmge(mat: BDM[Double]): Unit = {
-    rsmge = Option(mat)
+  private[streamingGmm] def updateAdamInfo(mat: BDM[Double]): Unit = {
+    adamInfo = Option(mat)
   }
 
   def invParamMat: BDM[Double] = {

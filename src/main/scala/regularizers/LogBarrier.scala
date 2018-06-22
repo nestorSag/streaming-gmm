@@ -7,7 +7,7 @@ class LogBarrier(val shift: Double = 0, val scale: Double = 1) extends GMMRegula
 	require(shift >= 0, "shift must be nonnegative")
 	require(scale > 0, "scale must be positive")
 
-	def weightGradient(weight: Double): Double = 0
+	def softWeightsGradient(weights: BDV[Double]): BDV[Double] = BDV.zeros[Double](weights.length)
 
 	def gradient(dist: UpdatableMultivariateGaussian): BDM[Double] = {
 
@@ -37,7 +37,7 @@ class LogBarrier(val shift: Double = 0, val scale: Double = 1) extends GMMRegula
 		}
 	}
 
-	private def evaluateWeight(weight: Double): Double = {
+	private def evaluateWeight(weights: Double): Double = {
 		0.0
 	}
 

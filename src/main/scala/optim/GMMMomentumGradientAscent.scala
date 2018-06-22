@@ -29,4 +29,18 @@ class GMMMomentumGradientAscent(
 		dist.momentum.get
 	}
 
+	override def softWeightsDirection(posteriors: BDV[Double], weights: SGDWeights): BDV[Double] = {
+
+		if(!weights.momentum.isDefined){
+			weights.initializeMomentum
+		}
+
+		val grad = softWeightGradient(posteriors, new BDV(weights.weights))
+		
+		weights.updateMomentum(weights.momentum.get*decayRate + grad)
+
+		weights.momentum.get
+
+	}
+
 }

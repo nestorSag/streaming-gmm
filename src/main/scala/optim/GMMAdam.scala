@@ -49,19 +49,41 @@ class GMMAdam(
 			dist.initializeMomentum
 		}
 
-		if(!dist.rsmge.isDefined){
-			dist.initializeRsmge
+		if(!dist.adamInfo.isDefined){
+			dist.initializeAdamInfo
 		}
 
 		val grad = lossGradient(dist, sampleInfo)
 
 		dist.updateMomentum(dist.momentum.get*beta1 + grad*(1.0-beta1))
 		
-		dist.updateRsmge(dist.rsmge.get*beta2 + (grad *:* grad)*(1.0-beta2))
+		dist.updateAdamInfo(dist.adamInfo.get*beta2 + (grad *:* grad)*(1.0-beta2))
 
 		val alpha_t = math.sqrt(1.0 - math.pow(beta2,t))/(1.0 - math.pow(beta1,t))
 
-		alpha_t * dist.momentum.get /:/ (sqrt(dist.rsmge.get) + eps)
+		alpha_t * dist.momentum.get /:/ (sqrt(dist.adamInfo.get) + eps)
+	}
+
+	override def softWeightsDirection(posteriors: BDV[Double], weights: SGDWeights): BDV[Double] = {
+
+		if(!weights.momentum.isDefined){
+			weights.initializeMomentum
+		}
+
+		if(!weights.adamInfo.isDefined){
+			weights.initializeAdamInfo
+		}
+
+		val grad = softWeightGradient(posteriors, new BDV(weights.weights))
+		
+		weights.updateMomentum(weights.momentum.get*beta1 + grad*(1.0-beta1))
+
+		weights.updateAdamInfo(weights.adamInfo.get*beta2 + (grad *:* grad)*(1.0-beta2))
+
+		val alpha_t = math.sqrt(1.0 - math.pow(beta2,t))/(1.0 - math.pow(beta1,t))
+
+		alpha_t * weights.momentum.get /:/ (sqrt(weights.adamInfo.get) + eps)
+
 	}
 
 }
