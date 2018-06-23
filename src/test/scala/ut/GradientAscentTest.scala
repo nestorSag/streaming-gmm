@@ -33,7 +33,7 @@ class GradientAscentTest extends OptimTestSpec{
 
 		for(i <- 1 to niter){
 
-			targetWeightsObj.update(targetWeightsObj.soft + optim.softWeightsDirection(targetWeights,targetWeightsObj) * optim.getLearningRate)
+			weightObj.update(weightObj.soft + optim.softWeightsDirection(targetWeights,weightObj) * optim.getLearningRate)
 
 		}
 
@@ -41,9 +41,9 @@ class GradientAscentTest extends OptimTestSpec{
 		// Y + (1 - lr/2)^n * (X0 - Y)
 		// where Y is the target weight vector and X0 the initial guess
 
-		val expectedWeights = (targetWeights + (initialWeights - targetWeights) * math.pow(1 -lr/2.0,niter))
-		var diff = toBDV(targetWeightsObj.weights) - expectedWeights 
-		assert(norm(dif) < errorTol)
+		val expectedWeights = (targetWeights + (toBDV(initialWeights.toArray) - targetWeights) * math.pow(1 -lr/2.0,niter))
+		var diff = toBDV(weightObj.weights) - expectedWeights 
+		assert(norm(diff) < errorTol)
 	
 	}
 

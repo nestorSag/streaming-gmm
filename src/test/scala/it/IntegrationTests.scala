@@ -21,7 +21,6 @@ class SGDGMMTest extends FlatSpec {
   val conf = new SparkConf().setMaster(master).setAppName(appName)
   sc = new SparkContext(conf)
   
-  def toBreeze
   val errorTol = 1e-8
   val dim = 10
   val k = 5
@@ -36,8 +35,7 @@ class SGDGMMTest extends FlatSpec {
 
   val sparkgmm = new GaussianMixtureModel(weights,gaussians)
 
-  val x = parsedData.take(1)
-  val rddx = parsedData.take(20)
+  val x = parsedData.take(1)(0)
 
   "predict()" should "give same result as spark GMM model for single vector" in {
     assert(sparkgmm.predict(x) - mygmm.predict(x) == 0)
@@ -45,17 +43,20 @@ class SGDGMMTest extends FlatSpec {
 
   "predict()" should "give same result as spark GMM model for RDD" in {
 
-    val res = sparkgmm.predict(rddx).zip(mygmm.predict(rddx)).map{case (x,y) => (x-y)*(x-y)}.sum
+    val res = sparkgmm.predict(parsedData).zip(mygmm.predict(parsedData)).map{case (x,y) => (x-y)*(x-y)}.sum
 
     assert(res == 0)
   }
 
   "predictSoft()" should "give same result as spark GMM model for single vector" in {
-    assert(math.pow(sparkgmm.predictSoft(x) - mygmm.predictSoft(x),2) < errorTol)
+    var v1 = new BDV(sparkgmm.predictSoft(x))
+    var v2 = new  BDV(mygmm.predictSoft(x))
+
+    assert(norm(v1-v2)*norm(v1-v2) < errorTol)
   }
 
   "predictSoft()" should "give same result as spark GMM model for RDD" in {
-    val res = sparkgmm.predictSoft(rddx).zip(mygmm.predictSoft(rddx)).map{case (a,b) => {
+    val res = sparkgmm.predictSoft(parsedData).zip(mygmm.predictSoft(parsedData)).map{case (a,b) => {
       val x = new BDV(a)
       val y = new BDV(b)
       norm(x-y)*norm(x-y)

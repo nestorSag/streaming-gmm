@@ -36,7 +36,7 @@ trait OptimTestSpec extends FlatSpec{
 
 	val initialWeights = (1 to dim).map{ case x => 1.0/dim}
 
-	var targetWeightsObj = new SGDWeights(initialWeights.toArray)
+	var weightObj = new SGDWeights(initialWeights.toArray)
 
 
 }
