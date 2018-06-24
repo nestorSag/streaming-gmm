@@ -1,15 +1,17 @@
+import org.scalatest.FlatSpec
+
 
 import streamingGmm.SGDWeights
-import org.scalatest.FlatSpec
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace}
 
 
 trait OptimTestSpec extends FlatSpec{
 	
 	
-	var dim = 5
+	var dim = 2
 	var niter = 5
 	var errorTol = 1e-8
+	var k = 5
 	//get random matrix
 
 	val randA = BDM.rand(dim,dim)
@@ -31,10 +33,10 @@ trait OptimTestSpec extends FlatSpec{
   		new BDV(x)
   	}
 
-  	val targetWeights = BDV.rand(dim)
+  	val targetWeights = BDV.rand(k)
 	targetWeights /= targetWeights.toArray.sum
 
-	val initialWeights = (1 to dim).map{ case x => 1.0/dim}
+	val initialWeights = (1 to k).map{ case x => 1.0/k}
 
 	var weightObj = new SGDWeights(initialWeights.toArray)
 

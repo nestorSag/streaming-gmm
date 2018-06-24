@@ -290,8 +290,8 @@ object SGDGMM{
 
 class SGDWeights(var weights: Array[Double]) {
 
-  private[streamingGmm]  var momentum: Option[BDV[Double]] = None
-  private[streamingGmm]  var adamInfo: Option[BDV[Double]] = None
+  var momentum: Option[BDV[Double]] = None
+  var adamInfo: Option[BDV[Double]] = None
   var length = weights.length
 
   def soft: BDV[Double] = {

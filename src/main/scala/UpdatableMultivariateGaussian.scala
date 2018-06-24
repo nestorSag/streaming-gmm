@@ -18,7 +18,7 @@ class UpdatableMultivariateGaussian private(
 
   val d = mu.length
 
-  private[streamingGmm] var momentum: Option[BDM[Double]] = None
+  var momentum: Option[BDM[Double]] = None
 
   private[streamingGmm] var adamInfo: Option[BDM[Double]] = None //raw second moment gradient estimate (for Adam optimizer)
 
@@ -115,20 +115,6 @@ class UpdatableMultivariateGaussian private(
   }
 
   def update(newParamsMat: BDM[Double]): Unit = {
-
-    // var s_ = newParamsMat(d,d)
-    // var mu_ = newParamsMat(0 to d-1,d)/s_
-    // var sigma_ = newParamsMat(0 to d-1,0 to d-1) - (mu_)*(mu_).t*s_
-
-    // var (rootSigmaInv_,u_) = calculateCovarianceConstants
-
-
-    // rootSigmaInv = rootSigmaInv_
-    // u = u_
-    // s = s_
-    // mu = mu_
-    // sigma = sigma_
-    // this
 
     s = newParamsMat(d,d)
     mu = newParamsMat(0 to d-1,d)/s

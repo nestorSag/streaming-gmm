@@ -6,19 +6,21 @@ import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV,
 class MomentumTest extends OptimTestSpec{
 
 	var lr = 0.5
+	var beta = 0.9
 	var current = UpdatableMultivariateGaussian(BDV.rand(dim),BDM.eye[Double](dim))
-	var optim = new GMMMomentumGradientAscent(lr,None,0.9)
+	var optim = new GMMMomentumGradientAscent(lr,None,beta)
 
-	"MomentumGradientAscent w/o reg" should "make current dist converge to target dist in expectation" in {
-		val paramMat0 = current.paramMat
+	"MomentumGradientAscent w/o reg" should "follow the right path in expectation" in {
+		
+		var x0 = current.paramMat.copy
 
-		var expectedRes = current.paramMat.copy
+		var m = BDM.zeros[Double](x0.rows,x0.cols) //momentum
 
-		// deterministic formula for Momentum descent in expectation
-		for(i <- 0 to (niter-1)){
-
-			expectedRes += (targetParamMat-expectedRes) * 0.5 * (1.0-math.pow(optim.decayRate,niter-i))/(1.0-optim.decayRate)*optim.getLearningRate
-			// (targetParamMat - expectedRes) * 0.5 = gradient
+		for(i <- 1 to niter){
+			var g = (targetParamMat - x0) * 0.5 //gradient
+			m *= beta
+			m += g
+			x0 += m*lr
 		}
 
 		for(i <- 1 to niter){
@@ -30,7 +32,7 @@ class MomentumTest extends OptimTestSpec{
 		// result should be 
 		// S_0 + alpha*sum((1-beta^(niters+1-i)/(1-beta))*grad(S_i))
 
-		var diff =  expectedRes - current.paramMat
+		var diff =  x0 - current.paramMat
 		assert(trace(diff.t * diff) < errorTol)
 	
 	}
@@ -38,12 +40,22 @@ class MomentumTest extends OptimTestSpec{
 	it should "make current weights converge to target weights in expectation" in {
 
 		// deterministic formula for Momentum descent in expectation
-		var expectedWeights = toBDV(weightObj.weights)
-		for(i <- 0 to (niter-1)){
+		var x0 = toBDV(initialWeights.toArray)
+		var m = BDV.zeros[Double](x0.length) //momentum
 
-			expectedWeights += (targetWeights-expectedWeights) * 0.5 * (1.0-math.pow(optim.decayRate,niter-i))/(1.0-optim.decayRate)*optim.getLearningRate
-			// (targetParamMat - expectedRes) * 0.5 = gradient
+		var softx0 = toBDV(x0.toArray.map{case w => math.log(w/x0(k-1))})
+
+		for(i <- 1 to niter){
+			var g = (targetWeights - x0) //gradient
+			g(k-1) = 0.0
+			m *= beta
+			m += g
+			softx0 += m*lr
+
+			var expsoftx0 = softx0.toArray.map{case w => math.exp(w)}
+			x0 = toBDV(expsoftx0.map{case w => w/expsoftx0.sum})
 		}
+
 
 		for(i <- 1 to niter){
 
@@ -54,7 +66,7 @@ class MomentumTest extends OptimTestSpec{
 		// result should be 
 		// S_0 + alpha*sum((1-beta^(niters+1-i)/(1-beta))*grad(S_i))
 
-		var vecdiff =  expectedWeights - toBDV(weightObj.weights)
+		var vecdiff =  x0 - toBDV(weightObj.weights)
 		assert(norm(vecdiff) < errorTol)
 	
 	}
