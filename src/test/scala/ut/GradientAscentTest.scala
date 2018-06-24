@@ -31,19 +31,39 @@ class GradientAscentTest extends OptimTestSpec{
 
 	it should "make current weights converge to target weights in expectation" in {
 
+		// the formula from above cannot be applied to the weights because of the 
+		// nonlinearity induced by the softmax function
+
+		// below: deterministic calculation for gradient descent in expectation
+		// same as momentum gradient descent but with beta = 0
+		var beta = 0.0
+		var x0 = toBDV(initialWeights.toArray)
+		var m = BDV.zeros[Double](x0.length) //momentum
+
+		var softx0 = toBDV(x0.toArray.map{case w => math.log(w/x0(k-1))})
+
+		//calculate gradient descent in expectation
+		// this will be checked against the program's results below
+		for(i <- 1 to niter){
+			var g = (targetWeights - x0) //gradient
+			g(k-1) = 0.0
+			m *= beta
+			m += g
+			softx0 += m*lr
+
+			var expsoftx0 = softx0.toArray.map{case w => math.exp(w)}
+			x0 = toBDV(expsoftx0.map{case w => w/expsoftx0.sum})
+		}
+
+		// get results from program
 		for(i <- 1 to niter){
 
 			weightObj.update(weightObj.soft + optim.softWeightsDirection(targetWeights,weightObj) * optim.getLearningRate)
 
 		}
 
-		// for a single component, expected result after n iterations is:
-		// Y + (1 - lr/2)^n * (X0 - Y)
-		// where Y is the target weight vector and X0 the initial guess
-
-		val expectedWeights = (targetWeights + (toBDV(initialWeights.toArray) - targetWeights) * math.pow(1 -lr/2.0,niter))
-		var diff = toBDV(weightObj.weights) - expectedWeights 
-		assert(norm(diff) < errorTol)
+		var vecdiff =  x0 - toBDV(weightObj.weights)
+		assert(norm(vecdiff) < errorTol)
 	
 	}
 

@@ -288,7 +288,7 @@ object SGDGMM{
   }
 }
 
-class SGDWeights(var weights: Array[Double]) {
+class SGDWeights(var weights: Array[Double]) extends Serializable{
 
   var momentum: Option[BDV[Double]] = None
   var adamInfo: Option[BDV[Double]] = None

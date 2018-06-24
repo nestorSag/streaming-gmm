@@ -1,4 +1,4 @@
-import org.scalatest.{FlatSpec,BeforeAndAfter}
+import org.scalatest.{FunSuite}
 
 
 import streamingGmm.{UpdatableMultivariateGaussian, SGDGMM, GMMGradientAscent}
@@ -11,62 +11,70 @@ import org.apache.spark.mllib.linalg.{Matrices => SMS, Matrix => SM, DenseMatrix
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, norm, trace, det}
 
 // tests for UpdatableMultivariateGaussian class
+trait SparkTester extends FunSuite{
+    var sc : SparkContext = _
 
-class SGDGMMTest extends FlatSpec {
+    val conf = new SparkConf().setAppName("SGDGMM-test").setMaster("local[4]")
+    sc = new SparkContext(conf)
 
-  val master = "local[4]"
-  val appName = "SGDGMM-test"
+    val errorTol = 1e-8
+    val dim = 10
+    val k = 5
 
-  var sc: SparkContext = _
-  val conf = new SparkConf().setMaster(master).setAppName(appName)
-  sc = new SparkContext(conf)
-  
-  val errorTol = 1e-8
-  val dim = 10
-  val k = 5
+    val data = sc.textFile("src/test/resources/testdata.csv")// Trains Gaussian Mixture Model
+    val parsedData = data.map(s => SVS.dense(s.trim.split(' ').map(_.toDouble))).cache()
 
-  val data = sc.textFile("src/test/resources/testdata.csv")// Trains Gaussian Mixture Model
-  val parsedData = data.map(s => SVS.dense(s.trim.split(' ').map(_.toDouble))).cache()
+    val mygmm = SGDGMM(k,new GMMGradientAscent(0.9,None),parsedData)
 
-  val mygmm = SGDGMM(k,new GMMGradientAscent(0.9,None),parsedData)
+    val weights = mygmm.getWeights
+    val gaussians = mygmm.getGaussians.map{
+  	case g => new MultivariateGaussian(
+  		SVS.dense(g.getMu.toArray),
+  		SMS.dense(g.getSigma.rows,g.getSigma.cols,g.getSigma.toArray))}
 
-  val weights = mygmm.getWeights
-  val gaussians = mygmm.getGaussians.map{case g => new MultivariateGaussian(SVS.dense(g.getMu.toArray),SMS.dense(dim,dim,g.getSigma.toArray))}
+    val sparkgmm = new GaussianMixtureModel(weights,gaussians)
 
-  val sparkgmm = new GaussianMixtureModel(weights,gaussians)
+    val x = parsedData.take(1)(0)
 
-  val x = parsedData.take(1)(0)
+    def stopContext(): Unit = {sc.stop()}
 
-  "predict()" should "give same result as spark GMM model for single vector" in {
-    assert(sparkgmm.predict(x) - mygmm.predict(x) == 0)
-  }
 
-  "predict()" should "give same result as spark GMM model for RDD" in {
+}
 
-    val res = sparkgmm.predict(parsedData).zip(mygmm.predict(parsedData)).map{case (x,y) => (x-y)*(x-y)}.sum
+class SGDGMMTest extends SparkTester{
 
-    assert(res == 0)
-  }
+  try{
+	  test("predict() should give same result as spark GMM model for single vector") {
 
-  "predictSoft()" should "give same result as spark GMM model for single vector" in {
-    var v1 = new BDV(sparkgmm.predictSoft(x))
-    var v2 = new  BDV(mygmm.predictSoft(x))
+	    assert(sparkgmm.predict(x) - mygmm.predict(x) == 0)
+	  }
 
-    assert(norm(v1-v2)*norm(v1-v2) < errorTol)
-  }
+	  test("predict() should give same result as spark GMM model for RDDs"){
 
-  "predictSoft()" should "give same result as spark GMM model for RDD" in {
-    val res = sparkgmm.predictSoft(parsedData).zip(mygmm.predictSoft(parsedData)).map{case (a,b) => {
-      val x = new BDV(a)
-      val y = new BDV(b)
-      norm(x-y)*norm(x-y)
-      }}.sum
+	    val res = sparkgmm.predict(parsedData).zip(mygmm.predict(parsedData)).map{case (x,y) => (x-y)*(x-y)}.sum
 
-    assert(res == 0)
-  }
+	    assert(res == 0)
+	  }
+
+	  test("predictSoft() should give same result as spark GMM model for single vector"){
+	    var v1 = new BDV(sparkgmm.predictSoft(x))
+	    var v2 = new BDV(mygmm.predictSoft(x))
+
+	    assert(norm(v1-v2)*norm(v1-v2) < errorTol)
+	  }
+
+	  test("predictSoft() should give same result as spark GMM model for RDDs") {
+	    val res = sparkgmm.predictSoft(parsedData).zip(mygmm.predictSoft(parsedData)).map{case (a,b) => {
+	     val x = new BDV(a)
+	     val y = new BDV(b)
+	     norm(x-y)*norm(x-y)
+	     }}.sum
+
+	    assert(res < errorTol)
+	  }
+	}
+
   // the step() method will be tested in the integration testing stage
-
-  sc.stop()
 }
 
 

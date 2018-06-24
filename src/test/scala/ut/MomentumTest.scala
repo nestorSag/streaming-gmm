@@ -10,12 +10,14 @@ class MomentumTest extends OptimTestSpec{
 	var current = UpdatableMultivariateGaussian(BDV.rand(dim),BDM.eye[Double](dim))
 	var optim = new GMMMomentumGradientAscent(lr,None,beta)
 
-	"MomentumGradientAscent w/o reg" should "follow the right path in expectation" in {
+	"MomentumGradientAscent w/o reg" should "follow the right path in expectation to target Gaussian parameters" in {
 		
 		var x0 = current.paramMat.copy
 
 		var m = BDM.zeros[Double](x0.rows,x0.cols) //momentum
-
+		
+		//calculate gradient descent with momentum in expectation
+		// this will be checked against the program's results below
 		for(i <- 1 to niter){
 			var g = (targetParamMat - x0) * 0.5 //gradient
 			m *= beta
@@ -37,7 +39,7 @@ class MomentumTest extends OptimTestSpec{
 	
 	}
 
-	it should "make current weights converge to target weights in expectation" in {
+	it should "follow the right path in expectation to target weights" in {
 
 		// deterministic formula for Momentum descent in expectation
 		var x0 = toBDV(initialWeights.toArray)
@@ -45,6 +47,8 @@ class MomentumTest extends OptimTestSpec{
 
 		var softx0 = toBDV(x0.toArray.map{case w => math.log(w/x0(k-1))})
 
+		//calculate gradient descent with momentum in expectation
+		// this will be checked against the program's results below
 		for(i <- 1 to niter){
 			var g = (targetWeights - x0) //gradient
 			g(k-1) = 0.0
@@ -56,15 +60,13 @@ class MomentumTest extends OptimTestSpec{
 			x0 = toBDV(expsoftx0.map{case w => w/expsoftx0.sum})
 		}
 
+		// get results from program
 
 		for(i <- 1 to niter){
 
 			weightObj.update(weightObj.soft + optim.softWeightsDirection(targetWeights,weightObj) * optim.getLearningRate)
 
 		}
-
-		// result should be 
-		// S_0 + alpha*sum((1-beta^(niters+1-i)/(1-beta))*grad(S_i))
 
 		var vecdiff =  x0 - toBDV(weightObj.weights)
 		assert(norm(vecdiff) < errorTol)
