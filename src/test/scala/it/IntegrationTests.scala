@@ -18,8 +18,7 @@ trait SparkTester extends FunSuite{
     sc = new SparkContext(conf)
 
     val errorTol = 1e-8
-    val dim = 10
-    val k = 5
+    val k = 3
 
     val data = sc.textFile("src/test/resources/testdata.csv")// Trains Gaussian Mixture Model
     val parsedData = data.map(s => SVS.dense(s.trim.split(' ').map(_.toDouble))).cache()
@@ -28,9 +27,9 @@ trait SparkTester extends FunSuite{
 
     val weights = mygmm.getWeights
     val gaussians = mygmm.getGaussians.map{
-  	case g => new MultivariateGaussian(
-  		SVS.dense(g.getMu.toArray),
-  		SMS.dense(g.getSigma.rows,g.getSigma.cols,g.getSigma.toArray))}
+    case g => new MultivariateGaussian(
+    SVS.dense(g.getMu.toArray),
+    SMS.dense(g.getSigma.rows,g.getSigma.cols,g.getSigma.toArray))}
 
     val sparkgmm = new GaussianMixtureModel(weights,gaussians)
 
@@ -78,35 +77,32 @@ class GradientBasedGaussianMixtureTest extends SparkTester{
 }
 
 
+val optim = new GMMGradientAscent(learningRate = 0.9,regularizer= None)
+var model = GradientBasedGaussianMixture(k = 3, optimizer = optim, data = parsedData)
+
+val initialWeights = model.getWeights
+val initialDists = model.getGaussians
+var initialMus = initialDists.map{case g => g.getMu}
 
 
-// val data = sc.textFile("src/test/resources/testdata.csv")// Trains Gaussian Mixture Model
-// val parsedData = data.map(s => SVS.dense(s.trim.split(' ').map(_.toDouble))).cache()
 
-// val optim = new GMMGradientAscent(learningRate = 0.9,regularizer= None)
-// var model = GradientBasedGaussianMixture(k = 4, optimizer = optim, data = parsedData)
-
-// val initialWeights = model.getWeights
-// val initialDists = model.getGaussians
+val initialSparkDists = initialDists.map{ d => new MultivariateGaussian(SVS.dense(d.getMu.toArray),SMS.dense(d.getSigma.rows,d.getSigma.cols,d.getSigma.toArray))}
+var sparkGmm = new GaussianMixtureModel(initialWeights.clone,initialSparkDists)
+var sparkGm = new GaussianMixture().setK(k).setInitialModel(sparkGmm)
 
 
-// val initialSparkDists = initialDists.map{ d => new MultivariateGaussian(SVS.dense(d.getMu.toArray),SMS.dense(d.getSigma.rows,d.getSigma.cols,d.getSigma.toArray))}
-// var sparkGmm = new GaussianMixtureModel(initialWeights,initialSparkDists)
-// var sparkGm = new GaussianMixture().setK(k).setInitialModel(sparkGmm)
+var sparkFittedModel = sparkGm.run(parsedData)
+var sparkFittedSigmas = sparkFittedModel.gaussians.map{case g => new BDM(g.sigma.numRows,g.sigma.numCols,g.sigma.toArray)}
+var sparkFittedMus = sparkFittedModel.gaussians.map{case g => BDV(g.mu.toArray)}
+var sparkFittedWeights = sparkFittedModel.weights
+
+val optim = new GMMGradientAscent(learningRate = 0.1,regularizer= None).setShrinkageRate(1.0).setMinLearningRate(1e-2)
+//val optim = new GMMMomentumGradientAscent(learningRate = 0.9,regularizer= None,decayRate=0.9).setShrinkageRate(0.9).setMinLearningRate(0)
+var fittedModel = GradientBasedGaussianMixture(initialWeights,initialDists.clone,optim).setmaxGradientIters(200).setBatchSize(25)
+//var fittedModel = GradientBasedGaussianMixture(3,parsedData.take(1)(0).size,optim).setmaxGradientIters(100).setBatchSize(50)
+fittedModel.step(parsedData)
 
 
-// var sparkFittedModel = sparkGm.run(parsedData)
-// var sparkFittedSigmas = sparkFittedModel.gaussians.map{case g => new BDM(g.sigma.numRows,g.sigma.numCols,g.sigma.toArray)}
-// var sparkFittedMus = sparkFittedModel.gaussians.map{case g => BDV(g.mu.toArray)}
-// var sparkFittedWeights = sparkFittedModel.weights
-
-// val optim = new GMMGradientAscent(learningRate = 0.1,regularizer= None)
-// //var fittedModel = GradientBasedGaussianMixture(k,parsedData.take(1)(0).size,optim).setmaxGradientIters(100).setWeightLearningRate(0.7)
-// var fittedModel = GradientBasedGaussianMixture(initialWeights,initialDists,optim).setmaxGradientIters(100).setWeightLearningRate(0.07)
-// fittedModel.learningRateShrinkage = 1.0
-// fittedModel.step(parsedData)
-
-
-// var sgdFittedSigmas = fittedModel.getGaussians.map{case g => g.getSigma}
-// var sgdFittedMus = fittedModel.getGaussians.map{case g => g.getMu}
-// var sgdFittedWeights = fittedModel.getWeights
+var sgdFittedSigmas = fittedModel.getGaussians.map{case g => g.getSigma}
+var sgdFittedMus = fittedModel.getGaussians.map{case g => g.getMu}
+var sgdFittedWeights = fittedModel.getWeights

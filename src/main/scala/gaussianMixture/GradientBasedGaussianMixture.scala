@@ -19,13 +19,15 @@ class GradientBasedGaussianMixture(
   g: Array[UpdatableMultivariateGaussian],
   private[streamingGmm] var optimizer: GMMOptimizer) extends UpdatableGaussianMixture(w,g) with Optimizable {
 
+  var batchFraction = 1.0
+
   def step(data: RDD[SV]): Unit = {
 
     val sc = data.sparkContext
 
-    val gconcaveData = data.map{x => new BDV[Double](x.toArray ++ Array[Double](1.0))} // y = [x 1]
- 
-    val d = gconcaveData.first().length - 1
+    val gConcaveData = data.map{x => new BDV[Double](x.toArray ++ Array[Double](1.0))} // y = [x 1]
+  
+    val d = gConcaveData.first().length - 1
 
     val shouldDistribute = shouldDistributeGaussians(k, d)
 
@@ -40,12 +42,17 @@ class GradientBasedGaussianMixture(
 
     val initialRate = optimizer.learningRate
    // var rv: Array[Double]
-     
+    batchFraction = if(batchSize.isDefined){
+      batchSize.get.toDouble/gConcaveData.count()
+      }else{
+        1.0
+      }
+
     while (iter < maxGradientIters && math.abs(newLL-oldLL) > convergenceTol) {
 
       val compute = sc.broadcast(SampleAggregator.add(weights.weights, gaussians)_)
 
-      val sampleStats = gconcaveData.treeAggregate(SampleAggregator.zero(k, d))(compute.value, _ += _)
+      val sampleStats = batch(gConcaveData).treeAggregate(SampleAggregator.zero(k, d))(compute.value, _ += _)
 
       val n: Double = sampleStats.gConcaveCovariance.map{case x => x(d,d)}.sum // number of data points 
 
@@ -81,8 +88,8 @@ class GradientBasedGaussianMixture(
           case (cov,g,w) => 
 
           val regVal = optimizer.penaltyValue(g,w)
-          g.update(g.paramMat + optimizer.direction(g,cov) * optimizer.learningRate/n)
-
+          g.update(g.paramMat + optimizer.direction(g,cov) * optimizer.learningRate)
+          
           (regVal, g)
 
         }.unzip
@@ -95,7 +102,7 @@ class GradientBasedGaussianMixture(
       val posteriorResps = sampleStats.gConcaveCovariance.map{case x => x(d,d)}
 
       //update weights in the driver
-      weights.update(weights.soft + optimizer.learningRate/n*optimizer.softWeightsDirection(toBDV(posteriorResps),weights))
+      weights.update(weights.soft + optimizer.learningRate*optimizer.softWeightsDirection(toBDV(posteriorResps),weights))
 
       oldLL = newLL // current becomes previous
       newLL = sampleStats.qLoglikelihood + newRegVal.sum// this is the freshly computed log-likelihood plus regularization
@@ -114,6 +121,14 @@ class GradientBasedGaussianMixture(
 
   private def toBDV(x: Array[Double]): BDV[Double] = {
     new BDV(x)
+  }
+
+  private def batch(data: RDD[BDV[Double]]): RDD[BDV[Double]] = {
+    if(batchFraction < 1.0){
+      data.sample(true,batchFraction)
+    }else{
+      data
+    }
   }
 
 }

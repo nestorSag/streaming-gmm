@@ -8,7 +8,7 @@ class GMMGradientAscent(
 
 	require(learningRate>0,"learningRate must be positive")
 
-	var minLearningRate = 1e-2
+	var minLearningRate = 1e-3
 	var shrinkageRate = 1.0
 
 	def penaltyValue(dist: UpdatableMultivariateGaussian,weight: Double): Double = {

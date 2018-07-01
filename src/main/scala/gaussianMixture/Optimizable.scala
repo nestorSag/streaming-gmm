@@ -8,10 +8,19 @@ trait Optimizable extends Serializable {
 
   private[streamingGmm] var optimizer: GMMOptimizer
 
-  var maxGradientIters = 100
+  var batchSize: Option[Int] = None
 
-  var convergenceTol = 1e-6
+  var maxGradientIters: Int = 100
 
+  var convergenceTol: Double = 1e-6
+
+  def getBatchSize: Option[Int] = batchSize
+
+  def setBatchSize(n: Int): this.type = {
+    require(n>0,"n must be a positive integer")
+    batchSize = Option(n)
+    this
+  }
 
   def getConvergenceTol: Double = convergenceTol
 
