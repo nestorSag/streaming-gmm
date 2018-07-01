@@ -7,16 +7,20 @@ import org.apache.spark.mllib.linalg.{Matrices => SMS, Matrix => SM, DenseMatrix
 import org.apache.spark.mllib.util.MLUtils
 import org.apache.spark.mllib.stat.distribution.{MultivariateGaussian => SMVG}
 
+import com.typesafe.scalalogging.LazyLogging
+
 class UpdatableMultivariateGaussian private(
   _s: Double, 
   _mu: BDV[Double], //there is a bug when using the same attribute names for the subclass and superclass
-  _sigma: BDM[Double]) extends GConcaveMultivariateGaussian(_s,_mu,_sigma) with GradientDescentUtils {
+  _sigma: BDM[Double]) extends GConcaveMultivariateGaussian(_s,_mu,_sigma) with GradientDescentUtils with LazyLogging {
 
   def update(newParamsMat: BDM[Double]): Unit = {
 
     this.s = newParamsMat(d,d)
     this.mu = newParamsMat(0 to d-1,d)/s
     this.sigma = newParamsMat(0 to d-1,0 to d-1) - (mu)*(mu).t*s
+
+    logger.debug(s"mu: ${mu}")
 
     var (rootSigmaInv_,u_) = calculateCovarianceConstants
 

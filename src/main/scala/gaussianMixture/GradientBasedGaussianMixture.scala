@@ -13,11 +13,14 @@ import org.apache.spark.mllib.util.{Loader, MLUtils, Saveable}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{Row, SparkSession}
 
+import com.typesafe.scalalogging.LazyLogging
 
 class GradientBasedGaussianMixture(
   w: SGDWeights,
   g: Array[UpdatableMultivariateGaussian],
-  private[streamingGmm] var optimizer: GMMOptimizer) extends UpdatableGaussianMixture(w,g) with Optimizable {
+  private[streamingGmm] var optimizer: GMMOptimizer) extends UpdatableGaussianMixture(w,g) with Optimizable with LazyLogging {
+
+  //val logger = Logger("logTest")
 
   var batchFraction = 1.0
 
@@ -55,6 +58,7 @@ class GradientBasedGaussianMixture(
       val sampleStats = batch(gConcaveData).treeAggregate(SampleAggregator.zero(k, d))(compute.value, _ += _)
 
       val n: Double = sampleStats.gConcaveCovariance.map{case x => x(d,d)}.sum // number of data points 
+      logger.debug(s"n: ${n}")
 
       val tuples =
           Seq.tabulate(k)(i => (sampleStats.gConcaveCovariance(i), 
@@ -106,7 +110,8 @@ class GradientBasedGaussianMixture(
 
       oldLL = newLL // current becomes previous
       newLL = sampleStats.qLoglikelihood + newRegVal.sum// this is the freshly computed log-likelihood plus regularization
-
+      logger.debug(s"newLL: ${newLL}")
+      
       optimizer.updateLearningRate
       iter += 1
       compute.destroy()
