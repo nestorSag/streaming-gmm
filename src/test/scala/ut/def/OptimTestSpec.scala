@@ -8,7 +8,7 @@ import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV,
 trait OptimTestSpec extends FlatSpec{
 	
 	
-	var dim = 10
+	var dim = 2
 	var niter = 5
 	var errorTol = 1e-8
 	var k = 5

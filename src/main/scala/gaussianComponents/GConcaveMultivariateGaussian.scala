@@ -5,8 +5,8 @@ import org.apache.spark.mllib.linalg.{Matrices => SMS, Matrix => SM, DenseMatrix
 
 class GConcaveMultivariateGaussian(
 	var s: Double,
-	mu: BDV[Double],
-  sigma: BDM[Double]) extends MultivariateGaussian(mu,sigma){
+	_mu: BDV[Double],
+  _sigma: BDM[Double]) extends MultivariateGaussian(_mu,_sigma){
 
 require(s > 0, s"s must be positive; got ${s}")
 

@@ -12,8 +12,9 @@ class GradientAscentTest extends OptimTestSpec{
 		
 	"GradientAscent w/o reg" should "make current dist converge to target dist in expectation" in {
 
+		//println(current.paramMat)
 		for(i <- 1 to niter){
-
+			//println(trace((current.paramMat-targetParamMat)*(current.paramMat-targetParamMat)))
 			current.update(current.paramMat + optim.direction(current,targetParamMat) * optim.getLearningRate)
 
 		}

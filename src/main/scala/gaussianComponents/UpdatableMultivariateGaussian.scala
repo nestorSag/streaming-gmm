@@ -14,15 +14,15 @@ class UpdatableMultivariateGaussian private(
 
   def update(newParamsMat: BDM[Double]): Unit = {
 
-    s = newParamsMat(d,d)
-    mu = newParamsMat(0 to d-1,d)/s
-    sigma = newParamsMat(0 to d-1,0 to d-1) - (mu)*(mu).t*s
+    this.s = newParamsMat(d,d)
+    this.mu = newParamsMat(0 to d-1,d)/s
+    this.sigma = newParamsMat(0 to d-1,0 to d-1) - (mu)*(mu).t*s
 
     var (rootSigmaInv_,u_) = calculateCovarianceConstants
 
 
-    rootSigmaInv = rootSigmaInv_
-    u = u_
+    this.rootSigmaInv = rootSigmaInv_
+    this.u = u_
   }
 
 }
