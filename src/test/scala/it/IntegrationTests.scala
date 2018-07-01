@@ -1,7 +1,7 @@
 import org.scalatest.{FunSuite}
 
 
-import streamingGmm.{UpdatableMultivariateGaussian, SGDGMM, GMMGradientAscent}
+import streamingGmm.{UpdatableMultivariateGaussian, GradientBasedGaussianMixture, GMMGradientAscent}
 
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.mllib.clustering.{GaussianMixture, GaussianMixtureModel}
@@ -14,7 +14,7 @@ import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV,
 trait SparkTester extends FunSuite{
     var sc : SparkContext = _
 
-    val conf = new SparkConf().setAppName("SGDGMM-test").setMaster("local[4]")
+    val conf = new SparkConf().setAppName("GradientBasedGaussianMixture-test").setMaster("local[4]")
     sc = new SparkContext(conf)
 
     val errorTol = 1e-8
@@ -24,7 +24,7 @@ trait SparkTester extends FunSuite{
     val data = sc.textFile("src/test/resources/testdata.csv")// Trains Gaussian Mixture Model
     val parsedData = data.map(s => SVS.dense(s.trim.split(' ').map(_.toDouble))).cache()
 
-    val mygmm = SGDGMM(k,new GMMGradientAscent(0.9,None),parsedData)
+    val mygmm = GradientBasedGaussianMixture(k,new GMMGradientAscent(0.9,None),parsedData)
 
     val weights = mygmm.getWeights
     val gaussians = mygmm.getGaussians.map{
@@ -41,7 +41,7 @@ trait SparkTester extends FunSuite{
 
 }
 
-class SGDGMMTest extends SparkTester{
+class GradientBasedGaussianMixtureTest extends SparkTester{
 
   try{
 	  test("predict() should give same result as spark GMM model for single vector") {
@@ -84,7 +84,7 @@ class SGDGMMTest extends SparkTester{
 // val parsedData = data.map(s => SVS.dense(s.trim.split(' ').map(_.toDouble))).cache()
 
 // val optim = new GMMGradientAscent(learningRate = 0.9,regularizer= None)
-// var model = SGDGMM(k = 4, optimizer = optim, data = parsedData)
+// var model = GradientBasedGaussianMixture(k = 4, optimizer = optim, data = parsedData)
 
 // val initialWeights = model.getWeights
 // val initialDists = model.getGaussians
@@ -101,8 +101,8 @@ class SGDGMMTest extends SparkTester{
 // var sparkFittedWeights = sparkFittedModel.weights
 
 // val optim = new GMMGradientAscent(learningRate = 0.1,regularizer= None)
-// //var fittedModel = SGDGMM(k,parsedData.take(1)(0).size,optim).setmaxGradientIters(100).setWeightLearningRate(0.7)
-// var fittedModel = SGDGMM(initialWeights,initialDists,optim).setmaxGradientIters(100).setWeightLearningRate(0.07)
+// //var fittedModel = GradientBasedGaussianMixture(k,parsedData.take(1)(0).size,optim).setmaxGradientIters(100).setWeightLearningRate(0.7)
+// var fittedModel = GradientBasedGaussianMixture(initialWeights,initialDists,optim).setmaxGradientIters(100).setWeightLearningRate(0.07)
 // fittedModel.learningRateShrinkage = 1.0
 // fittedModel.step(parsedData)
 

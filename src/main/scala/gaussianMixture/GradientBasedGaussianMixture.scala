@@ -14,126 +14,10 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{Row, SparkSession}
 
 
-class SGDGMM(
-  private var weights: SGDWeights,
-  private var gaussians: Array[UpdatableMultivariateGaussian],
-  private var optimizer: GMMOptimizer) extends Serializable {
-
-
-  def getWeights: Array[Double] = weights.weights
-  def getGaussians: Array[UpdatableMultivariateGaussian] = gaussians
-
-  var maxGradientIters = 100
-
-  var convergenceTol = 1e-6
-
-  def k: Int = weights.length
-
-  require(weights.length == gaussians.length, "Length of weight and Gaussian arrays must match")
-
-
-
-
-  def getConvergenceTol: Double = convergenceTol
-
-  def setConvergenceTol(x: Double): this.type = {
-    require(x>0,"convergenceTol must be positive")
-    convergenceTol = x
-    this
-  }
-
-
-
-
-  def setmaxGradientIters(maxGradientIters: Int): this.type = {
-    require(maxGradientIters > 0 ,s"maxGradientIters needs to be a positive integer; got ${maxGradientIters}")
-    this.maxGradientIters = maxGradientIters
-    this
-  }
-
-  def getmaxGradientIters: Int = {
-    maxGradientIters
-  }
-
-
-
-
-  def setOptimizer(optim: GMMGradientAscent): this.type = {
-    optimizer = optim
-    this
-  }
-
-  def getOpimizer: GMMOptimizer = optimizer
-
-
-  def setLearningRate(alpha: Double): this.type = {
-    require(alpha > 0,
-      s"learning rate must be positive; got ${alpha}")
-    optimizer.setLearningRate(alpha)
-    this
-  }
-
-  def getLearningRate: Double = optimizer.learningRate
-
-
-
-
-  // Spark vector predict methods
-  def predict(points: RDD[SV]): RDD[Int] = {
-    val responsibilityMatrix = predictSoft(points)
-    responsibilityMatrix.map(r => r.indexOf(r.max))
-  }
-
-
-  def predict(point: SV): Int = {
-    val r = predictSoft(point)
-    r.indexOf(r.max)
-  }
-
-  def predict(points: JavaRDD[SV]): JavaRDD[java.lang.Integer] =
-    predict(points.rdd).toJavaRDD().asInstanceOf[JavaRDD[java.lang.Integer]]
-
-
-  def predictSoft(points: RDD[SV]): RDD[Array[Double]] = {
-    val sc = points.sparkContext
-    val bcDists = sc.broadcast(gaussians)
-    val bcWeights = sc.broadcast(weights.weights)
-    points.map { x =>
-      computeSoftAssignments(new BDV[Double](x.toArray), bcDists.value, bcWeights.value, k)
-    }
-  }
-
-
-  def predictSoft(point: SV): Array[Double] = {
-    computeSoftAssignments(new BDV[Double](point.toArray), gaussians, weights.weights, k)
-  }
-
-  def predict(point: BDV[Double]): Int = {
-    val r = predictSoft(point)
-    r.indexOf(r.max)
-  }
-
-  def predictSoft(point: BDV[Double]): Array[Double] = {
-    computeSoftAssignments(point, gaussians, weights.weights, k)
-  }
-
-
-  private def computeSoftAssignments(
-      pt: BDV[Double],
-      dists: Array[UpdatableMultivariateGaussian],
-      weights: Array[Double],
-      k: Int): Array[Double] = {
-    val p = weights.zip(dists).map {
-      case (weight, dist) =>  weight * dist.pdf(pt) //ml eps
-    }
-    val pSum = p.sum
-    for (i <- 0 until k) {
-      p(i) /= pSum
-    }
-    p
-  }
-
-
+class GradientBasedGaussianMixture(
+  w: SGDWeights,
+  g: Array[UpdatableMultivariateGaussian],
+  private[streamingGmm] var optimizer: GMMOptimizer) extends UpdatableGaussianMixture(w,g) with Optimizable {
 
   def step(data: RDD[SV]): Unit = {
 
@@ -234,21 +118,21 @@ class SGDGMM(
 
 }
 
-object SGDGMM{
+object GradientBasedGaussianMixture{
 
   def apply(
     weights: Array[Double],
     gaussians: Array[UpdatableMultivariateGaussian],
-    optimizer: GMMOptimizer): SGDGMM = {
-    new SGDGMM(new SGDWeights(weights),gaussians,optimizer)
+    optimizer: GMMOptimizer): GradientBasedGaussianMixture = {
+    new GradientBasedGaussianMixture(new SGDWeights(weights),gaussians,optimizer)
   }
 
   def apply(
     k: Int,
     d: Int,
-    optimizer: GMMOptimizer): SGDGMM = {
+    optimizer: GMMOptimizer): GradientBasedGaussianMixture = {
 
-    new SGDGMM(
+    new GradientBasedGaussianMixture(
       new SGDWeights((1 to k).map{x => 1.0/k}.toArray),
       (1 to k).map{x => UpdatableMultivariateGaussian(BDV.rand(d),BDM.eye[Double](d))}.toArray,
       optimizer)
@@ -259,12 +143,12 @@ object SGDGMM{
     k: Int,
     optimizer: GMMOptimizer,
     data: RDD[SV],
-    seed: Long = 0): SGDGMM = {
+    seed: Long = 0): GradientBasedGaussianMixture = {
     
     val nSamples = 5
     val samples = data.map{x => new BDV[Double](x.toArray)}.takeSample(withReplacement = true, k * nSamples, seed)
 
-    new SGDGMM(
+    new GradientBasedGaussianMixture(
       new SGDWeights(Array.fill(k)(1.0 / k)), 
       Array.tabulate(k) { i =>
       val slice = samples.view(i * nSamples, (i + 1) * nSamples)
