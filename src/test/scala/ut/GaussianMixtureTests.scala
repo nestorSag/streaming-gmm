@@ -10,7 +10,7 @@ import org.apache.spark.mllib.linalg.{Matrices => SMS, Matrix => SM, DenseMatrix
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, norm, trace, det}
 
-// tests for UpdatableMultivariateGaussian class
+// tests for UpdatableGaussianMixture methods
 trait SparkTester extends FunSuite{
     var sc : SparkContext = _
 
@@ -40,7 +40,7 @@ trait SparkTester extends FunSuite{
 
 }
 
-class GradientBasedGaussianMixtureTest extends SparkTester{
+class GaussianMixtureTests extends SparkTester{
 
   try{
 	  test("predict() should give same result as spark GMM model for single vector") {
@@ -75,34 +75,3 @@ class GradientBasedGaussianMixtureTest extends SparkTester{
 
   // the step() method will be tested in the integration testing stage
 }
-
-
-val optim = new GMMGradientAscent(learningRate = 0.9,regularizer= None)
-var model = GradientBasedGaussianMixture(k = 3, optimizer = optim, data = parsedData)
-
-val initialWeights = model.getWeights
-val initialDists = model.getGaussians
-var initialMus = initialDists.map{case g => g.getMu}
-
-
-
-val initialSparkDists = initialDists.map{ d => new MultivariateGaussian(SVS.dense(d.getMu.toArray),SMS.dense(d.getSigma.rows,d.getSigma.cols,d.getSigma.toArray))}
-var sparkGmm = new GaussianMixtureModel(initialWeights.clone,initialSparkDists)
-var sparkGm = new GaussianMixture().setK(k).setInitialModel(sparkGmm)
-
-
-var sparkFittedModel = sparkGm.run(parsedData)
-var sparkFittedSigmas = sparkFittedModel.gaussians.map{case g => new BDM(g.sigma.numRows,g.sigma.numCols,g.sigma.toArray)}
-var sparkFittedMus = sparkFittedModel.gaussians.map{case g => BDV(g.mu.toArray)}
-var sparkFittedWeights = sparkFittedModel.weights
-
-val optim = new GMMGradientAscent(learningRate = 0.1,regularizer= None).setShrinkageRate(1.0).setMinLearningRate(1e-2)
-//val optim = new GMMMomentumGradientAscent(learningRate = 0.9,regularizer= None,decayRate=0.9).setShrinkageRate(0.9).setMinLearningRate(0)
-var fittedModel = GradientBasedGaussianMixture(initialWeights,initialDists.clone,optim).setmaxGradientIters(200).setBatchSize(25)
-//var fittedModel = GradientBasedGaussianMixture(3,parsedData.take(1)(0).size,optim).setmaxGradientIters(100).setBatchSize(50)
-fittedModel.step(parsedData)
-
-
-var sgdFittedSigmas = fittedModel.getGaussians.map{case g => g.getSigma}
-var sgdFittedMus = fittedModel.getGaussians.map{case g => g.getMu}
-var sgdFittedWeights = fittedModel.getWeights

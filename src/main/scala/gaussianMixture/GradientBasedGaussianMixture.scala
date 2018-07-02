@@ -1,6 +1,6 @@
 package streamingGmm
 
-import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
+import breeze.linalg.{diag, eigSym, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, max, min}
   
 import org.json4s.DefaultFormats
 import org.json4s.JsonDSL._
@@ -92,7 +92,7 @@ class GradientBasedGaussianMixture(
           case (cov,g,w) => 
 
           val regVal = optimizer.penaltyValue(g,w)
-          g.update(g.paramMat + optimizer.direction(g,cov) * optimizer.learningRate)
+          g.update(g.paramMat + optimizer.direction(g,cov) * optimizer.learningRate/n)
           
           (regVal, g)
 
@@ -111,7 +111,7 @@ class GradientBasedGaussianMixture(
       oldLL = newLL // current becomes previous
       newLL = sampleStats.qLoglikelihood + newRegVal.sum// this is the freshly computed log-likelihood plus regularization
       logger.debug(s"newLL: ${newLL}")
-      
+
       optimizer.updateLearningRate
       iter += 1
       compute.destroy()
@@ -198,12 +198,18 @@ class SGDWeights(var weights: Array[Double]) extends Serializable{
   var adamInfo: Option[BDV[Double]] = None
   var length = weights.length
 
+  lazy val (upperBound,lowerBound) = findBounds
+
   def soft: BDV[Double] = {
     new BDV(weights.map{case w => math.log(w/weights.last)})
   }
 
   def update(newWeights: BDV[Double]): Unit = {
-    weights = softmax(newWeights)
+    // recenter soft weights to avoid under or overflow
+    val offset = -(max(newWeights) + min(newWeights))/2
+    val d = newWeights.length
+    //bound the centered soft weights to avoid under or overflow
+    weights = softmax(bound(newWeights + BDV.ones[Double](d)*offset))
   }
 
   def softmax(sw: BDV[Double]): Array[Double] = {
@@ -211,6 +217,13 @@ class SGDWeights(var weights: Array[Double]) extends Serializable{
     val expsw = sw.toArray.map{ case w => math.exp(w)}
 
     expsw.map{case w => w/expsw.sum}
+  }
+
+  private def bound(weights: BDV[Double]): BDV[Double] = {
+    for(i <- 1 to weights.length){
+      weights(i) = math.max(math.min(weights(i),upperBound),lowerBound)
+    }
+    weights
   }
 
   private[streamingGmm] def updateMomentum(x: BDV[Double]): Unit = {
@@ -227,6 +240,18 @@ class SGDWeights(var weights: Array[Double]) extends Serializable{
 
   private[streamingGmm] def initializeAdamInfo: Unit = {
      adamInfo = Option(BDV.zeros[Double](weights.length))
+  }
+
+  private def findBounds: (Double,Double) = {
+    val bound = {
+      var eps = 1.0
+      while (!math.exp(eps).isInfinite) {
+        eps += 1
+      }
+      eps
+    }
+
+    (bound-1,-bound+1)
   }
 
 }
