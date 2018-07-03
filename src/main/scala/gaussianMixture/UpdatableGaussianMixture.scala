@@ -1,17 +1,11 @@
 package streamingGmm
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
-  
-import org.json4s.DefaultFormats
-import org.json4s.JsonDSL._
-import org.json4s.jackson.JsonMethods._
 
 import org.apache.spark.SparkContext
 import org.apache.spark.api.java.JavaRDD
 import org.apache.spark.mllib.linalg.{Matrix => SM, Vector => SV}
-import org.apache.spark.mllib.util.{Loader, MLUtils, Saveable}
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{Row, SparkSession}
 
 
 class UpdatableGaussianMixture(
@@ -24,6 +18,8 @@ class UpdatableGaussianMixture(
 
   def k: Int = weights.length
 
+  private val EPS = Utils.EPS
+  
   require(weights.length == gaussians.length, "Length of weight and Gaussian arrays must match")
 
   // Spark vector predict methods
@@ -65,14 +61,13 @@ class UpdatableGaussianMixture(
     computeSoftAssignments(point, gaussians, weights.weights, k)
   }
 
-
   private def computeSoftAssignments(
       pt: BDV[Double],
       dists: Array[UpdatableMultivariateGaussian],
       weights: Array[Double],
       k: Int): Array[Double] = {
     val p = weights.zip(dists).map {
-      case (weight, dist) =>  weight * dist.pdf(pt) //ml eps
+      case (weight, dist) => EPS + weight * dist.pdf(pt) //ml eps
     }
     val pSum = p.sum
     for (i <- 0 until k) {

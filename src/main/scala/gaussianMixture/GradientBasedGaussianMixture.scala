@@ -1,30 +1,24 @@
 package streamingGmm
 
 import breeze.linalg.{diag, eigSym, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, max, min}
-  
-import org.json4s.DefaultFormats
-import org.json4s.JsonDSL._
-import org.json4s.jackson.JsonMethods._
 
 import org.apache.spark.SparkContext
 import org.apache.spark.api.java.JavaRDD
 import org.apache.spark.mllib.linalg.{Matrix => SM, Vector => SV}
-import org.apache.spark.mllib.util.{Loader, MLUtils, Saveable}
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{Row, SparkSession}
 
-import com.typesafe.scalalogging.LazyLogging
+import org.apache.log4j.Logger
 
 class GradientBasedGaussianMixture(
   w: SGDWeights,
   g: Array[UpdatableMultivariateGaussian],
-  private[streamingGmm] var optimizer: GMMOptimizer) extends UpdatableGaussianMixture(w,g) with Optimizable with LazyLogging {
-
-  //val logger = Logger("logTest")
+  private[streamingGmm] var optimizer: GMMOptimizer) extends UpdatableGaussianMixture(w,g) with Optimizable {
 
   var batchFraction = 1.0
 
   def step(data: RDD[SV]): Unit = {
+
+    val logger: Logger = Logger.getLogger(getClass.getName)
 
     val sc = data.sparkContext
 
@@ -58,7 +52,7 @@ class GradientBasedGaussianMixture(
       val sampleStats = batch(gConcaveData).treeAggregate(SampleAggregator.zero(k, d))(compute.value, _ += _)
 
       val n: Double = sampleStats.gConcaveCovariance.map{case x => x(d,d)}.sum // number of data points 
-      logger.debug(s"n: ${n}")
+      logger.info(s"n: ${n}")
 
       val tuples =
           Seq.tabulate(k)(i => (sampleStats.gConcaveCovariance(i), 
@@ -101,16 +95,19 @@ class GradientBasedGaussianMixture(
         (rv.toArray,gs.toArray)
 
       }
+      
+      logger.info(s"means: ${gaussians.map{case g => "(" + g.getMu.toArray.mkString(",") + ")"}.mkString(",")}")
       gaussians = newDists
 
       val posteriorResps = sampleStats.gConcaveCovariance.map{case x => x(d,d)}
 
+      logger.info(s"weights: ${"(" + weights.weights.mkString(",") + ")"}")
       //update weights in the driver
-      weights.update(weights.soft + optimizer.learningRate*optimizer.softWeightsDirection(toBDV(posteriorResps),weights))
+      weights.update(weights.soft + optimizer.learningRate/n*optimizer.softWeightsDirection(toBDV(posteriorResps),weights))
 
       oldLL = newLL // current becomes previous
       newLL = sampleStats.qLoglikelihood + newRegVal.sum// this is the freshly computed log-likelihood plus regularization
-      logger.debug(s"newLL: ${newLL}")
+      logger.info(s"newLL: ${newLL}")
 
       optimizer.updateLearningRate
       iter += 1
@@ -221,7 +218,7 @@ class SGDWeights(var weights: Array[Double]) extends Serializable{
 
   private def bound(weights: BDV[Double]): BDV[Double] = {
     for(i <- 1 to weights.length){
-      weights(i) = math.max(math.min(weights(i),upperBound),lowerBound)
+      weights(i-1) = math.max(math.min(weights(i-1),upperBound),lowerBound)
     }
     weights
   }

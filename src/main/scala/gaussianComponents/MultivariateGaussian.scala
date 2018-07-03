@@ -9,14 +9,7 @@ class MultivariateGaussian(
 
   var (rootSigmaInv: BDM[Double], u: Double) = calculateCovarianceConstants
   val d = mu.length
-
-  private lazy val eps = {
-    var eps = 1.0
-    while ((1.0 + (eps / 2.0)) != 1.0) {
-      eps /= 2.0
-    }
-    eps
-  }
+  private val EPS = Utils.EPS
 
   require(sigma.cols == sigma.rows, "Covariance matrix must be square")
   require(mu.length == sigma.cols, "Mean vector length must match covariance matrix size")
@@ -51,13 +44,14 @@ class MultivariateGaussian(
     math.exp(logDetSigma)
   }
 
+
   private[streamingGmm] def calculateCovarianceConstants: (BDM[Double], Double) = {
     val eigSym.EigSym(d, u) = eigSym(sigma) // sigma = u * diag(d) * u.t
 
     // For numerical stability, values are considered to be non-zero only if they exceed tol.
     // This prevents any inverted value from exceeding (eps * n * max(d))^-1
 
-    val tol = eps * max(d) * d.length
+    val tol = EPS * max(d) * d.length
 
     try {
       // log(pseudo-determinant) is sum of the logs of all non-zero singular values
