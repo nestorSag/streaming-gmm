@@ -18,7 +18,7 @@ class GradientBasedGaussianMixture(
 
   def step(data: RDD[SV]): Unit = {
 
-    val logger: Logger = Logger.getLogger(getClass.getName)
+    val logger: Logger = Logger.getLogger("modelPath")
 
     val sc = data.sparkContext
 
@@ -47,12 +47,16 @@ class GradientBasedGaussianMixture(
 
     while (iter < maxGradientIters && math.abs(newLL-oldLL) > convergenceTol) {
 
+      //send values formatted for R processing to logs
+      logger.debug(s"means: list(${gaussians.map{case g => "c(" + g.getMu.toArray.mkString(",") + ")"}.mkString(",")})")
+      logger.debug(s"weights: ${"c(" + weights.weights.mkString(",") + ")"}")
+      
       val compute = sc.broadcast(SampleAggregator.add(weights.weights, gaussians)_)
 
       val sampleStats = batch(gConcaveData).treeAggregate(SampleAggregator.zero(k, d))(compute.value, _ += _)
 
       val n: Double = sampleStats.gConcaveCovariance.map{case x => x(d,d)}.sum // number of data points 
-      logger.info(s"n: ${n}")
+      logger.debug(s"n: ${n}")
 
       val tuples =
           Seq.tabulate(k)(i => (sampleStats.gConcaveCovariance(i), 
@@ -95,19 +99,17 @@ class GradientBasedGaussianMixture(
         (rv.toArray,gs.toArray)
 
       }
-      
-      logger.info(s"means: ${gaussians.map{case g => "(" + g.getMu.toArray.mkString(",") + ")"}.mkString(",")}")
+
       gaussians = newDists
 
       val posteriorResps = sampleStats.gConcaveCovariance.map{case x => x(d,d)}
 
-      logger.info(s"weights: ${"(" + weights.weights.mkString(",") + ")"}")
       //update weights in the driver
       weights.update(weights.soft + optimizer.learningRate/n*optimizer.softWeightsDirection(toBDV(posteriorResps),weights))
 
       oldLL = newLL // current becomes previous
       newLL = sampleStats.qLoglikelihood + newRegVal.sum// this is the freshly computed log-likelihood plus regularization
-      logger.info(s"newLL: ${newLL}")
+      logger.debug(s"newLL: ${newLL}")
 
       optimizer.updateLearningRate
       iter += 1
