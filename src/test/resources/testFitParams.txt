@@ -1,0 +1,4 @@
+lr=0.9
+shrinkageRate=0.95
+minLr=1e-1
+batchSize=25

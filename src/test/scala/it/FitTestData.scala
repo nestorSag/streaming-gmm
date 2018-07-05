@@ -1,0 +1,97 @@
+import org.scalatest.FlatSpec
+
+
+import streamingGmm._
+
+import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.mllib.clustering.{GaussianMixture, GaussianMixtureModel}
+import org.apache.spark.mllib.stat.distribution.MultivariateGaussian
+import org.apache.spark.mllib.linalg.{Matrices => SMS, Matrix => SM, DenseMatrix => SDM, Vector => SV, Vectors => SVS, DenseVector => SDV}
+
+import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, norm, trace, det}
+
+//this test runs the program over the test data and generate logs that can be parsed
+// with the R utils to generate plots of the opimisation path
+//make sure to set the log level to DEBUG
+object FitTestData{
+
+	var sc : SparkContext = _
+
+	val conf = new SparkConf().setAppName("GradientBasedGaussianMixture-test").setMaster("local[4]")
+
+	val errorTol = 1e-8
+	val k = 3
+
+	def paramParser: (Double,Double,Double,Option[Int]) = {
+		val source = scala.io.Source.fromFile("src/test/resources/testFitParams.txt")
+		val lines = source.getLines.toArray
+		source.close()
+
+		var pattern = """(lr=)(.+)""".r
+		var pattern(_,lr) = lines(0)
+
+		pattern = """(shrinkageRate=)(.+)""".r
+		var pattern(_,shrinkageRate) = lines(1)
+
+		pattern = """(minLr=)(.+)""".r
+		var pattern(_,minLr) = lines(2)
+
+		var batchSize:Option[Int] = None
+
+		if(lines.length > 3){
+			pattern = """(batchSize=)(.+)""".r
+			var pattern(_,batchSizeValue) = lines(3)
+			batchSize = Option(batchSizeValue.toInt)
+
+		}
+
+		(lr.toDouble,shrinkageRate.toDouble,minLr.toDouble,batchSize)
+	}
+
+	def run: Unit = {
+
+		val (lr,shrinkageRate,minLr,batchSize) = paramParser
+
+		sc = new SparkContext(conf)
+
+		val data = sc.textFile("src/test/resources/testdata.csv")// Trains Gaussian Mixture Model
+		val parsedData = data.map(s => SVS.dense(s.trim.split(' ').map(_.toDouble))).cache()
+		val d = parsedData.take(1)(0).size
+
+		val mygmm = GradientBasedGaussianMixture(k,new GMMGradientAscent(0.9,None),parsedData)
+
+		val weights = mygmm.getWeights
+		val gaussians = mygmm.getGaussians.map{
+		case g => new MultivariateGaussian(
+		SVS.dense(g.getMu.toArray),
+		SMS.dense(g.getSigma.rows,g.getSigma.cols,g.getSigma.toArray))}
+
+		val x = parsedData.take(1)(0)
+
+		val initialWeights = (1 to k).map{case x => 1.0/k}.toArray
+
+		val means = Array(BDV(-1.0,0.0),BDV(0.0,-1.0),BDV(1.0,0.0))
+		val covs = (1 to k).map{case k => BDM.eye[Double](d)}.toArray
+		val initialDists = means.zip(covs).map{case (m,s) => UpdatableMultivariateGaussian(m,s)}
+
+		//val optim = new GMMGradientAscent(learningRate = lr,regularizer= None).setShrinkageRate(shrinkageRate).setMinLearningRate(minLr)
+		val optim = new GMMMomentumGradientAscent(learningRate = lr,regularizer= None,decayRate=0.5).setShrinkageRate(shrinkageRate).setMinLearningRate(minLr)
+		//val optim = new GMMAdam(learningRate = lr,regularizer= None,beta1=0.9,beta2=0.1).setShrinkageRate(shrinkageRate).setMinLearningRate(minLr)
+		var model = GradientBasedGaussianMixture(initialWeights,initialDists.clone,optim).setmaxGradientIters(100)
+
+		if(batchSize.isDefined){
+			model.setBatchSize(batchSize.get)
+		}
+		
+		model.step(parsedData)
+
+		sc.stop()
+	}
+}
+
+class GeneratePathLogs extends FlatSpec{
+	"it" should "generate path logs" in {
+		FitTestData.run
+		assert(true)
+	}
+}

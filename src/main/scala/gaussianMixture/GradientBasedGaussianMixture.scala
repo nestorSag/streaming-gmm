@@ -53,6 +53,8 @@ class GradientBasedGaussianMixture(
 
       val compute = sc.broadcast(SampleAggregator.add(weights.weights, gaussians)_)
 
+      //val x = batch(gConcaveData)
+      //logger.debug(s"sample size: ${x.count()}")
       val sampleStats = batch(gConcaveData).treeAggregate(SampleAggregator.zero(k, d))(compute.value, _ += _)
 
       val n: Double = sampleStats.gConcaveCovariance.map{case x => x(d,d)}.sum // number of data points 
