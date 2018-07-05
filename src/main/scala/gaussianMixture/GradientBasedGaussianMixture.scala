@@ -50,7 +50,7 @@ class GradientBasedGaussianMixture(
       //send values formatted for R processing to logs
       logger.debug(s"means: list(${gaussians.map{case g => "c(" + g.getMu.toArray.mkString(",") + ")"}.mkString(",")})")
       logger.debug(s"weights: ${"c(" + weights.weights.mkString(",") + ")"}")
-      
+
       val compute = sc.broadcast(SampleAggregator.add(weights.weights, gaussians)_)
 
       val sampleStats = batch(gConcaveData).treeAggregate(SampleAggregator.zero(k, d))(compute.value, _ += _)
@@ -108,7 +108,7 @@ class GradientBasedGaussianMixture(
       weights.update(weights.soft + optimizer.learningRate/n*optimizer.softWeightsDirection(toBDV(posteriorResps),weights))
 
       oldLL = newLL // current becomes previous
-      newLL = sampleStats.qLoglikelihood + newRegVal.sum// this is the freshly computed log-likelihood plus regularization
+      newLL = (sampleStats.qLoglikelihood + newRegVal.sum)/n// this is the freshly computed log-likelihood plus regularization
       logger.debug(s"newLL: ${newLL}")
 
       optimizer.updateLearningRate

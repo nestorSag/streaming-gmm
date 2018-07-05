@@ -21,7 +21,7 @@ trait GMMOptimizer extends Serializable {
 	}
 
 	def setMinLearningRate(m: Double): this.type = { 
-		require(m >= 0 && m < learningRate, "minLearningRate rate must be in [0,learningRate]")
+		require(m >= 0, "minLearningRate rate must be in positive")
 		minLearningRate = m
 		this
 	}
