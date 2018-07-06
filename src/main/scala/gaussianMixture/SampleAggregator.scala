@@ -1,8 +1,8 @@
-package streamingGmm
+package edu.github.gradientgmm
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 
-private[streamingGmm] class SampleAggregator(
+private[gradientgmm] class SampleAggregator(
   var qLoglikelihood: Double,
   val gConcaveCovariance: Array[BDM[Double]]) extends Serializable{
 
@@ -20,7 +20,7 @@ private[streamingGmm] class SampleAggregator(
 
 }
 
-private[streamingGmm] object SampleAggregator {
+private[gradientgmm] object SampleAggregator {
 
   def zero(k: Int, d: Int): SampleAggregator = {
     new SampleAggregator(0.0,Array.fill(k)(BDM.zeros[Double](d+1, d+1)))

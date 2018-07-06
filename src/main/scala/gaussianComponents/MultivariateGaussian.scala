@@ -1,11 +1,11 @@
-package streamingGmm
+package edu.github.gradientgmm
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 import org.apache.spark.mllib.linalg.{Matrices => SMS, Matrix => SM, DenseMatrix => SDM, Vector => SV, Vectors => SVS, DenseVector => SDV}
 
 class MultivariateGaussian(
-  private[streamingGmm] var mu: BDV[Double],
-  private[streamingGmm] var sigma: BDM[Double]) extends Serializable{
+  private[gradientgmm] var mu: BDV[Double],
+  private[gradientgmm] var sigma: BDM[Double]) extends Serializable{
 
   var (rootSigmaInv: BDM[Double], u: Double) = calculateCovarianceConstants
   val d = mu.length
@@ -45,7 +45,7 @@ class MultivariateGaussian(
   }
 
 
-  private[streamingGmm] def calculateCovarianceConstants: (BDM[Double], Double) = {
+  private[gradientgmm] def calculateCovarianceConstants: (BDM[Double], Double) = {
     val eigSym.EigSym(d, u) = eigSym(sigma) // sigma = u * diag(d) * u.t
 
     // For numerical stability, values are considered to be non-zero only if they exceed tol.

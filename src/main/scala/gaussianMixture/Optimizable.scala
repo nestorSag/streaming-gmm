@@ -1,4 +1,4 @@
-package streamingGmm
+package edu.github.gradientgmm
 
 import org.apache.spark.mllib.linalg.{Matrix => SM, Vector => SV}
 import org.apache.spark.rdd.RDD
@@ -6,7 +6,7 @@ import org.apache.spark.rdd.RDD
 
 trait Optimizable extends Serializable {
 
-  private[streamingGmm] var optimizer: GMMOptimizer
+  private[gradientgmm] var optimizer: GMMOptimizer
 
   var batchSize: Option[Int] = None
 

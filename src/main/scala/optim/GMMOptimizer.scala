@@ -1,4 +1,4 @@
-package streamingGmm
+package edu.github.gradientgmm
 
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 
@@ -6,9 +6,9 @@ trait GMMOptimizer extends Serializable {
 
 	val regularizer: Option[GMMRegularizer]
 
-	private[streamingGmm] var learningRate: Double
-	private[streamingGmm] var minLearningRate: Double
-	private[streamingGmm] var shrinkageRate: Double
+	private[gradientgmm] var learningRate: Double
+	private[gradientgmm] var minLearningRate: Double
+	private[gradientgmm] var shrinkageRate: Double
 
 	def setLearningRate(learningRate: Double): this.type = { 
 		require(learningRate > 0 , "learning rate must be positive")

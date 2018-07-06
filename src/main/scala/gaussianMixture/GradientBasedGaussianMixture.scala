@@ -1,4 +1,4 @@
-package streamingGmm
+package edu.github.gradientgmm
 
 import breeze.linalg.{diag, eigSym, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, max, min}
 
@@ -12,7 +12,7 @@ import org.apache.log4j.Logger
 class GradientBasedGaussianMixture(
   w: SGDWeights,
   g: Array[UpdatableMultivariateGaussian],
-  private[streamingGmm] var optimizer: GMMOptimizer) extends UpdatableGaussianMixture(w,g) with Optimizable {
+  private[gradientgmm] var optimizer: GMMOptimizer) extends UpdatableGaussianMixture(w,g) with Optimizable {
 
   var batchFraction = 1.0
 
@@ -107,7 +107,8 @@ class GradientBasedGaussianMixture(
       val posteriorResps = sampleStats.gConcaveCovariance.map{case x => x(d,d)}
 
       //update weights in the driver
-      weights.update(weights.soft + optimizer.learningRate/n*optimizer.softWeightsDirection(toBDV(posteriorResps),weights))
+      //weights.update(weights.soft + optimizer.learningRate/n*optimizer.softWeightsDirection(toBDV(posteriorResps),weights))
+      weights.update(optimizer.weightsToSoft(weights.weights) + optimizer.learningRate/n*optimizer.softWeightsDirection(toBDV(posteriorResps),weights))
 
       oldLL = newLL // current becomes previous
       newLL = (sampleStats.qLoglikelihood + newRegVal.sum)/n// this is the freshly computed log-likelihood plus regularization
@@ -227,19 +228,19 @@ class SGDWeights(var weights: Array[Double]) extends Serializable{
     weights
   }
 
-  private[streamingGmm] def updateMomentum(x: BDV[Double]): Unit = {
+  private[gradientgmm] def updateMomentum(x: BDV[Double]): Unit = {
     momentum = Option(x)
   }
 
-  private[streamingGmm] def updateAdamInfo(x: BDV[Double]): Unit = {
+  private[gradientgmm] def updateAdamInfo(x: BDV[Double]): Unit = {
     adamInfo = Option(x)
   }
 
-  private[streamingGmm] def initializeMomentum: Unit = {
+  private[gradientgmm] def initializeMomentum: Unit = {
     momentum = Option(BDV.zeros[Double](weights.length))
   }
 
-  private[streamingGmm] def initializeAdamInfo: Unit = {
+  private[gradientgmm] def initializeAdamInfo: Unit = {
      adamInfo = Option(BDV.zeros[Double](weights.length))
   }
 

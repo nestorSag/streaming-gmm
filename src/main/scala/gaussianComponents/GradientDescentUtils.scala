@@ -1,4 +1,4 @@
-package streamingGmm
+package edu.github.gradientgmm
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 
@@ -6,11 +6,11 @@ trait GradientDescentUtils extends Serializable{
 
   val d: Int 
 
-  private[streamingGmm] var momentum: Option[BDM[Double]] = None
+  private[gradientgmm] var momentum: Option[BDM[Double]] = None
 
-  private[streamingGmm] var adamInfo: Option[BDM[Double]] = None //raw second moment gradient estimate (for Adam optimizer)
+  private[gradientgmm] var adamInfo: Option[BDM[Double]] = None //raw second moment gradient estimate (for Adam optimizer)
 
-  private[streamingGmm] def initializeMomentum: Unit = {
+  private[gradientgmm] def initializeMomentum: Unit = {
     momentum = Option(BDM.zeros[Double](d+1,d+1))
   }
 
@@ -18,11 +18,11 @@ trait GradientDescentUtils extends Serializable{
     momentum = None
   }
 
-  private[streamingGmm] def updateMomentum(mat: BDM[Double]): Unit = {
+  private[gradientgmm] def updateMomentum(mat: BDM[Double]): Unit = {
     momentum = Option(mat)
   }
 
-  private[streamingGmm] def initializeAdamInfo: Unit = {
+  private[gradientgmm] def initializeAdamInfo: Unit = {
     adamInfo = Option(BDM.zeros[Double](d+1,d+1))
   }
 
@@ -30,7 +30,7 @@ trait GradientDescentUtils extends Serializable{
     adamInfo = None
   }
 
-  private[streamingGmm] def updateAdamInfo(mat: BDM[Double]): Unit = {
+  private[gradientgmm] def updateAdamInfo(mat: BDM[Double]): Unit = {
     adamInfo = Option(mat)
   }
 

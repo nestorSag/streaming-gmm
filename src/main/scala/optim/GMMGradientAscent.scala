@@ -1,9 +1,9 @@
-package streamingGmm
+package edu.github.gradientgmm
 
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 
 class GMMGradientAscent(
-	private[streamingGmm] var learningRate: Double,
+	private[gradientgmm] var learningRate: Double,
 	val regularizer: Option[GMMRegularizer]) extends GMMOptimizer{ 
 
 	require(learningRate>0,"learningRate must be positive")
@@ -30,14 +30,14 @@ class GMMGradientAscent(
 
 	}
 
-	private[streamingGmm] def basicLossGradient(paramMat: BDM[Double], sampleInfo: BDM[Double]): BDM[Double] = {
+	private[gradientgmm] def basicLossGradient(paramMat: BDM[Double], sampleInfo: BDM[Double]): BDM[Double] = {
 
 		val posteriorProb = sampleInfo(sampleInfo.rows-1,sampleInfo.cols-1)
 
 		(sampleInfo - paramMat*posteriorProb)*0.5
 	}
 
-	private[streamingGmm] def lossGradient(dist: UpdatableMultivariateGaussian, sampleInfo: BDM[Double]): BDM[Double] = {
+	private[gradientgmm] def lossGradient(dist: UpdatableMultivariateGaussian, sampleInfo: BDM[Double]): BDM[Double] = {
 
 		regularizer match{
 			case None => basicLossGradient(dist.paramMat,sampleInfo) 
@@ -48,7 +48,7 @@ class GMMGradientAscent(
 	}
 
 
-	private[streamingGmm] def basicSoftWeightsGradient(posteriors: BDV[Double], weights: BDV[Double]): BDV[Double] = {
+	private[gradientgmm] def basicSoftWeightsGradient(posteriors: BDV[Double], weights: BDV[Double]): BDV[Double] = {
 
 		val n = posteriors.sum
 
@@ -57,7 +57,7 @@ class GMMGradientAscent(
 		//paramMat(paramMat.rows-1,paramMat.cols-1) - n*weight
 	}
 
-	private[streamingGmm] def softWeightGradient(posteriors: BDV[Double], weights: BDV[Double]): BDV[Double] = {
+	private[gradientgmm] def softWeightGradient(posteriors: BDV[Double], weights: BDV[Double]): BDV[Double] = {
 
 		var grads = regularizer match {
 			case None => basicSoftWeightsGradient(posteriors,weights)

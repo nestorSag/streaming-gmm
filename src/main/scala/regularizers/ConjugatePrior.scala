@@ -1,4 +1,4 @@
-package streamingGmm
+package edu.github.gradientgmm
 
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace}
 
