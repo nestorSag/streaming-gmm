@@ -1,12 +1,11 @@
-package edu.github.gradientgmm
+package net.github.gradientgmm
 
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 
-class GMMMomentumGradientAscent(
-	learningRate: Double,
-	regularizer: Option[GMMRegularizer],
-	var decayRate: Double) extends GMMGradientAscent(learningRate,regularizer) {
+class GMMMomentumGradientAscent extends GMMGradientAscent {
 
+	var decayRate = 0.5
+	
 	def setDecayRate(decayRate: Double): Unit = { 
 		require(decayRate > 0 , "decay rate must be positive")
 		this.decayRate = decayRate
@@ -29,7 +28,7 @@ class GMMMomentumGradientAscent(
 		dist.momentum.get
 	}
 
-	override def softWeightsDirection(posteriors: BDV[Double], weights: SGDWeights): BDV[Double] = {
+	override def softWeightsDirection(posteriors: BDV[Double], weights: WeightsWrapper): BDV[Double] = {
 
 		if(!weights.momentum.isDefined){
 			weights.initializeMomentum

@@ -1,4 +1,4 @@
-package edu.github.gradientgmm
+package net.github.gradientgmm
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 

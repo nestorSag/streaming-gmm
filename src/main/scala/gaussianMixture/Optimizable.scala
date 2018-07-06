@@ -1,4 +1,4 @@
-package edu.github.gradientgmm
+package net.github.gradientgmm
 
 import org.apache.spark.mllib.linalg.{Matrix => SM, Vector => SV}
 import org.apache.spark.rdd.RDD

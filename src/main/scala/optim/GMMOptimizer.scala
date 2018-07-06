@@ -1,14 +1,14 @@
-package edu.github.gradientgmm
+package net.github.gradientgmm
 
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 
 trait GMMOptimizer extends Serializable {
 
-	val regularizer: Option[GMMRegularizer]
-
-	private[gradientgmm] var learningRate: Double
-	private[gradientgmm] var minLearningRate: Double
-	private[gradientgmm] var shrinkageRate: Double
+	val regularizer: Option[GMMRegularizer] = None
+	val weightOptimizer: GMMWeightTransformation = new SoftmaxWeightTransformation()
+	private[gradientgmm] var learningRate: Double = 0.9
+	private[gradientgmm] var minLearningRate: Double = 1e-2
+	private[gradientgmm] var shrinkageRate: Double = 0.95
 
 	def setLearningRate(learningRate: Double): this.type = { 
 		require(learningRate > 0 , "learning rate must be positive")
@@ -44,9 +44,18 @@ trait GMMOptimizer extends Serializable {
 		learningRate = math.max(shrinkageRate*learningRate,minLearningRate)
 	}
 
+	def fromSimplex(weights: BDV[Double]): BDV[Double] = {
+		weightOptimizer.fromSimplex(weights)
+	}
+
+	def toSimplex(weights: BDV[Double]): BDV[Double] = {
+		weightOptimizer.toSimplex(weights)
+	}
+	
 	def penaltyValue(dist: UpdatableMultivariateGaussian,weight: Double): Double
 
 	def direction(dist: UpdatableMultivariateGaussian, sampleInfo: BDM[Double]): BDM[Double]
 
-	def softWeightsDirection(posteriors: BDV[Double], weights: SGDWeights): BDV[Double]
+	def softWeightsDirection(posteriors: BDV[Double], weights: WeightsWrapper): BDV[Double]
+
 }

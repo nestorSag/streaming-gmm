@@ -1,7 +1,7 @@
 import org.scalatest.FlatSpec
 
 
-import streamingGmm.SGDWeights
+import streamingGmm.WeightsWrapper
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace}
 
 
@@ -38,7 +38,7 @@ trait OptimTestSpec extends FlatSpec{
 
 	val initialWeights = (1 to k).map{ case x => 1.0/k}
 
-	var weightObj = new SGDWeights(initialWeights.toArray)
+	var weightObj = new WeightsWrapper(initialWeights.toArray)
 
 
 }

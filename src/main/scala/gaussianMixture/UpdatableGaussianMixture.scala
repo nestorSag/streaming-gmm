@@ -1,4 +1,4 @@
-package edu.github.gradientgmm
+package net.github.gradientgmm
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 
@@ -9,7 +9,7 @@ import org.apache.spark.rdd.RDD
 
 
 class UpdatableGaussianMixture(
-  private[gradientgmm] var weights: SGDWeights,
+  private[gradientgmm] var weights: WeightsWrapper,
   private[gradientgmm] var gaussians: Array[UpdatableMultivariateGaussian]) extends Serializable {
 
 

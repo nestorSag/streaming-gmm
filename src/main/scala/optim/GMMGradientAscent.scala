@@ -1,15 +1,10 @@
-package edu.github.gradientgmm
+package net.github.gradientgmm
 
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 
-class GMMGradientAscent(
-	private[gradientgmm] var learningRate: Double,
-	val regularizer: Option[GMMRegularizer]) extends GMMOptimizer{ 
+class GMMGradientAscent extends GMMOptimizer{ 
 
 	require(learningRate>0,"learningRate must be positive")
-
-	var minLearningRate = 1e-3
-	var shrinkageRate = 1.0
 
 	def penaltyValue(dist: UpdatableMultivariateGaussian,weight: Double): Double = {
 
@@ -20,7 +15,7 @@ class GMMGradientAscent(
 
 	}
 
-	def softWeightsDirection(posteriors: BDV[Double], weights: SGDWeights): BDV[Double] = {
+	def softWeightsDirection(posteriors: BDV[Double], weights: WeightsWrapper): BDV[Double] = {
 		softWeightGradient(posteriors,new BDV(weights.weights))
 	}
 
@@ -50,11 +45,7 @@ class GMMGradientAscent(
 
 	private[gradientgmm] def basicSoftWeightsGradient(posteriors: BDV[Double], weights: BDV[Double]): BDV[Double] = {
 
-		val n = posteriors.sum
-
-		posteriors - weights*n
-
-		//paramMat(paramMat.rows-1,paramMat.cols-1) - n*weight
+		weightOptimizer.gradient(posteriors,weights)
 	}
 
 	private[gradientgmm] def softWeightGradient(posteriors: BDV[Double], weights: BDV[Double]): BDV[Double] = {

@@ -1,6 +1,6 @@
-package edu.github.gradientgmm
+package net.github.gradientgmm
 
-import breeze.linalg.{diag, eigSym, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, max, min}
+import breeze.linalg.{diag, eigSym, DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 
 import org.apache.spark.SparkContext
 import org.apache.spark.api.java.JavaRDD
@@ -10,7 +10,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.log4j.Logger
 
 class GradientBasedGaussianMixture(
-  w: SGDWeights,
+  w:  WeightsWrapper,
   g: Array[UpdatableMultivariateGaussian],
   private[gradientgmm] var optimizer: GMMOptimizer) extends UpdatableGaussianMixture(w,g) with Optimizable {
 
@@ -107,8 +107,9 @@ class GradientBasedGaussianMixture(
       val posteriorResps = sampleStats.gConcaveCovariance.map{case x => x(d,d)}
 
       //update weights in the driver
-      //weights.update(weights.soft + optimizer.learningRate/n*optimizer.softWeightsDirection(toBDV(posteriorResps),weights))
-      weights.update(optimizer.weightsToSoft(weights.weights) + optimizer.learningRate/n*optimizer.softWeightsDirection(toBDV(posteriorResps),weights))
+      val current = optimizer.fromSimplex(Utils.toBDV(weights.weights))
+      val delta = optimizer.learningRate/n*optimizer.softWeightsDirection(Utils.toBDV(posteriorResps),weights)
+      weights.update(optimizer.toSimplex(current + delta))
 
       oldLL = newLL // current becomes previous
       newLL = (sampleStats.qLoglikelihood + newRegVal.sum)/n// this is the freshly computed log-likelihood plus regularization
@@ -126,10 +127,6 @@ class GradientBasedGaussianMixture(
 
   private def shouldDistributeGaussians(k: Int, d: Int): Boolean = ((k - 1.0) / k) * d > 25
 
-  private def toBDV(x: Array[Double]): BDV[Double] = {
-    new BDV(x)
-  }
-
   private def batch(data: RDD[BDV[Double]]): RDD[BDV[Double]] = {
     if(batchFraction < 1.0){
       data.sample(true,batchFraction)
@@ -146,7 +143,7 @@ object GradientBasedGaussianMixture{
     weights: Array[Double],
     gaussians: Array[UpdatableMultivariateGaussian],
     optimizer: GMMOptimizer): GradientBasedGaussianMixture = {
-    new GradientBasedGaussianMixture(new SGDWeights(weights),gaussians,optimizer)
+    new GradientBasedGaussianMixture(new WeightsWrapper(weights),gaussians,optimizer)
   }
 
   def apply(
@@ -155,7 +152,7 @@ object GradientBasedGaussianMixture{
     optimizer: GMMOptimizer): GradientBasedGaussianMixture = {
 
     new GradientBasedGaussianMixture(
-      new SGDWeights((1 to k).map{x => 1.0/k}.toArray),
+      new WeightsWrapper((1 to k).map{x => 1.0/k}.toArray),
       (1 to k).map{x => UpdatableMultivariateGaussian(BDV.rand(d),BDM.eye[Double](d))}.toArray,
       optimizer)
 
@@ -171,7 +168,7 @@ object GradientBasedGaussianMixture{
     val samples = data.map{x => new BDV[Double](x.toArray)}.takeSample(withReplacement = true, k * nSamples, seed)
 
     new GradientBasedGaussianMixture(
-      new SGDWeights(Array.fill(k)(1.0 / k)), 
+      new WeightsWrapper(Array.fill(k)(1.0 / k)), 
       Array.tabulate(k) { i =>
       val slice = samples.view(i * nSamples, (i + 1) * nSamples)
       UpdatableMultivariateGaussian(vectorMean(slice), initCovariance(slice))
@@ -194,38 +191,15 @@ object GradientBasedGaussianMixture{
   }
 }
 
-class SGDWeights(var weights: Array[Double]) extends Serializable{
+class WeightsWrapper(var weights: Array[Double]) extends Serializable{
 
   var momentum: Option[BDV[Double]] = None
   var adamInfo: Option[BDV[Double]] = None
   var length = weights.length
 
-  lazy val (upperBound,lowerBound) = findBounds
-
-  def soft: BDV[Double] = {
-    new BDV(weights.map{case w => math.log(w/weights.last)})
-  }
-
   def update(newWeights: BDV[Double]): Unit = {
     // recenter soft weights to avoid under or overflow
-    val offset = -(max(newWeights) + min(newWeights))/2
-    val d = newWeights.length
-    //bound the centered soft weights to avoid under or overflow
-    weights = softmax(bound(newWeights + BDV.ones[Double](d)*offset))
-  }
-
-  def softmax(sw: BDV[Double]): Array[Double] = {
-
-    val expsw = sw.toArray.map{ case w => math.exp(w)}
-
-    expsw.map{case w => w/expsw.sum}
-  }
-
-  private def bound(weights: BDV[Double]): BDV[Double] = {
-    for(i <- 1 to weights.length){
-      weights(i-1) = math.max(math.min(weights(i-1),upperBound),lowerBound)
-    }
-    weights
+    weights = newWeights.toArray
   }
 
   private[gradientgmm] def updateMomentum(x: BDV[Double]): Unit = {
@@ -242,18 +216,6 @@ class SGDWeights(var weights: Array[Double]) extends Serializable{
 
   private[gradientgmm] def initializeAdamInfo: Unit = {
      adamInfo = Option(BDV.zeros[Double](weights.length))
-  }
-
-  private def findBounds: (Double,Double) = {
-    val bound = {
-      var eps = 1.0
-      while (!math.exp(eps).isInfinite) {
-        eps += 1
-      }
-      eps
-    }
-
-    (bound-1,-bound+1)
   }
 
 }

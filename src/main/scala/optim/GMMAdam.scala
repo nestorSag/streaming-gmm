@@ -1,18 +1,17 @@
-package edu.github.gradientgmm
+package net.github.gradientgmm
 
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 
 import breeze.numerics.sqrt
 
-class GMMAdam(
-	learningRate: Double,
-	regularizer: Option[GMMRegularizer],
-	var beta1: Double,
-	var beta2: Double) extends GMMGradientAscent(learningRate,regularizer) {
+class GMMAdam extends GMMGradientAscent {
 
 	var t: Int = 0 //timestep
 	var eps = 1e-8
 
+	var beta1 = 0.5
+	var beta2 = 0.1
+	
 	def setBeta1(beta1: Double): Unit = { 
 		require(beta1 > 0 , "beta1 must be positive")
 		this.beta1 = beta1
@@ -64,7 +63,7 @@ class GMMAdam(
 		alpha_t * dist.momentum.get /:/ (sqrt(dist.adamInfo.get) + eps)
 	}
 
-	override def softWeightsDirection(posteriors: BDV[Double], weights: SGDWeights): BDV[Double] = {
+	override def softWeightsDirection(posteriors: BDV[Double], weights: WeightsWrapper): BDV[Double] = {
 
 		if(!weights.momentum.isDefined){
 			weights.initializeMomentum
