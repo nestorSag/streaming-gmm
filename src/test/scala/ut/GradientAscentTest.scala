@@ -7,7 +7,7 @@ class GradientAscentTest extends OptimTestSpec{
 
 	var lr = 0.5
 	var current = UpdatableMultivariateGaussian(BDV.rand(dim),BDM.eye[Double](dim))
-	var optim = new GMMGradientAscent(lr,None)
+	var optim = new GMMGradientAscent().setLearningRate(lr)
 	val paramMat0 = current.paramMat
 		
 	"GradientAscent w/o reg" should "make current dist converge to target dist in expectation" in {

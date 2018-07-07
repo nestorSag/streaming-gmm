@@ -1,15 +1,16 @@
 package net.github.gradientgmm
 
-import breeze.linalg.{diag, eigSym, DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
+import breeze.linalg.{diag, eigSym, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace}
 
+import org.apache.spark.rdd.RDD
 import org.apache.spark.SparkContext
 import org.apache.spark.api.java.JavaRDD
-import org.apache.spark.mllib.linalg.{Matrix => SM, Vector => SV}
-import org.apache.spark.rdd.RDD
+import org.apache.spark.mllib.linalg.{Matrix => SM, Vector => SV, Vectors => SVS}
+import org.apache.spark.mllib.clustering.{KMeans, KMeansModel}
 
 import org.apache.log4j.Logger
 
-class GradientBasedGaussianMixture(
+class GradientBasedGaussianMixture private (
   w:  WeightsWrapper,
   g: Array[UpdatableMultivariateGaussian],
   private[gradientgmm] var optimizer: GMMOptimizer) extends UpdatableGaussianMixture(w,g) with Optimizable {
@@ -38,14 +39,21 @@ class GradientBasedGaussianMixture(
     val bcOptim = sc.broadcast(this.optimizer)
 
     val initialRate = optimizer.learningRate
-   // var rv: Array[Double]
-    batchFraction = if(batchSize.isDefined){
-      batchSize.get.toDouble/gConcaveData.count()
+    // var rv: Array[Double]
+
+    // this is to prevent that 0 size samples are too frequent
+    // this is because of the way spark takes random samples
+    //Prob(0 size sample) <= 1e-3
+    val dataSize = gConcaveData.count()
+    val minSafeBatchSize: Double = dataSize*(1 - math.exp(math.log(1e-3/dataSize)))
+
+    batchFraction = if(optimizer.batchSize.isDefined){
+      math.max(optimizer.batchSize.get.toDouble,minSafeBatchSize)/dataSize
       }else{
         1.0
       }
 
-    while (iter < maxGradientIters && math.abs(newLL-oldLL) > convergenceTol) {
+    while (iter < optimizer.maxIter && math.abs(newLL-oldLL) > optimizer.convergenceTol) {
 
       //send values formatted for R processing to logs
       logger.debug(s"means: list(${gaussians.map{case g => "c(" + g.getMu.toArray.mkString(",") + ")"}.mkString(",")})")
@@ -129,7 +137,7 @@ class GradientBasedGaussianMixture(
 
   private def batch(data: RDD[BDV[Double]]): RDD[BDV[Double]] = {
     if(batchFraction < 1.0){
-      data.sample(true,batchFraction)
+      data.sample(false,batchFraction)
     }else{
       data
     }
@@ -146,33 +154,66 @@ object GradientBasedGaussianMixture{
     new GradientBasedGaussianMixture(new WeightsWrapper(weights),gaussians,optimizer)
   }
 
-  def apply(
-    k: Int,
-    d: Int,
-    optimizer: GMMOptimizer): GradientBasedGaussianMixture = {
-
-    new GradientBasedGaussianMixture(
-      new WeightsWrapper((1 to k).map{x => 1.0/k}.toArray),
-      (1 to k).map{x => UpdatableMultivariateGaussian(BDV.rand(d),BDM.eye[Double](d))}.toArray,
-      optimizer)
-
-  }
-
-  def apply(
-    k: Int,
-    optimizer: GMMOptimizer,
+  def initialize(
     data: RDD[SV],
+    optimizer: GMMOptimizer,
+    k: Int,
+    nSamples: Int,
+    nIters: Int,
     seed: Long = 0): GradientBasedGaussianMixture = {
     
-    val nSamples = 5
-    val samples = data.map{x => new BDV[Double](x.toArray)}.takeSample(withReplacement = true, k * nSamples, seed)
+    val sc = data.sparkContext
+    val d = data.take(1)(0).size
+    val n = math.max(nSamples,2*k)
+    var samples = sc.parallelize(data.takeSample(withReplacement = false, n, seed))
+
+    //create kmeans model
+    val kmeansModel = new KMeans()
+      .setMaxIterations(nIters)
+      .setK(k)
+      .setSeed(seed)
+      .run(samples)
+    
+    val means = kmeansModel.clusterCenters.map{case v => Utils.toBDV(v.toArray)}
+
+    //add means to sample points to avoid having cluster with zero points 
+    samples = samples.union(sc.parallelize(means.map{case v => SVS.dense(v.toArray)}))
+
+    // broadcast values to compute sample covariance matrices
+    val kmm = sc.broadcast(kmeansModel)
+    val scMeans = sc.broadcast(means)
+
+    // get empirical cluster proportions to initialize the mixture/s weights
+    //add 1 to counts to avoid division by zero
+    val proportions = samples
+      .map{case s => (kmm.value.predict(s),1)}
+      .reduceByKey(_ + _)
+      .sortByKey()
+      .collect()
+      .map{case (k,p) => p.toDouble}
+
+    val scProportions = sc.broadcast(proportions)
+
+    //get empirical covariance matrices
+    //also add a rescaled identity matrix to avoid starting with singular matrices 
+    val pseudoCov = samples
+      .map{case v => {
+          val prediction = kmm.value.predict(v)
+          val denom = math.sqrt(scProportions.value(prediction))
+          (prediction,(Utils.toBDV(v.toArray)-scMeans.value(prediction))/denom) }} // x => (x-mean)
+      .map{case (k,v) => (k,v*v.t)}
+      .reduceByKey(_ + _)
+      .map{case (k,v) => {
+        val avgVariance = math.max(1e-4,trace(v))/d
+        (k,v + BDM.eye[Double](d) * avgVariance)
+        }}
+      .sortByKey()
+      .collect()
+      .map{case (k,m) => m}
 
     new GradientBasedGaussianMixture(
-      new WeightsWrapper(Array.fill(k)(1.0 / k)), 
-      Array.tabulate(k) { i =>
-      val slice = samples.view(i * nSamples, (i + 1) * nSamples)
-      UpdatableMultivariateGaussian(vectorMean(slice), initCovariance(slice))
-      },
+      new WeightsWrapper(proportions.map{case p => p/n}), 
+      (0 to k-1).map{case i => UpdatableMultivariateGaussian(means(i),pseudoCov(i))}.toArray,
       optimizer)
 
   }
@@ -193,13 +234,36 @@ object GradientBasedGaussianMixture{
 
 class WeightsWrapper(var weights: Array[Double]) extends Serializable{
 
+  require(checkPositivity(weights), "some weights are negative or equal to zero")
+
+  var simplexErrorTol = 1e-8
   var momentum: Option[BDV[Double]] = None
   var adamInfo: Option[BDV[Double]] = None
   var length = weights.length
 
   def update(newWeights: BDV[Double]): Unit = {
     // recenter soft weights to avoid under or overflow
+    require(isInSimplex(weights),"new weights don't sum 1")
     weights = newWeights.toArray
+
+  }
+
+  def isInSimplex(x: Array[Double]): Boolean = {
+    val s = x.sum
+    val error = (s-1.0)
+    error*error <= simplexErrorTol
+  }
+
+  def checkPositivity(x: Array[Double]): Boolean = {
+    var allPositive = true
+    var i = 0
+    while(i < x.length && allPositive){
+      if(x(i)<=0){
+        allPositive = false
+      }
+      i += 1
+    }
+    allPositive
   }
 
   private[gradientgmm] def updateMomentum(x: BDV[Double]): Unit = {

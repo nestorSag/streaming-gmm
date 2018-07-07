@@ -8,7 +8,7 @@ class ConjugatePrior(
 	priorSigma: BDM[Double], 
 	val weightConcentration: Double, 
 	val numClusters: Int) extends GMMRegularizer {
-
+	
 	// val df = degFreedom
 	// val weightConcentration = dirichletParam
 	// val numClusters = nClust

@@ -2,10 +2,22 @@ package net.github.gradientgmm
 
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 
-class LogBarrier(val shift: Double = 0, val scale: Double = 1) extends GMMRegularizer{ 
+class LogBarrier extends GMMRegularizer{ 
 
-	require(shift >= 0, "shift must be nonnegative")
-	require(scale > 0, "scale must be positive")
+	var scale = 1.0
+	var shift = 0.0
+
+	def setScale(scale: Double): this.type = {
+		require(scale > 0, "scale must be positive")
+		this.scale = scale
+		this
+	}
+
+	def setShift(shift: Double): this.type = {
+		require(shift >= 0, "shift must be nonnegative")
+		this.shift = shift
+		this
+	}
 
 	def softWeightsGradient(weights: BDV[Double]): BDV[Double] = BDV.zeros[Double](weights.length)
 

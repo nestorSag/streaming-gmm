@@ -8,7 +8,7 @@ class MomentumTest extends OptimTestSpec{
 	var lr = 0.5
 	var beta = 0.9
 	var current = UpdatableMultivariateGaussian(BDV.rand(dim),BDM.eye[Double](dim))
-	var optim = new GMMMomentumGradientAscent(lr,None,beta)
+	var optim = new GMMMomentumGradientAscent().setLearningRate(lr).setBeta(beta)
 
 	"MomentumGradientAscent w/o reg" should "follow the right path in expectation to target Gaussian parameters" in {
 		

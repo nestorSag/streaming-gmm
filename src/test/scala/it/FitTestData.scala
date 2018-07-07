@@ -1,7 +1,7 @@
 import org.scalatest.FlatSpec
 
 
-import streamingGmm._
+import net.github.gradientgmm._
 
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.mllib.clustering.{GaussianMixture, GaussianMixtureModel}
@@ -58,6 +58,9 @@ object FitTestData{
 		val parsedData = data.map(s => SVS.dense(s.trim.split(' ').map(_.toDouble))).cache()
 		val d = parsedData.take(1)(0).size
 
+		val opt = new GMMGradientAscent()
+			.setLearningRate(0.9)
+			
 		val mygmm = GradientBasedGaussianMixture(k,new GMMGradientAscent(0.9,None),parsedData)
 
 		val weights = mygmm.getWeights
@@ -74,8 +77,17 @@ object FitTestData{
 		val covs = (1 to k).map{case k => BDM.eye[Double](d)}.toArray
 		val initialDists = means.zip(covs).map{case (m,s) => UpdatableMultivariateGaussian(m,s)}
 
-		//val optim = new GMMGradientAscent(learningRate = lr,regularizer= None).setShrinkageRate(shrinkageRate).setMinLearningRate(minLr)
-		val optim = new GMMMomentumGradientAscent(learningRate = lr,regularizer= None,decayRate=0.5).setShrinkageRate(shrinkageRate).setMinLearningRate(minLr)
+		//val optim = new GMMGradientAscent()
+		//	.setLearningRate(lr)
+		//	.setShrinkageRate(shrinkageRate)
+		//	.setMinLearningRate(setMinLearningRate)
+
+		val optim = new GMMMomentumGradientAscent()
+			.setLearningRate(lr)
+			.decayRate(0.5)
+			.setShrinkageRate(shrinkageRate)
+			.setMinLearningRate(minLr)
+
 		//val optim = new GMMAdam(learningRate = lr,regularizer= None,beta1=0.9,beta2=0.1).setShrinkageRate(shrinkageRate).setMinLearningRate(minLr)
 		var model = GradientBasedGaussianMixture(initialWeights,initialDists.clone,optim).setmaxGradientIters(100)
 

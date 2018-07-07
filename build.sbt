@@ -12,8 +12,8 @@ scalaVersion := "2.11.8"
 
 // It's possible to define many kinds of settings, such as:
 
-name := "streamingGmm"
-organization := "org.uoe.sgdgmm"
+name := "gradient based gaussian mixture model"
+organization := "edu.uk.ac.ed"
 version := "1.0"
 
 // Note, it's not required for you to define these three settings. These are
