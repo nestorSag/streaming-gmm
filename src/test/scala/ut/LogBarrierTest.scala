@@ -1,5 +1,5 @@
 import org.scalatest.FlatSpec
-import streamingGmm.{UpdatableMultivariateGaussian,LogBarrier}
+import net.github.gradientgmm.{UpdatableMultivariateGaussian,LogBarrier}
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, det, trace}
 
 
@@ -13,9 +13,9 @@ class LogBarrierTest extends FlatSpec {
 
   var r = scala.util.Random
 
-  var scale_ = r.nextFloat.toDouble
+  var scale = r.nextFloat.toDouble
 
-  var logbarrier = new LogBarrier(scale=scale_)
+  var logbarrier = new LogBarrier().setScale(scale)
 
   val randA = BDM.rand(covdim,covdim)
   val cov = randA.t * randA + BDM.eye[Double](covdim) // form SPD covariance matrix
@@ -31,12 +31,12 @@ class LogBarrierTest extends FlatSpec {
   "gradient()" should "give correct gradient" in { 
 
     var e = BDV(Array.fill(covdim)(0.0) ++ Array(1.0))
-    var shouldBeZero = logbarrier.gradient(unitdist) - (BDM.eye[Double](covdim+1) - e * e.t) * scale_
+    var shouldBeZero = logbarrier.gradient(unitdist) - (BDM.eye[Double](covdim+1) - e * e.t) * scale
 
     assert(trace(shouldBeZero.t*shouldBeZero) < errorTol)
 
     e = umgdist.paramMat(::,umgdist.paramMat.cols - 1)
-    shouldBeZero = logbarrier.gradient(umgdist) - (umgdist.paramMat - e * e.t) * scale_
+    shouldBeZero = logbarrier.gradient(umgdist) - (umgdist.paramMat - e * e.t) * scale
 
     assert(trace(shouldBeZero.t*shouldBeZero) < errorTol)
 
@@ -46,7 +46,7 @@ class LogBarrierTest extends FlatSpec {
 
     var reg = logbarrier.evaluate(umgdist,1.0)
 
-    var diff = reg - scale_ * (math.log(det(umgdist.paramMat)) - umgdist.getS)
+    var diff = reg - scale * (math.log(det(umgdist.paramMat)) - umgdist.getS)
 
     assert(math.pow(diff,2) < errorTol)
     

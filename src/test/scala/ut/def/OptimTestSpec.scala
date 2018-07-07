@@ -1,7 +1,7 @@
 import org.scalatest.FlatSpec
 
 
-import streamingGmm.WeightsWrapper
+import net.github.gradientgmm.WeightsWrapper
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace}
 
 

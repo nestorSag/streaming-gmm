@@ -1,4 +1,4 @@
-import streamingGmm.{GMMMomentumGradientAscent, UpdatableMultivariateGaussian}
+import net.github.gradientgmm.{GMMMomentumGradientAscent, UpdatableMultivariateGaussian}
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, norm}
 
@@ -64,7 +64,9 @@ class MomentumTest extends OptimTestSpec{
 
 		for(i <- 1 to niter){
 
-			weightObj.update(weightObj.soft + optim.softWeightsDirection(targetWeights,weightObj) * optim.getLearningRate)
+			var currentWeights = optim.fromSimplex(new BDV(weightObj.weights))
+			var delta = optim.softWeightsDirection(targetWeights,weightObj) * optim.getLearningRate
+			weightObj.update(optim.toSimplex(currentWeights + delta))
 
 		}
 

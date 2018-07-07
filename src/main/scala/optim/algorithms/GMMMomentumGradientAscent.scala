@@ -4,15 +4,16 @@ import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 
 class GMMMomentumGradientAscent extends GMMGradientAscent {
 
-	var decayRate = 0.5
+	var beta = 0.5
 	
-	def setDecayRate(decayRate: Double): Unit = { 
-		require(decayRate > 0 , "decay rate must be positive")
-		this.decayRate = decayRate
+	def setBeta(beta: Double): this.type = { 
+		require(beta > 0 , "beta must be positive")
+		this.beta = beta
+		this
 	}
 
-	def getDecayRate: Double = { 
-		this.decayRate
+	def getBeta: Double = { 
+		this.beta
 	}
 
 	override def direction(dist: UpdatableMultivariateGaussian, sampleInfo: BDM[Double]): BDM[Double] = {
@@ -23,7 +24,7 @@ class GMMMomentumGradientAscent extends GMMGradientAscent {
 
 		val grad = lossGradient(dist, sampleInfo)
 		
-		dist.updateMomentum(dist.momentum.get*decayRate + grad)
+		dist.updateMomentum(dist.momentum.get*beta + grad)
 
 		dist.momentum.get
 	}
@@ -36,7 +37,7 @@ class GMMMomentumGradientAscent extends GMMGradientAscent {
 
 		val grad = softWeightGradient(posteriors, new BDV(weights.weights))
 		
-		weights.updateMomentum(weights.momentum.get*decayRate + grad)
+		weights.updateMomentum(weights.momentum.get*beta + grad)
 
 		weights.momentum.get
 

@@ -1,7 +1,7 @@
 import org.scalatest.{FunSuite}
 
 
-import streamingGmm.{UpdatableMultivariateGaussian, GradientBasedGaussianMixture, GMMGradientAscent}
+import net.github.gradientgmm.{UpdatableMultivariateGaussian, GradientBasedGaussianMixture, GMMGradientAscent}
 
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.mllib.clustering.{GaussianMixture, GaussianMixtureModel}
@@ -15,15 +15,15 @@ trait SparkTester extends FunSuite{
     var sc : SparkContext = _
 
     val conf = new SparkConf().setAppName("GradientBasedGaussianMixture-test").setMaster("local[4]")
-    sc = new SparkContext(conf)
 
     val errorTol = 1e-8
     val k = 3
 
+    sc = new SparkContext(conf)
     val data = sc.textFile("src/test/resources/testdata.csv")// Trains Gaussian Mixture Model
     val parsedData = data.map(s => SVS.dense(s.trim.split(' ').map(_.toDouble))).cache()
 
-    val mygmm = GradientBasedGaussianMixture(k,new GMMGradientAscent(0.9,None),parsedData)
+    val mygmm = GradientBasedGaussianMixture.initialize(parsedData,new GMMGradientAscent(),k,50,20,0)
 
     val weights = mygmm.getWeights
     val gaussians = mygmm.getGaussians.map{
@@ -34,9 +34,6 @@ trait SparkTester extends FunSuite{
     val sparkgmm = new GaussianMixtureModel(weights,gaussians)
 
     val x = parsedData.take(1)(0)
-
-    def stopContext(): Unit = {sc.stop()}
-
 
 }
 
@@ -53,6 +50,7 @@ class GaussianMixtureTests extends SparkTester{
 	    val res = sparkgmm.predict(parsedData).zip(mygmm.predict(parsedData)).map{case (x,y) => (x-y)*(x-y)}.sum
 
 	    assert(res == 0)
+
 	  }
 
 	  test("predictSoft() should give same result as spark GMM model for single vector"){
@@ -63,6 +61,7 @@ class GaussianMixtureTests extends SparkTester{
 	  }
 
 	  test("predictSoft() should give same result as spark GMM model for RDDs") {
+	    
 	    val res = sparkgmm.predictSoft(parsedData).zip(mygmm.predictSoft(parsedData)).map{case (a,b) => {
 	     val x = new BDV(a)
 	     val y = new BDV(b)
@@ -70,8 +69,14 @@ class GaussianMixtureTests extends SparkTester{
 	     }}.sum
 
 	    assert(res < errorTol)
+	    sc.stop()
 	  }
+	} catch{
+		case _: Throwable => println("SOmething went wrong")
 	}
+	// finally{
+	// 	sc.stop() //doesn't work. fixing this is in todo list
+	// }
 
   // the step() method will be tested in the integration testing stage
 }

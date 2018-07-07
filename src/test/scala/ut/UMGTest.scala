@@ -1,5 +1,5 @@
 import org.scalatest.FlatSpec
-import streamingGmm.{UpdatableMultivariateGaussian}
+import net.github.gradientgmm.{UpdatableMultivariateGaussian}
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, norm, trace, det}
 
 import org.apache.spark.mllib.stat.distribution.MultivariateGaussian

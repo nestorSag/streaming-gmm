@@ -1,6 +1,6 @@
 // can't figure out how to test this properly
 
-// import streamingGmm.{GMMAdam, UpdatableMultivariateGaussian}
+// import net.github.gradientgmm.{GMMAdam, UpdatableMultivariateGaussian}
 
 // import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, norm}
 

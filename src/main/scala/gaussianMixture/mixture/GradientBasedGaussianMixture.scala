@@ -212,7 +212,7 @@ object GradientBasedGaussianMixture{
       .map{case (k,m) => m}
 
     new GradientBasedGaussianMixture(
-      new WeightsWrapper(proportions.map{case p => p/n}), 
+      new WeightsWrapper(proportions.map{case p => p/(n+k)}), 
       (0 to k-1).map{case i => UpdatableMultivariateGaussian(means(i),pseudoCov(i))}.toArray,
       optimizer)
 
@@ -230,56 +230,4 @@ object GradientBasedGaussianMixture{
     x.foreach(xi => v += xi)
     v / x.length.toDouble
   }
-}
-
-class WeightsWrapper(var weights: Array[Double]) extends Serializable{
-
-  require(checkPositivity(weights), "some weights are negative or equal to zero")
-
-  var simplexErrorTol = 1e-8
-  var momentum: Option[BDV[Double]] = None
-  var adamInfo: Option[BDV[Double]] = None
-  var length = weights.length
-
-  def update(newWeights: BDV[Double]): Unit = {
-    // recenter soft weights to avoid under or overflow
-    require(isInSimplex(weights),"new weights don't sum 1")
-    weights = newWeights.toArray
-
-  }
-
-  def isInSimplex(x: Array[Double]): Boolean = {
-    val s = x.sum
-    val error = (s-1.0)
-    error*error <= simplexErrorTol
-  }
-
-  def checkPositivity(x: Array[Double]): Boolean = {
-    var allPositive = true
-    var i = 0
-    while(i < x.length && allPositive){
-      if(x(i)<=0){
-        allPositive = false
-      }
-      i += 1
-    }
-    allPositive
-  }
-
-  private[gradientgmm] def updateMomentum(x: BDV[Double]): Unit = {
-    momentum = Option(x)
-  }
-
-  private[gradientgmm] def updateAdamInfo(x: BDV[Double]): Unit = {
-    adamInfo = Option(x)
-  }
-
-  private[gradientgmm] def initializeMomentum: Unit = {
-    momentum = Option(BDV.zeros[Double](weights.length))
-  }
-
-  private[gradientgmm] def initializeAdamInfo: Unit = {
-     adamInfo = Option(BDV.zeros[Double](weights.length))
-  }
-
 }

@@ -5,7 +5,7 @@ import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 import org.apache.spark.mllib.linalg.{Vector => SV}
 import org.apache.spark.rdd.RDD
 
-trait GMMOptimizer extends Serializable {
+trait GMMOptimizer extends Serializable{
 
 	private[gradientgmm] val regularizer: Option[GMMRegularizer] = None
 	private[gradientgmm] val weightOptimizer: GMMWeightTransformation = new SoftmaxWeightTransformation()
