@@ -5,17 +5,23 @@ import breeze.linalg.{diag, eigSym, DenseMatrix => BDM, DenseVector => BDV, Vect
 import org.apache.spark.rdd.RDD
 import org.apache.spark.SparkContext
 import org.apache.spark.api.java.JavaRDD
-import org.apache.spark.mllib.linalg.{Matrix => SM, Vector => SV, Vectors => SVS}
-import org.apache.spark.mllib.clustering.{KMeans, KMeansModel}
+import org.apache.spark.mllib.linalg.{Matrix => SM, Vector => SV, Vectors => SVS, Matrices => SMS}
+import org.apache.spark.mllib.clustering.{KMeans, KMeansModel, GaussianMixtureModel}
+import org.apache.spark.mllib.stat.distribution.{MultivariateGaussian => SMG}
+
 
 import org.apache.log4j.Logger
 
 class GradientBasedGaussianMixture private (
   w:  WeightsWrapper,
-  g: Array[UpdatableMultivariateGaussian],
+  g: Array[UpdatableGConcaveGaussian],
   private[gradientgmm] var optimizer: GMMOptimizer) extends UpdatableGaussianMixture(w,g) with Optimizable {
 
+
+
   var batchFraction = 1.0
+
+
 
   def step(data: RDD[SV]): Unit = {
 
@@ -33,13 +39,9 @@ class GradientBasedGaussianMixture private (
     var oldLL = 0.0  // previous log-likelihood
     var iter = 0
     
-
-    var regVals = Array.fill(k)(0.0)
-
     val bcOptim = sc.broadcast(this.optimizer)
 
     val initialRate = optimizer.learningRate
-    // var rv: Array[Double]
 
     // this is to prevent that 0 size samples are too frequent
     // this is because of the way spark takes random samples
@@ -59,60 +61,59 @@ class GradientBasedGaussianMixture private (
       logger.debug(s"means: list(${gaussians.map{case g => "c(" + g.getMu.toArray.mkString(",") + ")"}.mkString(",")})")
       logger.debug(s"weights: ${"c(" + weights.weights.mkString(",") + ")"}")
 
-      val compute = sc.broadcast(SampleAggregator.add(weights.weights, gaussians)_)
+      val adder = sc.broadcast(
+        StatAggregator.add(weights.weights, gaussians, optimizer, dataSize*batchFraction)_)
 
       //val x = batch(gConcaveData)
       //logger.debug(s"sample size: ${x.count()}")
-      val sampleStats = batch(gConcaveData).treeAggregate(SampleAggregator.zero(k, d))(compute.value, _ += _)
+      val sampleStats = batch(gConcaveData).treeAggregate(StatAggregator.init(k, d))(adder.value, _ += _)
 
-      val n: Double = sampleStats.gConcaveCovariance.map{case x => x(d,d)}.sum // number of data points 
+      val n: Double = sampleStats.posteriors.sum // number of data points 
       logger.debug(s"n: ${n}")
 
       val tuples =
-          Seq.tabulate(k)(i => (sampleStats.gConcaveCovariance(i), 
-                                gaussians(i),
-                                weights.weights(i)))
+          Seq.tabulate(k)(i => (sampleStats.gradients(i), 
+                                gaussians(i)))
 
 
 
       // update gaussians
-      var (newRegVal, newDists) = if (shouldDistribute) {
+      var newDists = if (shouldDistribute) {
         // compute new gaussian parameters and regularization values in
         // parallel
 
         val numPartitions = math.min(k, 1024)
 
-        val (rv,gs) = sc.parallelize(tuples, numPartitions).map { case (cov,g,w) =>
+        val newDists = sc.parallelize(tuples, numPartitions).map { case (grad,dist) =>
 
-          val regVal =  bcOptim.value.penaltyValue(g,w)
-          g.update(g.paramMat + bcOptim.value.direction(g,cov) * bcOptim.value.learningRate/n)
+          dist.update(dist.paramMat + grad * bcOptim.value.learningRate)
 
-          bcOptim.value.updateLearningRate
+          bcOptim.value.updateLearningRate //update learning rate in workers
 
-          (regVal,g)
+          dist
 
-        }.collect().unzip
+        }.collect()
 
-        (rv.toArray,gs.toArray)
+        newDists.toArray
+
       } else {
 
-        val (rv,gs) = tuples.map{ 
-          case (cov,g,w) => 
+        val newDists = tuples.map{ 
+          case (grad,dist) => 
 
-          val regVal = optimizer.penaltyValue(g,w)
-          g.update(g.paramMat + optimizer.direction(g,cov) * optimizer.learningRate/n)
+          dist.update(dist.paramMat + grad * optimizer.learningRate)
           
-          (regVal, g)
+          dist
 
-        }.unzip
+        }
 
-        (rv.toArray,gs.toArray)
+        newDists.toArray
 
       }
 
       gaussians = newDists
 
-      val posteriorResps = sampleStats.gConcaveCovariance.map{case x => x(d,d)}
+      val posteriorResps = sampleStats.posteriors
 
       //update weights in the driver
       val current = optimizer.fromSimplex(Utils.toBDV(weights.weights))
@@ -120,12 +121,12 @@ class GradientBasedGaussianMixture private (
       weights.update(optimizer.toSimplex(current + delta))
 
       oldLL = newLL // current becomes previous
-      newLL = (sampleStats.qLoglikelihood + newRegVal.sum)/n// this is the freshly computed log-likelihood plus regularization
+      newLL = sampleStats.qLoglikelihood
       logger.debug(s"newLL: ${newLL}")
 
-      optimizer.updateLearningRate
+      optimizer.updateLearningRate //update learning rate in driver
       iter += 1
-      compute.destroy()
+      adder.destroy()
     }
 
     bcOptim.destroy()
@@ -133,7 +134,23 @@ class GradientBasedGaussianMixture private (
 
   }
 
+  def toSparkGMM: GaussianMixtureModel = {
+
+    val d = gaussians(0).getMu.length
+
+    new GaussianMixtureModel(
+      weights.weights,
+      gaussians.map{
+        case g => new SMG(
+          SVS.dense(g.getMu.toArray),
+          SMS.dense(d,d,g.getSigma.toArray))})
+  }
+
+
+
   private def shouldDistributeGaussians(k: Int, d: Int): Boolean = ((k - 1.0) / k) * d > 25
+
+
 
   private def batch(data: RDD[BDV[Double]]): RDD[BDV[Double]] = {
     if(batchFraction < 1.0){
@@ -149,7 +166,7 @@ object GradientBasedGaussianMixture{
 
   def apply(
     weights: Array[Double],
-    gaussians: Array[UpdatableMultivariateGaussian],
+    gaussians: Array[UpdatableGConcaveGaussian],
     optimizer: GMMOptimizer): GradientBasedGaussianMixture = {
     new GradientBasedGaussianMixture(new WeightsWrapper(weights),gaussians,optimizer)
   }
@@ -213,7 +230,7 @@ object GradientBasedGaussianMixture{
 
     new GradientBasedGaussianMixture(
       new WeightsWrapper(proportions.map{case p => p/(n+k)}), 
-      (0 to k-1).map{case i => UpdatableMultivariateGaussian(means(i),pseudoCov(i))}.toArray,
+      (0 to k-1).map{case i => UpdatableGConcaveGaussian(means(i),pseudoCov(i))}.toArray,
       optimizer)
 
   }

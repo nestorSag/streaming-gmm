@@ -1,4 +1,4 @@
-import net.github.gradientgmm.{GMMGradientAscent, UpdatableMultivariateGaussian}
+import net.github.gradientgmm.{GMMGradientAscent, UpdatableGConcaveGaussian}
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, norm}
 
@@ -6,7 +6,7 @@ import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV,
 class GradientAscentTest extends OptimTestSpec{
 
 	var lr = 0.5
-	var current = UpdatableMultivariateGaussian(BDV.rand(dim),BDM.eye[Double](dim))
+	var current = UpdatableGConcaveGaussian(BDV.rand(dim),BDM.eye[Double](dim))
 	var optim = new GMMGradientAscent().setLearningRate(lr)
 	val paramMat0 = current.paramMat
 		
@@ -15,7 +15,7 @@ class GradientAscentTest extends OptimTestSpec{
 		//println(current.paramMat)
 		for(i <- 1 to niter){
 			//println(trace((current.paramMat-targetParamMat)*(current.paramMat-targetParamMat)))
-			current.update(current.paramMat + optim.direction(current,targetParamMat) * optim.getLearningRate)
+			current.update(current.paramMat + optim.direction(current,targetParamMat, 1.0) * optim.getLearningRate)
 
 		}
 

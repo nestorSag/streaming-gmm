@@ -1,5 +1,5 @@
 import org.scalatest.FlatSpec
-import net.github.gradientgmm.{UpdatableMultivariateGaussian,ConjugatePrior}
+import net.github.gradientgmm.{UpdatableGConcaveGaussian,ConjugatePrior}
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, norm, det}
 
 import org.apache.spark.mllib.stat.distribution.MultivariateGaussian
@@ -72,7 +72,7 @@ class ConjugatePriorTest extends FlatSpec {
     numClusters = k
     )
 
-    var testdist = UpdatableMultivariateGaussian(covdim,mu,cov) // when paramMat = regularizingMatrix
+    var testdist = UpdatableGConcaveGaussian(covdim,mu,cov) // when paramMat = regularizingMatrix
 
     //Tr(regMat*paramMat) = dim(regMat) = dim(paramMat) = covdim + 1
     //weightGrad(1.0) = 0
@@ -84,7 +84,7 @@ class ConjugatePriorTest extends FlatSpec {
     assert(math.pow(shouldBeZero,2) < errorTol)
 
     // when paramMat = identity, logdet should cancel out
-    testdist = UpdatableMultivariateGaussian(BDV.zeros[Double](covdim),BDM.eye[Double](covdim))
+    testdist = UpdatableGConcaveGaussian(BDV.zeros[Double](covdim),BDM.eye[Double](covdim))
 
     //logdet(paramMat) = log(1) = 0
     shouldBeZero = prior.evaluate(testdist,1.0) - (- 0.5*trace(prior.regularizingMatrix))

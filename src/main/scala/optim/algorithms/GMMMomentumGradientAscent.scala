@@ -16,13 +16,13 @@ class GMMMomentumGradientAscent extends GMMGradientAscent {
 		this.beta
 	}
 
-	override def direction(dist: UpdatableMultivariateGaussian, sampleInfo: BDM[Double]): BDM[Double] = {
+	override def direction(dist: UpdatableGConcaveGaussian, point: BDM[Double], w: Double): BDM[Double] = {
 
 		if(!dist.momentum.isDefined){
 			dist.initializeMomentum
 		}
 
-		val grad = lossGradient(dist, sampleInfo)
+		val grad = lossGradient(dist, point, w)
 		
 		dist.updateMomentum(dist.momentum.get*beta + grad)
 

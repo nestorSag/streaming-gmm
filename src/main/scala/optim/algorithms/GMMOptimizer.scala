@@ -84,13 +84,69 @@ trait GMMOptimizer extends Serializable{
 	def getMaxIter: Int = {
 		maxIter
 	}
-	
-	def penaltyValue(dist: UpdatableMultivariateGaussian,weight: Double): Double
 
-	def direction(dist: UpdatableMultivariateGaussian, sampleInfo: BDM[Double]): BDM[Double]
+	private[gradientgmm] def lossGradient(dist: UpdatableGConcaveGaussian, point: BDM[Double], w: Double): BDM[Double] = {
+
+		regularizer match{
+			case None => basicLossGradient(dist.paramMat,point,w) 
+			case Some(_) => basicLossGradient(dist.paramMat,point,w) +
+				regularizer.get.gradient(dist)
+		}
+
+	}
+
+	private[gradientgmm] def basicLossGradient(paramMat: BDM[Double], point: BDM[Double], w: Double): BDM[Double] = {
+
+		(point - paramMat) * 0.5 * w
+	}
+
+
+	private[gradientgmm] def basicSoftWeightsGradient(posteriors: BDV[Double], weights: BDV[Double]): BDV[Double] = {
+
+		weightOptimizer.gradient(posteriors,weights)
+	}
+
+	private[gradientgmm] def softWeightGradient(posteriors: BDV[Double], weights: BDV[Double]): BDV[Double] = {
+
+		var grads = regularizer match {
+			case None => basicSoftWeightsGradient(posteriors,weights)
+			case Some(_) => basicSoftWeightsGradient(posteriors,weights) +
+		 			regularizer.get.softWeightsGradient(weights)
+		}
+
+		grads(weights.length - 1) = 0.0
+
+		grads
+
+	}
+
+	def evaluateRegularizationTerm(dist: UpdatableGConcaveGaussian,weight: Double): Double = {
+
+		regularizer match{
+			case None => 0
+			case Some(_) => regularizer.get.evaluate(dist,weight)
+		}
+
+	}
+
+	def fit(data: RDD[SV], k: Int = 2, startingSampleSize: Int = 50, kMeansIters: Int = 20, seed: Int = 0): GradientBasedGaussianMixture = {
+		
+		val model = GradientBasedGaussianMixture.initialize(
+			data,
+			this,
+			k,
+			startingSampleSize,
+			kMeansIters,
+			seed)
+		    
+		model.step(data)
+
+		model
+	}
+
+	def direction(dist: UpdatableGConcaveGaussian, point: BDM[Double], w: Double): BDM[Double]
 
 	def softWeightsDirection(posteriors: BDV[Double], weights: WeightsWrapper): BDV[Double]
 
-	def fit(data: RDD[SV], k: Int, startingSampleSize: Int, kMeansIters: Int, seed: Int): GradientBasedGaussianMixture
 
 }

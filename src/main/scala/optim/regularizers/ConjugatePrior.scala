@@ -20,7 +20,7 @@ class ConjugatePrior(
 	require(priorSigma == priorSigma.t,"priorSigma must be symmetric")
 
 
-	def gradient(dist:UpdatableMultivariateGaussian): BDM[Double] = {
+	def gradient(dist:UpdatableGConcaveGaussian): BDM[Double] = {
 		(this.regularizingMatrix - df*dist.paramMat)*0.5
 		//updateRegularizer(paramMat)
 	}
@@ -29,11 +29,11 @@ class ConjugatePrior(
 		(BDV.ones[Double](numClusters) - weights*numClusters.toDouble)*weightConcentration
 	}
 
-	def evaluate(dist: UpdatableMultivariateGaussian, weight: Double): Double = {
+	def evaluate(dist: UpdatableGConcaveGaussian, weight: Double): Double = {
 		evaluateGaussian(dist) + evaluateWeight(weight)
 	}
 
-	private def evaluateGaussian(dist:UpdatableMultivariateGaussian): Double = {
+	private def evaluateGaussian(dist:UpdatableGConcaveGaussian): Double = {
 		- 0.5*(df*(dist.logDetSigma + math.log(dist.getS)) + symProdTrace(regularizingMatrix,dist.invParamMat))
 	}
 

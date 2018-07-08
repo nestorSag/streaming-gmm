@@ -40,7 +40,7 @@ class GMMAdam extends GMMGradientAscent {
 	}
 
 
-	override def direction(dist: UpdatableMultivariateGaussian, sampleInfo: BDM[Double]): BDM[Double] = {
+	override def direction(dist: UpdatableGConcaveGaussian, point: BDM[Double], w: Double): BDM[Double] = {
 
 		t += 1
 
@@ -52,7 +52,7 @@ class GMMAdam extends GMMGradientAscent {
 			dist.initializeAdamInfo
 		}
 
-		val grad = lossGradient(dist, sampleInfo)
+		val grad = lossGradient(dist, point, w)
 
 		dist.updateMomentum(dist.momentum.get*beta1 + grad*(1.0-beta1))
 		

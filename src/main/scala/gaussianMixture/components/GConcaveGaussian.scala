@@ -3,7 +3,7 @@ package net.github.gradientgmm
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 import org.apache.spark.mllib.linalg.{Matrices => SMS, Matrix => SM, DenseMatrix => SDM, Vector => SV, Vectors => SVS, DenseVector => SDV}
 
-class GConcaveMultivariateGaussian(
+class GConcaveGaussian(
 	var s: Double,
 	_mu: BDV[Double],
   _sigma: BDM[Double]) extends MultivariateGaussian(_mu,_sigma){
@@ -16,13 +16,7 @@ require(s > 0, s"s must be positive; got ${s}")
     pdf(x.slice(0,d)) * math.exp(0.5*(1-1/s)) / math.sqrt(s)
   }
 
-  def paramMat: BDM[Double] = {
-    // build S matrix
-    val lastRow = new BDV[Double](mu.toArray ++ Array[Double](1))
-
-    BDM.vertcat(BDM.horzcat(sigma + mu*mu.t*s,mu.asDenseMatrix.t*s),lastRow.asDenseMatrix*s)
-
-  }
+  var paramMat: BDM[Double] = computeParamMat
 
   def invParamMat: BDM[Double] = {
     // build S inv matrix
@@ -33,4 +27,14 @@ require(s > 0, s"s must be positive; got ${s}")
     BDM.vertcat(BDM.horzcat(this.rootSigmaInv.t*this.rootSigmaInv,-x.asDenseMatrix.t),-lastRow.asDenseMatrix)
 
   }
+
+  def computeParamMat: BDM[Double] = {
+    // build S matrix
+    val lastRow = new BDV[Double](mu.toArray ++ Array[Double](1))
+
+    BDM.vertcat(BDM.horzcat(sigma + mu*mu.t*s,mu.asDenseMatrix.t*s),lastRow.asDenseMatrix*s)
+
+  }
+
+
 }

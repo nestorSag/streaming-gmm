@@ -1,6 +1,6 @@
 // can't figure out how to test this properly
 
-// import net.github.gradientgmm.{GMMAdam, UpdatableMultivariateGaussian}
+// import net.github.gradientgmm.{GMMAdam, UpdatableGConcaveGaussian}
 
 // import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, norm}
 
@@ -15,7 +15,7 @@
 // 	var beta1 = 0.9
 // 	var beta2 = 0.999
 
-// 	var current = UpdatableMultivariateGaussian(BDV.rand(dim),BDM.eye[Double](dim))
+// 	var current = UpdatableGConcaveGaussian(BDV.rand(dim),BDM.eye[Double](dim))
 // 	var optim = new GMMAdam(lr,None,beta1,beta2)
 
 // 	"Adam w/o reg" should "make steady progress toward target gaussian parameters" in {
