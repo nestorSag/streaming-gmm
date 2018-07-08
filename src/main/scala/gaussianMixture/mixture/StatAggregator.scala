@@ -2,7 +2,7 @@ package net.github.gradientgmm
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 
-private[gradientgmm] class StatAggregator(
+class StatAggregator(
   var qLoglikelihood: Double,
   val posteriors: Array[Double],
   val gradients: Array[BDM[Double]]) extends Serializable{
@@ -22,7 +22,7 @@ private[gradientgmm] class StatAggregator(
 
 }
 
-private[gradientgmm] object StatAggregator {
+object StatAggregator {
 
   def init(k: Int, d: Int): StatAggregator = {
     new StatAggregator(
