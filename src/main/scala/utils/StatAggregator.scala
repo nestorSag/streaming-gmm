@@ -2,13 +2,36 @@ package com.github.nestorsag.gradientgmm
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 
+/**
+  * Distributed aggregator of relevant statistics
+  *
+  * In each worker it computes and aggregates the current batch log-likelihood,
+  * the regularization values for the current parameters and the 
+  * gradients for each data point. The class structure is based heavily on
+  * [[org.apache.spark.mllib.clustering.EXpectationSum]]
+
+  * @param qLogLikelihood aggregate log-likelihood
+  * @param posteriors: aggregate posterior responsability for each component. See ''Pattern Recognition
+  * And Machine Learning. Bishop, Chis.'', page 432
+  * @param gradients Aggregate point-wise gradients for each component
+ 
+  */
 class StatAggregator(
   var qLoglikelihood: Double,
   val posteriors: Array[Double],
   val gradients: Array[BDM[Double]]) extends Serializable{
 
+/**
+  * Number of components in the model
+  */
   val k = gradients.length
 
+/**
+  * Adder for different {{{StatAggregator}}}
+  *
+  * Used for further aggregation between each worker's object
+ 
+  */
   def +=(x: StatAggregator): StatAggregator = {
     var i = 0
     while (i < k) {
@@ -24,6 +47,14 @@ class StatAggregator(
 
 object StatAggregator {
 
+/**
+  * {{{StatAggregator}}} initializer
+  *
+  * Initializes an instance with initial statistics set as zero
+  * @param k Number of components in the model
+  * @param d Dimensionality of the data
+ 
+  */
   def init(k: Int, d: Int): StatAggregator = {
     new StatAggregator(
       0.0,
@@ -31,8 +62,17 @@ object StatAggregator {
       Array.fill(k)(BDM.zeros[Double](d+1, d+1)))
   }
 
-  //compute cluster contributions for each input point
-  // (U, T) => U for aggregation
+/**
+  * Adder for individual points
+  *
+  * Used for reducing individual data points and aggregating the ir statistics
+  * @param weights Current weights vector
+  * @param dists Current model components
+  * @param optim Optimization algorithm
+  * @param Number of points in the current batch
+  * @return Instance with updated statistics
+ 
+  */
   def add(
       weights: Array[Double],
       dists: Array[UpdatableGConcaveGaussian],

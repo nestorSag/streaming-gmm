@@ -2,8 +2,17 @@ package com.github.nestorsag.gradientgmm
 
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV, max, min, sum}
 
+/**
+  * Implements a ratio mapping to optimize the weight vector
+
+  * The precise mapping is {{{w_i => w_i/w_last}}}
+
+  */
 class RatioWeightTransformation extends GMMWeightTransformation {
-	
+
+/**
+  * machine's epsilon
+  */
 	val eps = Utils.EPS
 
 	def fromSimplex(weights: BDV[Double]): BDV[Double] = {
@@ -31,6 +40,11 @@ class RatioWeightTransformation extends GMMWeightTransformation {
 
 	}
 
+/**
+  * Trim extreme values to avoid over or underflows
+
+  */
+  
 	private def trim(weights: BDV[Double]): BDV[Double] = {
 		for(i <- 1 to weights.length){
 		  weights(i-1) = math.max(math.min(weights(i-1),Double.MaxValue),eps)

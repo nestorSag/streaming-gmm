@@ -3,8 +3,21 @@ package com.github.nestorsag.gradientgmm
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV, max, min, sum}
 
 import breeze.numerics.{exp, log}
+
+/**
+  * Implements a Softmax mapping to optimize the weight vector
+
+  *The precise mapping is {{{w_i => log(w_i/w_last)}}} and is an implementation of the procedure 
+  * described in ''Hosseini, Reshad & Sra, Suvrit. (2017). An Alternative to EM for Gaussian Mixture Models: Batch and Stochastic Riemannian Optimization''
+  * (see [[https://arxiv.org/abs/1706.03267]]).
+
+  */
 class SoftmaxWeightTransformation extends GMMWeightTransformation {
 	
+	/**
+  * upper and lower bounds for allowed values before applying {{{toSimplex}}}
+
+  */
 	private val (upperBound,lowerBound) = findBounds
 	
 	def toSimplex(soft: BDV[Double]): BDV[Double] = {
@@ -33,6 +46,10 @@ class SoftmaxWeightTransformation extends GMMWeightTransformation {
 
 	}
 
+/**
+  * Use the machine's epsilon to find maximum and minimum allowed values before applying {{{toSimplex}}}
+
+  */
 	private def findBounds: (Double,Double) = {
 		val bound = {
 		  var eps = 1.0
@@ -45,6 +62,10 @@ class SoftmaxWeightTransformation extends GMMWeightTransformation {
 		(bound-1,-bound+1)
 	}
 
+/**
+  * Trim extreme values to avoid over or underflows
+
+  */
 	private def trim(weights: BDV[Double]): BDV[Double] = {
 		for(i <- 1 to weights.length){
 		  weights(i-1) = math.max(math.min(weights(i-1),upperBound),lowerBound)

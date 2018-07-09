@@ -2,6 +2,18 @@ package com.github.nestorsag.gradientgmm
 
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace}
 
+/**
+  * Conjugate prior regularization for all the mixture's parameters. 
+  * See [[https://en.wikipedia.org/wiki/Normal-inverse-Wishart_distribution]]
+  * See [[https://en.wikipedia.org/wiki/Dirichlet_distribution]]
+
+  * @param df Degrees of freedom for the Inverse-Wishart prior over the covariance matrices
+  * @param priorMu mean for the prior normal distribution over the means
+  * @param priorSigma expected covariance matrix for the Inverse-Wishart prior over the covariance matrices
+  * @param weightConcentration COncentration parameter for the Dirichlet prior over the weight vector
+  * @param numClusters number of mixture components
+
+  */
 class ConjugatePrior(
 	val df: Double, 
 	priorMu: BDV[Double], 
@@ -9,9 +21,10 @@ class ConjugatePrior(
 	val weightConcentration: Double, 
 	val numClusters: Int) extends GMMRegularizer {
 	
-	// val df = degFreedom
-	// val weightConcentration = dirichletParam
-	// val numClusters = nClust
+/**
+  * Get augmented parameter matrix. See ''Hosseini, Reshad & Sra, Suvrit. (2017). An Alternative to EM for Gaussian Mixture Models: Batch and Stochastic Riemannian Optimization''
+
+  */
 	val regularizingMatrix = buildRegMatrix(df,priorMu,priorSigma)
 
 	require(df>priorSigma.cols-1,"degrees of freedom must me greater than dim(priorSigma)")
@@ -33,14 +46,26 @@ class ConjugatePrior(
 		evaluateGaussian(dist) + evaluateWeight(weight)
 	}
 
+/**
+  * Evaluate regularization term of current component parameters
+
+  */
 	private def evaluateGaussian(dist:UpdatableGConcaveGaussian): Double = {
 		- 0.5*(df*(dist.logDetSigma + math.log(dist.getS)) + symProdTrace(regularizingMatrix,dist.invParamMat))
 	}
 
+/**
+  * Evaluate regularization term of current component's corresponding weight parameter
+
+  */
 	private def evaluateWeight(weight: Double): Double = {
 		weightConcentration*math.log(weight)
 	}
 	
+/**
+  * Build augmented parameter matrix
+
+  */
 	private def buildRegMatrix(df: Double, priorMu: BDV[Double], priorSigma: BDM[Double]): BDM[Double] = {
 
 		//       [priorSigma + df*priorMu*priorMu.t, df*priorMu
@@ -52,7 +77,11 @@ class ConjugatePrior(
 		BDM.vertcat(BDM.horzcat(priorSigma + shrinkedMu*priorMu.t,shrinkedMu.toDenseMatrix.t),lastRow.asDenseMatrix)
 	}
 
-	private def symProdTrace(x: BDM[Double], y: BDM[Double]): Double = { // faster computation of Tr(A*B) for symmetric matrices
+/**
+  * Faster computation of Tr(X*Y) for symmetric matrices
+
+  */
+	private def symProdTrace(x: BDM[Double], y: BDM[Double]): Double = { 
 		
 		x.toArray.zip(y.toArray).foldLeft(0.0){case (s,(a,b)) => s + a*b}
 	}

@@ -2,9 +2,16 @@ package com.github.nestorsag.gradientgmm
 
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 
+/**
+  * Regularization term of the form {{{scale*log(det(cov) - shift)}}}
+
+  */
+
 class LogBarrier extends GMMRegularizer{ 
 
+
 	var scale = 1.0
+
 	var shift = 0.0
 
 	def setScale(scale: Double): this.type = {
@@ -40,6 +47,10 @@ class LogBarrier extends GMMRegularizer{
 		scale * (evaluateGaussian(dist) + evaluateWeight(weight))
 	}
 
+/**
+  * Evaluate regularization term of current component parameters
+
+  */
 	private def evaluateGaussian(dist:UpdatableGConcaveGaussian): Double = {
 
 		if(shift >0){
@@ -48,7 +59,10 @@ class LogBarrier extends GMMRegularizer{
 			dist.logDetSigma + math.log(dist.getS) - dist.getS
 		}
 	}
+/**
+  * Evaluate regularization term of current component's corresponding weight parameter
 
+  */
 	private def evaluateWeight(weights: Double): Double = {
 		0.0
 	}
