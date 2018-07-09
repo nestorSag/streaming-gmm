@@ -1,4 +1,4 @@
-package net.github.gradientgmm
+package com.github.nestorsag.gradientgmm
 
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 
@@ -146,7 +146,7 @@ trait GMMOptimizer extends Serializable{
 
 	def direction(dist: UpdatableGConcaveGaussian, point: BDM[Double], w: Double): BDM[Double]
 
-	def softWeightsDirection(posteriors: BDV[Double], weights: WeightsWrapper): BDV[Double]
+	def softWeightsDirection(posteriors: BDV[Double], weights: UpdatableWeights): BDV[Double]
 
 
 }

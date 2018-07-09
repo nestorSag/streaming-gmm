@@ -1,4 +1,4 @@
-package net.github.gradientgmm
+package com.github.nestorsag.gradientgmm
 
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 
@@ -9,7 +9,7 @@ class GMMGradientAscent extends GMMOptimizer{
 
 	require(learningRate>0,"learningRate must be positive")
 
-	def softWeightsDirection(posteriors: BDV[Double], weights: WeightsWrapper): BDV[Double] = {
+	def softWeightsDirection(posteriors: BDV[Double], weights: UpdatableWeights): BDV[Double] = {
 		softWeightGradient(posteriors,new BDV(weights.weights))
 	}
 

@@ -1,6 +1,6 @@
 // can't figure out how to test this properly
 
-// import net.github.gradientgmm.{GMMAdam, UpdatableGConcaveGaussian}
+// import com.github.nestorsag.gradientgmm.{GMMAdam, UpdatableGConcaveGaussian}
 
 // import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, norm}
 

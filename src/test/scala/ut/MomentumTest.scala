@@ -1,4 +1,4 @@
-import net.github.gradientgmm.{GMMMomentumGradientAscent, UpdatableGConcaveGaussian}
+import com.github.nestorsag.gradientgmm.{GMMMomentumGradientAscent, UpdatableGConcaveGaussian}
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, norm}
 

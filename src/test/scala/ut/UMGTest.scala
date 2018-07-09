@@ -1,5 +1,5 @@
 import org.scalatest.FlatSpec
-import net.github.gradientgmm.{UpdatableGConcaveGaussian}
+import com.github.nestorsag.gradientgmm.{UpdatableGConcaveGaussian}
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, norm, trace, det}
 
 import org.apache.spark.mllib.stat.distribution.MultivariateGaussian

@@ -1,7 +1,7 @@
 // import org.scalatest.FlatSpec
 
 
-// import net.github.gradientgmm._
+// import com.github.nestorsag.gradientgmm._
 
 // import org.apache.spark.{SparkConf, SparkContext}
 // import org.apache.spark.mllib.clustering.{GaussianMixture, GaussianMixtureModel}

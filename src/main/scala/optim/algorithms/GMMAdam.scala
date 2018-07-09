@@ -1,4 +1,4 @@
-package net.github.gradientgmm
+package com.github.nestorsag.gradientgmm
 
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 
@@ -44,44 +44,44 @@ class GMMAdam extends GMMGradientAscent {
 
 		t += 1
 
-		if(!dist.momentum.isDefined){
-			dist.initializeMomentum
+		if(!dist.optimUtils.momentum.isDefined){
+			dist.optimUtils.initializeMomentum
 		}
 
-		if(!dist.adamInfo.isDefined){
-			dist.initializeAdamInfo
+		if(!dist.optimUtils.adamInfo.isDefined){
+			dist.optimUtils.initializeAdamInfo
 		}
 
 		val grad = lossGradient(dist, point, w)
 
-		dist.updateMomentum(dist.momentum.get*beta1 + grad*(1.0-beta1))
+		dist.optimUtils.updateMomentum(dist.optimUtils.momentum.get*beta1 + grad*(1.0-beta1))
 		
-		dist.updateAdamInfo(dist.adamInfo.get*beta2 + (grad *:* grad)*(1.0-beta2))
+		dist.optimUtils.updateAdamInfo(dist.optimUtils.adamInfo.get*beta2 + (grad *:* grad)*(1.0-beta2))
 
 		val alpha_t = math.sqrt(1.0 - math.pow(beta2,t))/(1.0 - math.pow(beta1,t))
 
-		alpha_t * dist.momentum.get /:/ (sqrt(dist.adamInfo.get) + eps)
+		alpha_t * dist.optimUtils.momentum.get /:/ (sqrt(dist.optimUtils.adamInfo.get) + eps)
 	}
 
-	override def softWeightsDirection(posteriors: BDV[Double], weights: WeightsWrapper): BDV[Double] = {
+	override def softWeightsDirection(posteriors: BDV[Double], weights: UpdatableWeights): BDV[Double] = {
 
-		if(!weights.momentum.isDefined){
-			weights.initializeMomentum
+		if(!weights.optimUtils.momentum.isDefined){
+			weights.optimUtils.initializeMomentum
 		}
 
-		if(!weights.adamInfo.isDefined){
-			weights.initializeAdamInfo
+		if(!weights.optimUtils.adamInfo.isDefined){
+			weights.optimUtils.initializeAdamInfo
 		}
 
 		val grad = softWeightGradient(posteriors, new BDV(weights.weights))
 		
-		weights.updateMomentum(weights.momentum.get*beta1 + grad*(1.0-beta1))
+		weights.optimUtils.updateMomentum(weights.optimUtils.momentum.get*beta1 + grad*(1.0-beta1))
 
-		weights.updateAdamInfo(weights.adamInfo.get*beta2 + (grad *:* grad)*(1.0-beta2))
+		weights.optimUtils.updateAdamInfo(weights.optimUtils.adamInfo.get*beta2 + (grad *:* grad)*(1.0-beta2))
 
 		val alpha_t = math.sqrt(1.0 - math.pow(beta2,t))/(1.0 - math.pow(beta1,t))
 
-		alpha_t * weights.momentum.get /:/ (sqrt(weights.adamInfo.get) + eps)
+		alpha_t * weights.optimUtils.momentum.get /:/ (sqrt(weights.optimUtils.adamInfo.get) + eps)
 
 	}
 

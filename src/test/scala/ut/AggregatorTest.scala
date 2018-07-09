@@ -1,7 +1,7 @@
 import org.scalatest.FlatSpec
 
 
-import net.github.gradientgmm.{GMMGradientAscent,StatAggregator,UpdatableGConcaveGaussian}
+import com.github.nestorsag.gradientgmm.{GMMGradientAscent,StatAggregator,UpdatableGConcaveGaussian}
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, norm}
 
 

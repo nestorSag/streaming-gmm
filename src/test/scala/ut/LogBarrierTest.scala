@@ -1,5 +1,5 @@
 import org.scalatest.FlatSpec
-import net.github.gradientgmm.{UpdatableGConcaveGaussian,LogBarrier}
+import com.github.nestorsag.gradientgmm.{UpdatableGConcaveGaussian,LogBarrier}
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, det, trace}
 
 

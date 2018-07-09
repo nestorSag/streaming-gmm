@@ -1,17 +1,19 @@
-package net.github.gradientgmm
+package com.github.nestorsag.gradientgmm
 
 import breeze.linalg.{DenseVector => BDV}
 
-class WeightsWrapper(var weights: Array[Double]) extends Serializable{
+class UpdatableWeights(var weights: Array[Double]) extends Serializable with VectorOptimUtils{
 
   require(checkPositivity(weights), "some weights are negative or equal to zero")
   require(isInSimplex(weights),s"new weights don't sum 1: ${weights.mkString(",")}")
 
   var simplexErrorTol = 1e-8
-  var momentum: Option[BDV[Double]] = None
-  var adamInfo: Option[BDV[Double]] = None
-  var length = weights.length
+  val d = weights.length
+  
+  val optimUtils = new VectorGradientUtils(d)
 
+  def length: Int = d
+  
   def update(newWeights: BDV[Double]): Unit = {
     // recenter soft weights to avoid under or overflow
     val newW = newWeights.toArray
@@ -36,22 +38,6 @@ class WeightsWrapper(var weights: Array[Double]) extends Serializable{
       i += 1
     }
     allPositive
-  }
-
-  private[gradientgmm] def updateMomentum(x: BDV[Double]): Unit = {
-    momentum = Option(x)
-  }
-
-  private[gradientgmm] def updateAdamInfo(x: BDV[Double]): Unit = {
-    adamInfo = Option(x)
-  }
-
-  private[gradientgmm] def initializeMomentum: Unit = {
-    momentum = Option(BDV.zeros[Double](weights.length))
-  }
-
-  private[gradientgmm] def initializeAdamInfo: Unit = {
-     adamInfo = Option(BDV.zeros[Double](weights.length))
   }
 
 }

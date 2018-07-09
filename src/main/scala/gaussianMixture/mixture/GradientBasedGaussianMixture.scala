@@ -1,4 +1,4 @@
-package net.github.gradientgmm
+package com.github.nestorsag.gradientgmm
 
 import breeze.linalg.{diag, eigSym, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace}
 
@@ -13,7 +13,7 @@ import org.apache.spark.mllib.stat.distribution.{MultivariateGaussian => SMG}
 import org.apache.log4j.Logger
 
 class GradientBasedGaussianMixture private (
-  w:  WeightsWrapper,
+  w:  UpdatableWeights,
   g: Array[UpdatableGConcaveGaussian],
   private[gradientgmm] var optimizer: GMMOptimizer) extends UpdatableGaussianMixture(w,g) with Optimizable {
 
@@ -168,7 +168,7 @@ object GradientBasedGaussianMixture{
     weights: Array[Double],
     gaussians: Array[UpdatableGConcaveGaussian],
     optimizer: GMMOptimizer): GradientBasedGaussianMixture = {
-    new GradientBasedGaussianMixture(new WeightsWrapper(weights),gaussians,optimizer)
+    new GradientBasedGaussianMixture(new UpdatableWeights(weights),gaussians,optimizer)
   }
 
   def initialize(
@@ -229,7 +229,7 @@ object GradientBasedGaussianMixture{
       .map{case (k,m) => m}
 
     new GradientBasedGaussianMixture(
-      new WeightsWrapper(proportions.map{case p => p/(n+k)}), 
+      new UpdatableWeights(proportions.map{case p => p/(n+k)}), 
       (0 to k-1).map{case i => UpdatableGConcaveGaussian(means(i),pseudoCov(i))}.toArray,
       optimizer)
 

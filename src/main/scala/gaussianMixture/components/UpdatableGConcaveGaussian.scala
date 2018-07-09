@@ -1,4 +1,4 @@
-package net.github.gradientgmm
+package com.github.nestorsag.gradientgmm
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 
@@ -8,7 +8,9 @@ import org.apache.spark.mllib.stat.distribution.{MultivariateGaussian => SMVG}
 class UpdatableGConcaveGaussian private(
   _s: Double, 
   _mu: BDV[Double], //there is a bug when using the same attribute names for the subclass and superclass
-  _sigma: BDM[Double]) extends GConcaveGaussian(_s,_mu,_sigma) with GradientDescentUtils {
+  _sigma: BDM[Double]) extends GConcaveGaussian(_s,_mu,_sigma) with MatrixOptimUtils {
+
+  val optimUtils = new MatrixGradientUtils(d+1)
 
   def update(newParamsMat: BDM[Double]): Unit = {
 
