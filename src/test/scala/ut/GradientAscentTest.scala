@@ -1,4 +1,4 @@
-import com.github.nestorsag.gradientgmm.{GMMGradientAscent, UpdatableGConcaveGaussian}
+import com.github.nestorsag.gradientgmm.{GMMGradientAscent, UpdatableGaussianMixtureComponent}
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, norm}
 
@@ -6,7 +6,7 @@ import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV,
 class GradientAscentTest extends OptimTestSpec{
 
 	var lr = 0.5
-	var current = UpdatableGConcaveGaussian(BDV.rand(dim),BDM.eye[Double](dim))
+	var current = UpdatableGaussianMixtureComponent(BDV.rand(dim),BDM.eye[Double](dim))
 	var optim = new GMMGradientAscent().setLearningRate(lr)
 	val paramMat0 = current.paramMat
 		

@@ -24,7 +24,7 @@ import org.apache.log4j.Logger
   */
 class GradientBasedGaussianMixture private (
   w:  UpdatableWeights,
-  g: Array[UpdatableGConcaveGaussian],
+  g: Array[UpdatableGaussianMixtureComponent],
   private[gradientgmm] var optimizer: GMMOptimizer) extends UpdatableGaussianMixture(w,g) with Optimizable {
 
 
@@ -211,7 +211,7 @@ object GradientBasedGaussianMixture{
   */
   def apply(
     weights: Array[Double],
-    gaussians: Array[UpdatableGConcaveGaussian],
+    gaussians: Array[UpdatableGaussianMixtureComponent],
     optimizer: GMMOptimizer): GradientBasedGaussianMixture = {
     new GradientBasedGaussianMixture(new UpdatableWeights(weights),gaussians,optimizer)
   }
@@ -286,7 +286,7 @@ object GradientBasedGaussianMixture{
 
     new GradientBasedGaussianMixture(
       new UpdatableWeights(proportions.map{case p => p/(n+k)}), 
-      (0 to k-1).map{case i => UpdatableGConcaveGaussian(means(i),pseudoCov(i))}.toArray,
+      (0 to k-1).map{case i => UpdatableGaussianMixtureComponent(means(i),pseudoCov(i))}.toArray,
       optimizer)
 
   }

@@ -25,7 +25,7 @@ class GMMMomentumGradientAscent extends GMMGradientAscent {
 		this.beta
 	}
 
-	override def direction(dist: UpdatableGConcaveGaussian, point: BDM[Double], w: Double): BDM[Double] = {
+	override def direction(dist: UpdatableGaussianMixtureComponent, point: BDM[Double], w: Double): BDM[Double] = {
 
 		if(!dist.optimUtils.momentum.isDefined){
 			dist.optimUtils.initializeMomentum

@@ -68,7 +68,7 @@ class GMMAdam extends GMMGradientAscent {
 	def getEps: Double = eps
 
 
-	override def direction(dist: UpdatableGConcaveGaussian, point: BDM[Double], w: Double): BDM[Double] = {
+	override def direction(dist: UpdatableGaussianMixtureComponent, point: BDM[Double], w: Double): BDM[Double] = {
 
 		t += 1
 

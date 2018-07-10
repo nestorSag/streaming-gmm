@@ -28,7 +28,7 @@ class LogBarrier extends GMMRegularizer{
 
 	def softWeightsGradient(weights: BDV[Double]): BDV[Double] = BDV.zeros[Double](weights.length)
 
-	def gradient(dist: UpdatableGConcaveGaussian): BDM[Double] = {
+	def gradient(dist: UpdatableGaussianMixtureComponent): BDM[Double] = {
 
 		val lastCol = dist.paramMat(::,dist.paramMat.cols-1)
 
@@ -43,7 +43,7 @@ class LogBarrier extends GMMRegularizer{
 		}
 	}
 
-	def evaluate(dist: UpdatableGConcaveGaussian, weight: Double): Double = {
+	def evaluate(dist: UpdatableGaussianMixtureComponent, weight: Double): Double = {
 		scale * (evaluateGaussian(dist) + evaluateWeight(weight))
 	}
 
@@ -51,7 +51,7 @@ class LogBarrier extends GMMRegularizer{
   * Evaluate regularization term of current component parameters
 
   */
-	private def evaluateGaussian(dist:UpdatableGConcaveGaussian): Double = {
+	private def evaluateGaussian(dist:UpdatableGaussianMixtureComponent): Double = {
 
 		if(shift >0){
 			math.log(dist.detSigma - shift) + math.log(dist.getS) - dist.getS

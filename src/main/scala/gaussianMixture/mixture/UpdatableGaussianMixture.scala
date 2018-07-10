@@ -10,11 +10,11 @@ import org.apache.spark.rdd.RDD
 
 class UpdatableGaussianMixture(
   private[gradientgmm] var weights: UpdatableWeights,
-  private[gradientgmm] var gaussians: Array[UpdatableGConcaveGaussian]) extends Serializable {
+  private[gradientgmm] var gaussians: Array[UpdatableGaussianMixtureComponent]) extends Serializable {
 
 
   def getWeights: Array[Double] = weights.weights
-  def getGaussians: Array[UpdatableGConcaveGaussian] = gaussians
+  def getGaussians: Array[UpdatableGaussianMixtureComponent] = gaussians
 
   def k: Int = weights.length
 
@@ -63,7 +63,7 @@ class UpdatableGaussianMixture(
 
   private def computeSoftAssignments(
       pt: BDV[Double],
-      dists: Array[UpdatableGConcaveGaussian],
+      dists: Array[UpdatableGaussianMixtureComponent],
       weights: Array[Double],
       k: Int): Array[Double] = {
     val p = weights.zip(dists).map {

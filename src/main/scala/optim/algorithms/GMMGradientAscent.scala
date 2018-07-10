@@ -17,7 +17,7 @@ class GMMGradientAscent extends GMMOptimizer{
 		softWeightGradient(posteriors,new BDV(weights.weights))
 	}
 
-	def direction(dist: UpdatableGConcaveGaussian, point: BDM[Double], w: Double): BDM[Double] = {
+	def direction(dist: UpdatableGaussianMixtureComponent, point: BDM[Double], w: Double): BDM[Double] = {
 
 		lossGradient(dist,point,w)
 

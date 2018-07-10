@@ -1,5 +1,5 @@
 import org.scalatest.FlatSpec
-import com.github.nestorsag.gradientgmm.{UpdatableGConcaveGaussian,LogBarrier}
+import com.github.nestorsag.gradientgmm.{UpdatableGaussianMixtureComponent,LogBarrier}
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, det, trace}
 
 
@@ -24,9 +24,9 @@ class LogBarrierTest extends FlatSpec {
 
   val mu = BDV.rand(covdim)
 
-  val umgdist = UpdatableGConcaveGaussian(mu,cov)
+  val umgdist = UpdatableGaussianMixtureComponent(mu,cov)
 
-  val unitdist = UpdatableGConcaveGaussian(BDV.zeros[Double](covdim),BDM.eye[Double](covdim))// zero mean-unit variance dist
+  val unitdist = UpdatableGaussianMixtureComponent(BDV.zeros[Double](covdim),BDM.eye[Double](covdim))// zero mean-unit variance dist
   
   "gradient()" should "give correct gradient" in { 
 

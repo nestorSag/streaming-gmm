@@ -1,5 +1,5 @@
 import org.scalatest.FlatSpec
-import com.github.nestorsag.gradientgmm.{UpdatableGConcaveGaussian,ConjugatePrior}
+import com.github.nestorsag.gradientgmm.{UpdatableGaussianMixtureComponent,ConjugatePrior}
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, norm, det}
 
 import org.apache.spark.mllib.stat.distribution.MultivariateGaussian
@@ -28,13 +28,11 @@ class ConjugatePriorTest extends FlatSpec {
 
     // same kind of structure as un dist.ParamMat
     
-    val prior = new ConjugatePrior(
-    df = covdim,
-    priorMu = mu,
-    priorSigma = cov,
-    weightConcentration = 1.0/k,
-    numClusters = k
-    )
+    var prior = new ConjugatePrior()
+      .setDf(covdim)
+      .setGaussianParsPriorMeans(mu,cov)
+      .setWeightConcentrationPar(1.0/k)
+      .setK(k)
 
     val lcv = BDV(Array.fill(covdim)(0.0) ++ Array(1.0)) // last canonical vector e_d = (0,...,0,1)
 
@@ -64,27 +62,25 @@ class ConjugatePriorTest extends FlatSpec {
 
 
     // -df/2*log det paramMat - 0.5*trace(psi*sInv)
-    var prior = new ConjugatePrior(
-    df = covdim,
-    priorMu = mu,
-    priorSigma = cov,
-    weightConcentration = 1.0/k,
-    numClusters = k
-    )
+    var prior = new ConjugatePrior()
+      .setDf(covdim)
+      .setGaussianParsPriorMeans(mu,cov)
+      .setWeightConcentrationPar(1.0/k)
+      .setK(k)
 
-    var testdist = UpdatableGConcaveGaussian(covdim,mu,cov) // when paramMat = regularizingMatrix
+    var testdist = UpdatableGaussianMixtureComponent(covdim,mu,cov) // when paramMat = regularizingMatrix
 
     //Tr(regMat*paramMat) = dim(regMat) = dim(paramMat) = covdim + 1
     //weightGrad(1.0) = 0
-    var shouldBeZero = prior.evaluate(testdist,1.0) - (-0.5*prior.df*logdet(testdist.paramMat) - 0.5*(covdim+1))
+    var shouldBeZero = prior.evaluate(testdist,1.0) - (-0.5*prior.getDf*logdet(testdist.paramMat) - 0.5*(covdim+1))
     assert(math.pow(shouldBeZero,2) < errorTol)
 
     // try moving the weight 
-    shouldBeZero = prior.evaluate(testdist,0.5) - (-0.5*prior.df*logdet(testdist.paramMat) - 0.5*(covdim+1) + prior.weightConcentration*math.log(0.5))
+    shouldBeZero = prior.evaluate(testdist,0.5) - (-0.5*prior.getDf*logdet(testdist.paramMat) - 0.5*(covdim+1) + prior.getWeightConcentrationPar*math.log(0.5))
     assert(math.pow(shouldBeZero,2) < errorTol)
 
     // when paramMat = identity, logdet should cancel out
-    testdist = UpdatableGConcaveGaussian(BDV.zeros[Double](covdim),BDM.eye[Double](covdim))
+    testdist = UpdatableGaussianMixtureComponent(BDV.zeros[Double](covdim),BDM.eye[Double](covdim))
 
     //logdet(paramMat) = log(1) = 0
     shouldBeZero = prior.evaluate(testdist,1.0) - (- 0.5*trace(prior.regularizingMatrix))
@@ -93,15 +89,14 @@ class ConjugatePriorTest extends FlatSpec {
 
     // when paramMat = identity and regularizingMatrix = almost identity (last diagonal entry = df, which cant equal one
     // if regularization is a true conjugate prior unless the problem's dimensionality is one)
-    prior = new ConjugatePrior(
-    df = covdim,
-    priorMu = BDV.zeros[Double](covdim),
-    priorSigma = BDM.eye[Double](covdim),
-    weightConcentration = 1.0/k,
-    numClusters = k
-    )
+    prior = new ConjugatePrior()
+      .setDf(covdim)
+      .setGaussianParsPriorMeans(BDV.zeros[Double](covdim),BDM.eye[Double](covdim))
+      .setWeightConcentrationPar(1.0/k)
+      .setK(k)
 
-    shouldBeZero = prior.evaluate(testdist,1.0) - (- 0.5*(covdim+testdist.getS*prior.df))
+
+    shouldBeZero = prior.evaluate(testdist,1.0) - (- 0.5*(covdim+testdist.getS*prior.getDf))
     assert(math.pow(shouldBeZero,2) < errorTol)
   }
   // gradient methods are simple enough

@@ -50,6 +50,7 @@ class ConjugatePrior extends GMMRegularizer{
 	def setDf(df: Double): this.type = {
 		require(df>sigmaPriorMean.cols-1,"degrees of freedom must me greater than dim(sigmaPriorMean)")
 		this.df = df
+		this.regularizingMatrix = buildRegMatrix(df,muPriorMean,sigmaPriorMean)
 		this
 	}
 
@@ -59,7 +60,7 @@ class ConjugatePrior extends GMMRegularizer{
   * The Gaussian parameter prior means must be set at the same time to check correctness, since their dimension must match
 
   */
-	def setGaussianParsPrioMeans(muPriorMean: BDV[Double], sigmaPriorMean: BDM[Double]): this.type = {
+	def setGaussianParsPriorMeans(muPriorMean: BDV[Double], sigmaPriorMean: BDM[Double]): this.type = {
 		val logger: Logger = Logger.getLogger("conjugatePrior")
 
 		require(sigmaPriorMean.cols == sigmaPriorMean.rows, "sigma prior mean is not a square matrix")
@@ -72,6 +73,7 @@ class ConjugatePrior extends GMMRegularizer{
 		}
 		this.muPriorMean = muPriorMean
 		this.sigmaPriorMean = sigmaPriorMean
+		this.regularizingMatrix = buildRegMatrix(df,muPriorMean,sigmaPriorMean)
 		this
 	}
 
@@ -98,10 +100,10 @@ class ConjugatePrior extends GMMRegularizer{
   * Get augmented parameter matrix. See ''Hosseini, Reshad & Sra, Suvrit. (2017). An Alternative to EM for Gaussian Mixture Models: Batch and Stochastic Riemannian Optimization''
 
   */
-	val regularizingMatrix = buildRegMatrix(df,muPriorMean,sigmaPriorMean)
+	var regularizingMatrix = buildRegMatrix(df,muPriorMean,sigmaPriorMean)
 
 
-	def gradient(dist:UpdatableGConcaveGaussian): BDM[Double] = {
+	def gradient(dist:UpdatableGaussianMixtureComponent): BDM[Double] = {
 		(this.regularizingMatrix - df*dist.paramMat)*0.5
 		//updateRegularizer(paramMat)
 	}
@@ -110,7 +112,7 @@ class ConjugatePrior extends GMMRegularizer{
 		(BDV.ones[Double](k) - weights*k.toDouble)*weightConcentrationPar
 	}
 
-	def evaluate(dist: UpdatableGConcaveGaussian, weight: Double): Double = {
+	def evaluate(dist: UpdatableGaussianMixtureComponent, weight: Double): Double = {
 		evaluateGaussian(dist) + evaluateWeight(weight)
 	}
 
@@ -118,7 +120,7 @@ class ConjugatePrior extends GMMRegularizer{
   * Evaluate regularization term of current component parameters
 
   */
-	private def evaluateGaussian(dist:UpdatableGConcaveGaussian): Double = {
+	private def evaluateGaussian(dist:UpdatableGaussianMixtureComponent): Double = {
 		- 0.5*(df*(dist.logDetSigma + math.log(dist.getS)) + symProdTrace(regularizingMatrix,dist.invParamMat))
 	}
 

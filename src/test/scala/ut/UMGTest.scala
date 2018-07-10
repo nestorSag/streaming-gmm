@@ -1,11 +1,11 @@
 import org.scalatest.FlatSpec
-import com.github.nestorsag.gradientgmm.{UpdatableGConcaveGaussian}
+import com.github.nestorsag.gradientgmm.{UpdatableGaussianMixtureComponent}
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, norm, trace, det}
 
 import org.apache.spark.mllib.stat.distribution.MultivariateGaussian
 import org.apache.spark.mllib.linalg.{Matrices => SMS, Matrix => SM, DenseMatrix => SDM, Vector => SV, Vectors => SVS, DenseVector => SDV}
 
-// tests for UpdatableGConcaveGaussian class
+// tests for UpdatableGaussianMixtureComponent class
 
 class UMGTest extends FlatSpec {
   
@@ -21,7 +21,7 @@ class UMGTest extends FlatSpec {
 
   val mu = BDV.rand(covdim)
 
-  var umgdist = UpdatableGConcaveGaussian(mu,cov)
+  var umgdist = UpdatableGaussianMixtureComponent(mu,cov)
   val mldist = new MultivariateGaussian(SVS.dense(mu.toArray),SMS.dense(covdim,covdim,cov.toArray))
 
   val btp = BDV.rand(covdim) //breeze test point

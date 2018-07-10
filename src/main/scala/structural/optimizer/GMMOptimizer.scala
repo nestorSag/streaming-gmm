@@ -151,7 +151,7 @@ trait GMMOptimizer extends Serializable{
 /**
   * Computes the full loss gradient 
   */
-	private[gradientgmm] def lossGradient(dist: UpdatableGConcaveGaussian, point: BDM[Double], w: Double): BDM[Double] = {
+	private[gradientgmm] def lossGradient(dist: UpdatableGaussianMixtureComponent, point: BDM[Double], w: Double): BDM[Double] = {
 
 		regularizer match{
 			case None => basicLossGradient(dist.paramMat,point,w) 
@@ -200,7 +200,7 @@ trait GMMOptimizer extends Serializable{
   * @param weight Corresponding mixture weight
   * @return regularization term value
   */
-	def evaluateRegularizationTerm(dist: UpdatableGConcaveGaussian,weight: Double): Double = {
+	def evaluateRegularizationTerm(dist: UpdatableGaussianMixtureComponent,weight: Double): Double = {
 
 		regularizer match{
 			case None => 0
@@ -244,7 +244,7 @@ trait GMMOptimizer extends Serializable{
   * @param w {{{dist}}}'s posterior responsability for {{{point}}} (see [[StatAggregator]])
   * @return ascent direction for the component's parameters
   */
-	def direction(dist: UpdatableGConcaveGaussian, point: BDM[Double], w: Double): BDM[Double]
+	def direction(dist: UpdatableGaussianMixtureComponent, point: BDM[Double], w: Double): BDM[Double]
 
 /**
   * Compute the ascent direction for the weight vector

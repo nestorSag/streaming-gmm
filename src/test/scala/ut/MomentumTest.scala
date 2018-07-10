@@ -1,4 +1,4 @@
-import com.github.nestorsag.gradientgmm.{GMMMomentumGradientAscent, UpdatableGConcaveGaussian}
+import com.github.nestorsag.gradientgmm.{GMMMomentumGradientAscent, UpdatableGaussianMixtureComponent}
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, norm}
 
@@ -7,7 +7,7 @@ class MomentumTest extends OptimTestSpec{
 
 	var lr = 0.5
 	var beta = 0.9
-	var current = UpdatableGConcaveGaussian(BDV.rand(dim),BDM.eye[Double](dim))
+	var current = UpdatableGaussianMixtureComponent(BDV.rand(dim),BDM.eye[Double](dim))
 	var optim = new GMMMomentumGradientAscent().setLearningRate(lr).setBeta(beta)
 
 	"MomentumGradientAscent w/o reg" should "follow the right path in expectation to target Gaussian parameters" in {

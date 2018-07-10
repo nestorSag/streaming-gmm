@@ -76,7 +76,7 @@ object StatAggregator {
   */
   def add(
       weights: Array[Double],
-      dists: Array[UpdatableGConcaveGaussian],
+      dists: Array[UpdatableGaussianMixtureComponent],
       optim: GMMOptimizer,
       n: Double)
       (agg: StatAggregator, y: BDV[Double]): StatAggregator = {

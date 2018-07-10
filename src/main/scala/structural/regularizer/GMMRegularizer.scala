@@ -18,7 +18,7 @@ trait GMMRegularizer extends Serializable {
   * @return gradient
  
   */
-	def gradient(dist:UpdatableGConcaveGaussian): BDM[Double]
+	def gradient(dist:UpdatableGaussianMixtureComponent): BDM[Double]
 
 
 /**
@@ -39,6 +39,6 @@ trait GMMRegularizer extends Serializable {
   * @return regularization value
  
   */
-	def evaluate(dist: UpdatableGConcaveGaussian, weight: Double): Double
+	def evaluate(dist: UpdatableGaussianMixtureComponent, weight: Double): Double
 
 }
