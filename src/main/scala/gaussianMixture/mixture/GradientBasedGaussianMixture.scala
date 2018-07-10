@@ -12,25 +12,47 @@ import org.apache.spark.mllib.stat.distribution.{MultivariateGaussian => SMG}
 
 import org.apache.log4j.Logger
 
+/**
+  * Optimizable gradient-based Gaussian Mixture Model
+
+
+  * See ''Hosseini, Reshad & Sra, Suvrit. (2017). An Alternative to EM for Gaussian Mixture Models: Batch and Stochastic Riemannian Optimization''
+  * @param w Weight vector wrapper
+  * @param g Array of mixture components (distributions)
+  * @param optimizer Optimization object
+ 
+  */
 class GradientBasedGaussianMixture private (
   w:  UpdatableWeights,
   g: Array[UpdatableGConcaveGaussian],
   private[gradientgmm] var optimizer: GMMOptimizer) extends UpdatableGaussianMixture(w,g) with Optimizable {
 
 
-
+/**
+  * mini-batch size as fraction of the complete training data
+ 
+  */
   var batchFraction = 1.0
 
 
+/**
+  * Optimize the mixture parameters given some training data
 
+  * @param data Training data as an RDD of Spark vectors 
+ 
+  */
   def step(data: RDD[SV]): Unit = {
 
+    // initialize logger. It logs the parameters' paths to solution
+    // the messages' leve; lis set to DEBUG, so be sure to set the log level to DEBUG 
+    // if you want to see them
     val logger: Logger = Logger.getLogger("modelPath")
 
     val sc = data.sparkContext
 
+    //map original vectors to points for the g-concave formulation
     val gConcaveData = data.map{x => new BDV[Double](x.toArray ++ Array[Double](1.0))} // y = [x 1]
-  
+    
     val d = gConcaveData.first().length - 1
 
     val shouldDistribute = shouldDistributeGaussians(k, d)
@@ -39,6 +61,7 @@ class GradientBasedGaussianMixture private (
     var oldLL = 0.0  // previous log-likelihood
     var iter = 0
     
+    // breadcast optimizer to workers
     val bcOptim = sc.broadcast(this.optimizer)
 
     val initialRate = optimizer.learningRate
@@ -61,6 +84,9 @@ class GradientBasedGaussianMixture private (
       logger.debug(s"means: list(${gaussians.map{case g => "c(" + g.getMu.toArray.mkString(",") + ")"}.mkString(",")})")
       logger.debug(s"weights: ${"c(" + weights.weights.mkString(",") + ")"}")
 
+      // initialize curried adder that will aggregate the necessary statistics in the workers
+      // dataSize*batchFraction is the expected current batch size
+      // but it is not exact due to how spark takes samples from RDDs
       val adder = sc.broadcast(
         StatAggregator.add(weights.weights, gaussians, optimizer, dataSize*batchFraction)_)
 
@@ -68,9 +94,10 @@ class GradientBasedGaussianMixture private (
       //logger.debug(s"sample size: ${x.count()}")
       val sampleStats = batch(gConcaveData).treeAggregate(StatAggregator.init(k, d))(adder.value, _ += _)
 
-      val n: Double = sampleStats.posteriors.sum // number of data points 
+      val n: Double = sampleStats.posteriors.sum // number of actual data points in current batch
       logger.debug(s"n: ${n}")
 
+      // pair Gaussian components with their respective parameter gradients
       val tuples =
           Seq.tabulate(k)(i => (sampleStats.gradients(i), 
                                 gaussians(i)))
@@ -134,6 +161,10 @@ class GradientBasedGaussianMixture private (
 
   }
 
+/**
+  * Returns a Spark's Gaussian Mixture Model with the current parameters initialized with the current parameters
+ 
+  */
   def toSparkGMM: GaussianMixtureModel = {
 
     val d = gaussians(0).getMu.length
@@ -147,11 +178,17 @@ class GradientBasedGaussianMixture private (
   }
 
 
-
+/**
+  * Heuristic to decide when to distribute the computations. Taken from Spark's GaussianMixture class
+ 
+  */
   private def shouldDistributeGaussians(k: Int, d: Int): Boolean = ((k - 1.0) / k) * d > 25
 
 
-
+/**
+  * take sample for the current mini-batch, or pass the whole dataset if {{{optimizer.batchSize = None}}}
+ 
+  */
   private def batch(data: RDD[BDV[Double]]): RDD[BDV[Double]] = {
     if(batchFraction < 1.0){
       data.sample(false,batchFraction)
@@ -164,6 +201,14 @@ class GradientBasedGaussianMixture private (
 
 object GradientBasedGaussianMixture{
 
+/**
+  * Creates a new {{{GradientBasedGaussianMixture}}} instance
+
+  * @param weights Array of weights
+  * @param gaussians Array of mixture components
+  * @param optimizer Optimizer object
+ 
+  */
   def apply(
     weights: Array[Double],
     gaussians: Array[UpdatableGConcaveGaussian],
@@ -171,6 +216,17 @@ object GradientBasedGaussianMixture{
     new GradientBasedGaussianMixture(new UpdatableWeights(weights),gaussians,optimizer)
   }
 
+/**
+  * Creates a new {{{GradientBasedGaussianMixture}}} instance initialized with the
+  * results of a K-means model fitted with a sample of the data
+
+  * @param data training data in the form of an RDD of Spark vectors
+  * @param optimizer Optimizer object
+  * @param k Number of components in the mixture
+  * @param nSamples Number of data points to train the K-means model
+  * @param nIters Number of iterations allowed for the K-means model
+  * @param seed random seed
+  */
   def initialize(
     data: RDD[SV],
     optimizer: GMMOptimizer,
@@ -235,16 +291,4 @@ object GradientBasedGaussianMixture{
 
   }
 
-  private def initCovariance(x: IndexedSeq[BDV[Double]]): BDM[Double] = {
-    val mu = vectorMean(x)
-    val ss = BDV.zeros[Double](x(0).length)
-    x.foreach(xi => ss += (xi - mu) ^:^ 2.0)
-    diag(ss / x.length.toDouble)
-  }
-
-  private def vectorMean(x: IndexedSeq[BV[Double]]): BDV[Double] = {
-    val v = BDV.zeros[Double](x(0).length)
-    x.foreach(xi => v += xi)
-    v / x.length.toDouble
-  }
 }

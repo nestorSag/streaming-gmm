@@ -8,7 +8,8 @@ import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV,
   * In each worker it computes and aggregates the current batch log-likelihood,
   * the regularization values for the current parameters and the 
   * gradients for each data point. The class structure is based heavily on
-  * [[org.apache.spark.mllib.clustering.EXpectationSum]]
+  * Spark Clustering's {{{ExpectationSum}}} class. 
+  * See [[https://github.com/apache/spark/blob/master/mllib/src/main/scala/org/apache/spark/mllib/clustering/GaussianMixture.scala]]
 
   * @param qLogLikelihood aggregate log-likelihood
   * @param posteriors: aggregate posterior responsability for each component. See ''Pattern Recognition

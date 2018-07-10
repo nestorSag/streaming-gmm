@@ -4,9 +4,9 @@ import breeze.linalg.{DenseVector => BDV}
 
 
 /**
-  * Wrapper class for the weight vector.
+  * Wrapper class for the weights vector.
 
-  * It includes functionality to check simplex-related restrictions and accelerated gradient descent functionality.
+  * It includes functionality to check the simplex constraints and perofrm accelerated gradient descent.
   * see [[https://en.wikipedia.org/wiki/Simplex]]
   
   * @param weights weight vector
@@ -31,7 +31,7 @@ class UpdatableWeights(var weights: Array[Double]) extends Serializable with Vec
   val d = weights.length
 
 /**
-  * accelerated gradient descent utilities. See [[AcceleratedGradientDescentUtils]]
+  * accelerated gradient descent utilities. See [[AcceleratedGradientUtils]]
  
   */
   val optimUtils = new VectorGradientUtils(d)
