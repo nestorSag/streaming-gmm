@@ -82,7 +82,7 @@ class MultivariateGaussian(
 * Returns the covariance matrix' log-determinant
 
 */
-  def logDetSigma(): Double = {
+  def logDetSigma: Double = {
     -2.0*u - mu.size * math.log(2.0 * math.Pi)
   }
 
@@ -90,7 +90,7 @@ class MultivariateGaussian(
 * Returns the covariance matrix' determinant
 
 */
-  def detSigma(): Double = {
+  def detSigma: Double = {
     math.exp(logDetSigma)
   }
 

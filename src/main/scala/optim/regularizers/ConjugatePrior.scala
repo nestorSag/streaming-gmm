@@ -2,35 +2,103 @@ package com.github.nestorsag.gradientgmm
 
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace}
 
+import org.apache.log4j.Logger
+
+
 /**
-  * Conjugate prior regularization for all the mixture's parameters. 
+  * Conjugate prior regularization for all the mixture's parameters; this means an 
+  * Inverse-Wishart prior over the covariance matrices, a Normal prior over the means
+  * and a Dirchlet prior over the weights.
+
   * See [[https://en.wikipedia.org/wiki/Normal-inverse-Wishart_distribution]]
+
   * See [[https://en.wikipedia.org/wiki/Dirichlet_distribution]]
 
-  * @param df Degrees of freedom for the Inverse-Wishart prior over the covariance matrices
-  * @param priorMu mean for the prior normal distribution over the means
-  * @param priorSigma expected covariance matrix for the Inverse-Wishart prior over the covariance matrices
-  * @param weightConcentration COncentration parameter for the Dirichlet prior over the weight vector
-  * @param numClusters number of mixture components
+  */
+class ConjugatePrior extends GMMRegularizer{
+
+/**
+  * Number of mixture components
 
   */
-class ConjugatePrior(
-	val df: Double, 
-	priorMu: BDV[Double], 
-	priorSigma: BDM[Double], 
-	val weightConcentration: Double, 
-	val numClusters: Int) extends GMMRegularizer {
-	
+	private var k: Int = 2
+
+/**
+  * prior mean for components' mean vector
+
+  */
+	private var muPriorMean: BDV[Double] = BDV.zeros[Double](k)
+
+/**
+  * prior mean for components' covariance matrix
+
+  */
+	private var sigmaPriorMean: BDM[Double] = BDM.eye[Double](k)
+
+/**
+  * Degrees of freedom for the covariance prior
+
+  */
+	private var df: Double = 3 
+
+/**
+  * COncentration parameter for the weight vector prior
+
+  */
+	private var weightConcentrationPar: Double = 0.5 
+
+	def setDf(df: Double): this.type = {
+		require(df>sigmaPriorMean.cols-1,"degrees of freedom must me greater than dim(sigmaPriorMean)")
+		this.df = df
+		this
+	}
+
+	def getDf = this.df
+
+/**
+  * The Gaussian parameter prior means must be set at the same time to check correctness, since their dimension must match
+
+  */
+	def setGaussianParsPrioMeans(muPriorMean: BDV[Double], sigmaPriorMean: BDM[Double]): this.type = {
+		val logger: Logger = Logger.getLogger("conjugatePrior")
+
+		require(sigmaPriorMean.cols == sigmaPriorMean.rows, "sigma prior mean is not a square matrix")
+		require(muPriorMean.length == sigmaPriorMean.cols, "parameters' dimensions does not match")
+		require(sigmaPriorMean == sigmaPriorMean.t,"sigmaPriorMean must be symmetric")
+
+		if(df <= sigmaPriorMean.cols-1){
+			this.df = sigmaPriorMean.cols
+			logger.info(s"Setting df to ${this.df}. It must be larger than ${muPriorMean.length}")
+		}
+		this.muPriorMean = muPriorMean
+		this.sigmaPriorMean = sigmaPriorMean
+		this
+	}
+
+	def getMuPriorMean = muPriorMean
+
+	def getSigmaPriorMean = sigmaPriorMean
+
+	def setWeightConcentrationPar(alpha: Double): this.type = {
+		require(alpha>0,"Dirichlet prior concentration parameter must be positive")
+		this.weightConcentrationPar = alpha
+		this
+	}
+
+	def getWeightConcentrationPar = weightConcentrationPar
+
+	def setK(k: Int): this.type = {
+		require(k>0,"number of clusters must be positive")
+		this.k = k
+		this
+	}
+
+	def getK = this.k
 /**
   * Get augmented parameter matrix. See ''Hosseini, Reshad & Sra, Suvrit. (2017). An Alternative to EM for Gaussian Mixture Models: Batch and Stochastic Riemannian Optimization''
 
   */
-	val regularizingMatrix = buildRegMatrix(df,priorMu,priorSigma)
-
-	require(df>priorSigma.cols-1,"degrees of freedom must me greater than dim(priorSigma)")
-	require(weightConcentration>0,"Dirichlet prior concentration parameter must be positive")
-
-	require(priorSigma == priorSigma.t,"priorSigma must be symmetric")
+	val regularizingMatrix = buildRegMatrix(df,muPriorMean,sigmaPriorMean)
 
 
 	def gradient(dist:UpdatableGConcaveGaussian): BDM[Double] = {
@@ -39,7 +107,7 @@ class ConjugatePrior(
 	}
 
 	def softWeightsGradient(weights: BDV[Double]): BDV[Double] = {
-		(BDV.ones[Double](numClusters) - weights*numClusters.toDouble)*weightConcentration
+		(BDV.ones[Double](k) - weights*k.toDouble)*weightConcentrationPar
 	}
 
 	def evaluate(dist: UpdatableGConcaveGaussian, weight: Double): Double = {
@@ -59,22 +127,22 @@ class ConjugatePrior(
 
   */
 	private def evaluateWeight(weight: Double): Double = {
-		weightConcentration*math.log(weight)
+		weightConcentrationPar*math.log(weight)
 	}
 	
 /**
   * Build augmented parameter matrix
 
   */
-	private def buildRegMatrix(df: Double, priorMu: BDV[Double], priorSigma: BDM[Double]): BDM[Double] = {
+	private def buildRegMatrix(df: Double, muPriorMean: BDV[Double], sigmaPriorMean: BDM[Double]): BDM[Double] = {
 
-		//       [priorSigma + df*priorMu*priorMu.t, df*priorMu
-		//        df*priorMu^T                     ,         df]
+		//       [sigmaPriorMean + df*muPriorMean*muPriorMean.t, df*muPriorMean
+		//        df*muPriorMean^T                     ,         df]
 		
-		val shrinkedMu = priorMu*df
+		val shrinkedMu = muPriorMean*df
 		val lastRow = new BDV[Double](shrinkedMu.toArray ++ Array(df))
 
-		BDM.vertcat(BDM.horzcat(priorSigma + shrinkedMu*priorMu.t,shrinkedMu.toDenseMatrix.t),lastRow.asDenseMatrix)
+		BDM.vertcat(BDM.horzcat(sigmaPriorMean + shrinkedMu*muPriorMean.t,shrinkedMu.toDenseMatrix.t),lastRow.asDenseMatrix)
 	}
 
 /**
