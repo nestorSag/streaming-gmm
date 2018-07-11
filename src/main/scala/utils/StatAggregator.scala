@@ -90,7 +90,7 @@ object StatAggregator {
     val outer = y*y.t
     while (i < agg.k) {
       q(i) /= qSum 
-      agg.gradients(i) += optim.direction( dists(i), outer , q(i)) / n
+      agg.gradients(i) += optim.lossGradient( dists(i), outer , q(i)) / n
       agg.posteriors(i) += q(i)
       agg.qLoglikelihood += optim.evaluateRegularizationTerm(dists(i),weights(i)) / (n*n)
       i = i + 1

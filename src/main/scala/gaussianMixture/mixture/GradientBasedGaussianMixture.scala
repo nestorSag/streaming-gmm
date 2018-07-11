@@ -14,8 +14,6 @@ import org.apache.log4j.Logger
 
 /**
   * Optimizable gradient-based Gaussian Mixture Model
-
-
   * See ''Hosseini, Reshad & Sra, Suvrit. (2017). An Alternative to EM for Gaussian Mixture Models: Batch and Stochastic Riemannian Optimization''
   * @param w Weight vector wrapper
   * @param g Array of mixture components (distributions)
@@ -37,7 +35,6 @@ class GradientBasedGaussianMixture private (
 
 /**
   * Optimize the mixture parameters given some training data
-
   * @param data Training data as an RDD of Spark vectors 
  
   */
@@ -70,7 +67,7 @@ class GradientBasedGaussianMixture private (
     // this is because of the way spark takes random samples
     //Prob(0 size sample) <= 1e-3
     val dataSize = gConcaveData.count()
-    val minSafeBatchSize: Double = dataSize*(1 - math.exp(math.log(1e-3/dataSize)))
+    val minSafeBatchSize: Double = dataSize*(1 - math.exp(math.log(1e-3)/dataSize))
 
     batchFraction = if(optimizer.batchSize.isDefined){
       math.max(optimizer.batchSize.get.toDouble,minSafeBatchSize)/dataSize
@@ -144,7 +141,7 @@ class GradientBasedGaussianMixture private (
 
       //update weights in the driver
       val current = optimizer.fromSimplex(Utils.toBDV(weights.weights))
-      val delta = optimizer.learningRate/n*optimizer.softWeightsDirection(Utils.toBDV(posteriorResps),weights)
+      val delta = optimizer.learningRate/n*optimizer.weightsDirection(Utils.toBDV(posteriorResps),weights)
       weights.update(optimizer.toSimplex(current + delta))
 
       oldLL = newLL // current becomes previous
@@ -203,7 +200,6 @@ object GradientBasedGaussianMixture{
 
 /**
   * Creates a new {{{GradientBasedGaussianMixture}}} instance
-
   * @param weights Array of weights
   * @param gaussians Array of mixture components
   * @param optimizer Optimizer object
@@ -219,7 +215,6 @@ object GradientBasedGaussianMixture{
 /**
   * Creates a new {{{GradientBasedGaussianMixture}}} instance initialized with the
   * results of a K-means model fitted with a sample of the data
-
   * @param data training data in the form of an RDD of Spark vectors
   * @param optimizer Optimizer object
   * @param k Number of components in the mixture
@@ -290,5 +285,4 @@ object GradientBasedGaussianMixture{
       optimizer)
 
   }
-
 }

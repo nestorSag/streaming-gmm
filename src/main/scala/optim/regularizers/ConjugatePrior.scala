@@ -108,7 +108,7 @@ class ConjugatePrior extends GMMRegularizer{
 		//updateRegularizer(paramMat)
 	}
 
-	def softWeightsGradient(weights: BDV[Double]): BDV[Double] = {
+	def weightsGradient(weights: BDV[Double]): BDV[Double] = {
 		(BDV.ones[Double](k) - weights*k.toDouble)*weightConcentrationPar
 	}
 

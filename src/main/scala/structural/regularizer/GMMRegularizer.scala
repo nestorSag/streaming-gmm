@@ -28,7 +28,7 @@ trait GMMRegularizer extends Serializable {
   * @return gradient
  
   */
-	def softWeightsGradient(weights: BDV[Double]): BDV[Double]
+	def weightsGradient(weights: BDV[Double]): BDV[Double]
 
 
 /**

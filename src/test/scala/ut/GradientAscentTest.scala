@@ -60,7 +60,7 @@ class GradientAscentTest extends OptimTestSpec{
 		for(i <- 1 to niter){
 
 			var currentWeights = optim.fromSimplex(new BDV(weightObj.weights))
-			var delta = optim.softWeightsDirection(targetWeights,weightObj) * optim.getLearningRate
+			var delta = optim.weightsDirection(targetWeights,weightObj) * optim.getLearningRate
 			weightObj.update(optim.toSimplex(currentWeights + delta))
 
 		}

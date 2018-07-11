@@ -8,58 +8,49 @@ import org.apache.spark.rdd.RDD
 /**
   * Optimizer interface that contains base hyperparameters and their getters and setters.
   * Optimization algorithms like Stochastic Gradient Ascent are implementations of this trait
-
   */
 trait GMMOptimizer extends Serializable{
 
 /**
   * Regularization term, if any
-
   */
 	private[gradientgmm] val regularizer: Option[GMMRegularizer] = None
 
 /**
   * Calculates the mapping from and to the weights' Simplex (see [[]]) and the transformation's gradient
-
   */
 	private[gradientgmm] val weightOptimizer: GMMWeightTransformation = new SoftmaxWeightTransformation()
 
 /**
   * Ascent procedure's learning rate
-
   */
 	private[gradientgmm] var learningRate: Double = 0.9
 
 /**
   * Rate at which the learning rate is decreased as the number of iterations grow.
   * After {{{t}}} iterations the learning rate will be {{{shrinkageRate^t * learningRate}}}
-
   */
     private[gradientgmm] var shrinkageRate: Double = 0.95
 
 /**
   * Minimum allowed learning rate. Once this lower bound is reached the learning rate will not
   * shrink anymore
-
   */
 	private[gradientgmm] var minLearningRate: Double = 1e-2
 
 /**
   * Minibatch size for each iteration in the ascent procedure. If {{{None}}}, it does
   * full batch gradient ascent.
-
   */
 	private[gradientgmm] var batchSize: Option[Int] = None
 
 /**
   * Maximum allowed tolerance in the change in log-likelihood for the program to finish
-
   */
 	private[gradientgmm] var convergenceTol: Double = 1e-6
 
 /**
   * Maximum number of iterations allowed
-
   */
 	private[gradientgmm] var maxIter: Int = 100
 
@@ -172,19 +163,19 @@ trait GMMOptimizer extends Serializable{
 /**
   * Computes the loss gradient of the weights vector without regularization term 
   */
-	private[gradientgmm] def basicSoftWeightsGradient(posteriors: BDV[Double], weights: BDV[Double]): BDV[Double] = {
+	private[gradientgmm] def basicWeightsGradient(posteriors: BDV[Double], weights: BDV[Double]): BDV[Double] = {
 
 		weightOptimizer.gradient(posteriors,weights)
 	}
 /**
   * Computes the full loss gradient of the weights vector 
   */
-	private[gradientgmm] def softWeightGradient(posteriors: BDV[Double], weights: BDV[Double]): BDV[Double] = {
+	private[gradientgmm] def weightsGradient(posteriors: BDV[Double], weights: BDV[Double]): BDV[Double] = {
 
 		var grads = regularizer match {
-			case None => basicSoftWeightsGradient(posteriors,weights)
-			case Some(_) => basicSoftWeightsGradient(posteriors,weights) +
-		 			regularizer.get.softWeightsGradient(weights)
+			case None => basicWeightsGradient(posteriors,weights)
+			case Some(_) => basicWeightsGradient(posteriors,weights) +
+		 			regularizer.get.weightsGradient(weights)
 		}
 
 		grads(weights.length - 1) = 0.0
@@ -213,7 +204,6 @@ trait GMMOptimizer extends Serializable{
   * Fit a Gaussian Mixture Model (see [[https://en.wikipedia.org/wiki/Mixture_model#Gaussian_mixture_model]]).
   * The model is initialized using a K-means algorithm over a small sample and then 
   * fitting the resulting parameters to the data using this {{{GMMOptimization}}} object
-
   * @param data Data to fit the model
   * @param k Number of mixture components (clusters)
   * @param startingSampleSize Sample size for the K-means algorithm
@@ -238,7 +228,6 @@ trait GMMOptimizer extends Serializable{
 
 /**
   * Compute the ascent direction 
-
   * @param dist Mixture component
   * @param point Data point
   * @param w {{{dist}}}'s posterior responsability for {{{point}}} (see [[StatAggregator]])
@@ -248,12 +237,11 @@ trait GMMOptimizer extends Serializable{
 
 /**
   * Compute the ascent direction for the weight vector
-
   * @param posteriors posterior responsability for the corresponding mixture component
   * @param weights vector fo current weights
   * @return ascent direction for weight parameters
   */
-	def softWeightsDirection(posteriors: BDV[Double], weights: UpdatableWeights): BDV[Double]
+	def weightsDirection(posteriors: BDV[Double], weights: UpdatableWeights): BDV[Double]
 
 
 }

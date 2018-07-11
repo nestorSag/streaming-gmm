@@ -52,7 +52,7 @@
 			
 // 			for(i <- 1 to niter){
 
-// 				weightObj.update(weightObj.soft + optim.softWeightsDirection(targetWeights,weightObj) * optim.getLearningRate)
+// 				weightObj.update(weightObj.soft + optim.weightsDirection(targetWeights,weightObj) * optim.getLearningRate)
 
 // 			}
 

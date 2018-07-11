@@ -6,46 +6,43 @@ import breeze.numerics.sqrt
 
 /**
   * Compute ADAM algirithm directions. See ''Adam: A Method for Stochastic Optimization. Kingma, Diederik P.; Ba, Jimmy, 2014''
-
   */
 class GMMAdam extends GMMGradientAscent {
 
 /**
   * iteration counter
-
   */
-	var t: Int = 0
+	var t: Int = 1
 
 /**
   * offset term to avoid division by zero in the main direction calculations
-
   */
 	var eps = 1e-8
 
 /**
   * Exponential smoothing parameter for the first raw moment estimator 
-
   */
 	var beta1 = 0.5
 
 /**
   * Exponential smoothing parameter for the second raw moment estimator 
-
   */
 	var beta2 = 0.1
 	
-	def setBeta1(beta1: Double): Unit = { 
+	def setBeta1(beta1: Double): this.type = { 
 		require(beta1 > 0 , "beta1 must be positive")
 		this.beta1 = beta1
+		this
 	}
 
 	def getBeta1: Double = { 
 		this.beta1
 	}
 
-	def setBeta2(beta2: Double): Unit = { 
+	def setBeta2(beta2: Double): this.type = { 
 		require(beta2 > 0 , "beta2 must be positive")
 		this.beta2 = beta2
+		this
 	}
 
 	def getBeta2: Double = { 
@@ -54,7 +51,6 @@ class GMMAdam extends GMMGradientAscent {
 
 /**
   * Reset iterator counter
-
   */
 	def reset: Unit = {
 		t = 0
@@ -91,7 +87,7 @@ class GMMAdam extends GMMGradientAscent {
 		alpha_t * dist.optimUtils.momentum.get /:/ (sqrt(dist.optimUtils.adamInfo.get) + eps)
 	}
 
-	override def softWeightsDirection(posteriors: BDV[Double], weights: UpdatableWeights): BDV[Double] = {
+	override def weightsDirection(posteriors: BDV[Double], weights: UpdatableWeights): BDV[Double] = {
 
 		if(!weights.optimUtils.momentum.isDefined){
 			weights.optimUtils.initializeMomentum
@@ -101,7 +97,7 @@ class GMMAdam extends GMMGradientAscent {
 			weights.optimUtils.initializeAdamInfo
 		}
 
-		val grad = softWeightGradient(posteriors, new BDV(weights.weights))
+		val grad = weightsGradient(posteriors, new BDV(weights.weights))
 		
 		weights.optimUtils.updateMomentum(weights.optimUtils.momentum.get*beta1 + grad*(1.0-beta1))
 

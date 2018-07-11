@@ -15,6 +15,7 @@ trueWeightsDf = data.frame(w1=trueWeights[1],w2=trueWeights[2],w3=trueWeights[3]
 #weights can be in any order
 
 l = logParser(logsPath)
+save(l,file="RUtils/pathPlots/data.RData")
 
 saveMeansPlot(l$means,trueCenters)
 

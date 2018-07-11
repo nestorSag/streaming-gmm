@@ -6,7 +6,7 @@ import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
   * Compute gradient ascent directions with momentum
   */
 
-class GMMMomentumGradientAscent extends GMMGradientAscent {
+class GMMNesterovGradientAscent extends GMMGradientAscent {
 
 /**
   * exponential smoothing parameter. See ''Goh, "Why Momentum Really Works", Distill, 2017. http://doi.org/10.23915/distill.00006''

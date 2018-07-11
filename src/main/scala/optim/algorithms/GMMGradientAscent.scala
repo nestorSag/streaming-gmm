@@ -7,14 +7,13 @@ import org.apache.spark.rdd.RDD
 
 /**
   * Computes stochastic gradient ascent directions
-
   */
 class GMMGradientAscent extends GMMOptimizer{ 
 
 	require(learningRate>0,"learningRate must be positive")
 
-	def softWeightsDirection(posteriors: BDV[Double], weights: UpdatableWeights): BDV[Double] = {
-		softWeightGradient(posteriors,new BDV(weights.weights))
+	def weightsDirection(posteriors: BDV[Double], weights: UpdatableWeights): BDV[Double] = {
+		weightsGradient(posteriors,new BDV(weights.weights))
 	}
 
 	def direction(dist: UpdatableGaussianMixtureComponent, point: BDM[Double], w: Double): BDM[Double] = {

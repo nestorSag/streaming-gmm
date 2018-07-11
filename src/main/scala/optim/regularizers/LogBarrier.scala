@@ -26,7 +26,7 @@ class LogBarrier extends GMMRegularizer{
 		this
 	}
 
-	def softWeightsGradient(weights: BDV[Double]): BDV[Double] = BDV.zeros[Double](weights.length)
+	def weightsGradient(weights: BDV[Double]): BDV[Double] = BDV.zeros[Double](weights.length)
 
 	def gradient(dist: UpdatableGaussianMixtureComponent): BDM[Double] = {
 
