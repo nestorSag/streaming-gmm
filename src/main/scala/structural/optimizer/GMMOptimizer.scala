@@ -54,64 +54,22 @@ trait GMMOptimizer extends Serializable{
   */
 	private[gradientgmm] var maxIter: Int = 100
 
-	def setLearningRate(learningRate: Double): this.type = { 
-		require(learningRate > 0 , "learning rate must be positive")
-		this.learningRate = learningRate
-		this
-	}
-
-	def getLearningRate: Double = { 
-		this.learningRate
-	}
-
-	def setMinLearningRate(m: Double): this.type = { 
-		require(m >= 0, "minLearningRate rate must be in positive")
-		minLearningRate = m
-		this
-	}
-
-	def getMinLearningRate: Double = { 
-		minLearningRate
-	}
-
-	def setShrinkageRate(s: Double): this.type = { 
-		require(s > 0 &&  s <= 1.0, "learning rate must be in (0,1]")
-		shrinkageRate = s
-		this
-	}
-
-	def getBatchSize: Option[Int] = batchSize
-
-	def setBatchSize(n: Int): this.type = {
-		require(n>0,"n must be a positive integer")
-		batchSize = Option(n)
-		this
-	}
-
-	def getShrinkageRate: Double = { 
-		shrinkageRate
-	}
-
-    def getConvergenceTol: Double = convergenceTol
-
-	def setConvergenceTol(x: Double): this.type = {
-		require(x>0,"convergenceTol must be positive")
-		convergenceTol = x
-		this
-	}
-
-
-	def setMaxIter(m: Int): this.type = {
-		require(m > 0 ,s"maxIter needs to be a positive integer; got ${m}")
-		maxIter = m
-		this
-	}
-
-	def getMaxIter: Int = {
-		maxIter
-	}
+/**
+  * Compute the ascent direction 
+  * @param dist Mixture component
+  * @param grad current batch gradient
+  * @return ascent direction for the component's parameters
+  */
+	def direction(grad: BDM[Double], utils: AcceleratedGradientUtils[BDM[Double]]): BDM[Double]
 
 /**
+  * Compute the ascent direction for the weight vector
+  * @param posteriors posterior responsability for the corresponding mixture component
+  * @param weights vector fo current weights
+  * @return ascent direction for weight parameters
+  */
+
+ /**
   * Shrink {{{learningRate}}} by {{{shrinkageRate}}}
   *
   */
@@ -226,22 +184,65 @@ trait GMMOptimizer extends Serializable{
 		model
 	}
 
-/**
-  * Compute the ascent direction 
-  * @param dist Mixture component
-  * @param point Data point
-  * @param w {{{dist}}}'s posterior responsability for {{{point}}} (see [[StatAggregator]])
-  * @return ascent direction for the component's parameters
-  */
-	def direction(dist: UpdatableGaussianMixtureComponent, point: BDM[Double], w: Double): BDM[Double]
-
-/**
-  * Compute the ascent direction for the weight vector
-  * @param posteriors posterior responsability for the corresponding mixture component
-  * @param weights vector fo current weights
-  * @return ascent direction for weight parameters
-  */
 	def weightsDirection(posteriors: BDV[Double], weights: UpdatableWeights): BDV[Double]
+
+	def setLearningRate(learningRate: Double): this.type = { 
+		require(learningRate > 0 , "learning rate must be positive")
+		this.learningRate = learningRate
+		this
+	}
+
+	def getLearningRate: Double = { 
+		this.learningRate
+	}
+
+	def setMinLearningRate(m: Double): this.type = { 
+		require(m >= 0, "minLearningRate rate must be in positive")
+		minLearningRate = m
+		this
+	}
+
+	def getMinLearningRate: Double = { 
+		minLearningRate
+	}
+
+	def setShrinkageRate(s: Double): this.type = { 
+		require(s > 0 &&  s <= 1.0, "learning rate must be in (0,1]")
+		shrinkageRate = s
+		this
+	}
+
+	def getBatchSize: Option[Int] = batchSize
+
+	def setBatchSize(n: Int): this.type = {
+		require(n>0,"n must be a positive integer")
+		batchSize = Option(n)
+		this
+	}
+
+	def getShrinkageRate: Double = { 
+		shrinkageRate
+	}
+
+    def getConvergenceTol: Double = convergenceTol
+
+	def setConvergenceTol(x: Double): this.type = {
+		require(x>0,"convergenceTol must be positive")
+		convergenceTol = x
+		this
+	}
+
+
+	def setMaxIter(m: Int): this.type = {
+		require(m > 0 ,s"maxIter needs to be a positive integer; got ${m}")
+		maxIter = m
+		this
+	}
+
+	def getMaxIter: Int = {
+		maxIter
+	}
+
 
 
 }

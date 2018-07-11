@@ -110,7 +110,13 @@ class GradientBasedGaussianMixture private (
 
         val newDists = sc.parallelize(tuples, numPartitions).map { case (grad,dist) =>
 
-          dist.update(dist.paramMat + grad * bcOptim.value.learningRate)
+          //dist.update(
+          //  bcOptim.value.gaussianUpdate(
+          //    dist.paramMat,
+          //    grad,
+          //    dist.optimUtils))
+
+          dist.update(dist.paramMat + bcOptim.value.direction(grad,dist.optimUtils) * bcOptim.value.learningRate)
 
           bcOptim.value.updateLearningRate //update learning rate in workers
 

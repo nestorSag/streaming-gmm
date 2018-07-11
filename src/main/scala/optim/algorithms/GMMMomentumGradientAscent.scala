@@ -6,7 +6,7 @@ import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
   * Compute gradient ascent directions with momentum
   */
 
-class GMMMomentumGradientAscent extends GMMGradientAscent {
+class GMMMomentumGradientAscent extends GMMOptimizer {
 
 /**
   * exponential smoothing parameter. See ''Goh, "Why Momentum Really Works", Distill, 2017. http://doi.org/10.23915/distill.00006''
@@ -23,20 +23,18 @@ class GMMMomentumGradientAscent extends GMMGradientAscent {
 		this.beta
 	}
 
-	override def direction(dist: UpdatableGaussianMixtureComponent, point: BDM[Double], w: Double): BDM[Double] = {
+	def direction(grad: BDM[Double], utils: AcceleratedGradientUtils[BDM[Double]]): BDM[Double] = {
 
-		if(!dist.optimUtils.momentum.isDefined){
-			dist.optimUtils.initializeMomentum
+		if(!utils.momentum.isDefined){
+			utils.initializeMomentum
 		}
-
-		val grad = lossGradient(dist, point, w)
 		
-		dist.optimUtils.updateMomentum(dist.optimUtils.momentum.get*beta + grad)
+		utils.updateMomentum(utils.momentum.get*beta + grad)
 
-		dist.optimUtils.momentum.get
+		utils.momentum.get
 	}
 
-	override def weightsDirection(posteriors: BDV[Double], weights: UpdatableWeights): BDV[Double] = {
+	def weightsDirection(posteriors: BDV[Double], weights: UpdatableWeights): BDV[Double] = {
 
 		if(!weights.optimUtils.momentum.isDefined){
 			weights.optimUtils.initializeMomentum

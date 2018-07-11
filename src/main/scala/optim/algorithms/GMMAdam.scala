@@ -7,7 +7,7 @@ import breeze.numerics.sqrt
 /**
   * Compute ADAM algirithm directions. See ''Adam: A Method for Stochastic Optimization. Kingma, Diederik P.; Ba, Jimmy, 2014''
   */
-class GMMAdam extends GMMGradientAscent {
+class GMMAdam extends GMMOptimizer {
 
 /**
   * iteration counter
@@ -64,27 +64,25 @@ class GMMAdam extends GMMGradientAscent {
 	def getEps: Double = eps
 
 
-	override def direction(dist: UpdatableGaussianMixtureComponent, point: BDM[Double], w: Double): BDM[Double] = {
+	def direction(grad: BDM[Double], utils: AcceleratedGradientUtils[BDM[Double]]): BDM[Double] = {
 
 		t += 1
 
-		if(!dist.optimUtils.momentum.isDefined){
-			dist.optimUtils.initializeMomentum
+		if(!utils.momentum.isDefined){
+			utils.initializeMomentum
 		}
 
-		if(!dist.optimUtils.adamInfo.isDefined){
-			dist.optimUtils.initializeAdamInfo
+		if(!utils.adamInfo.isDefined){
+			utils.initializeAdamInfo
 		}
 
-		val grad = lossGradient(dist, point, w)
-
-		dist.optimUtils.updateMomentum(dist.optimUtils.momentum.get*beta1 + grad*(1.0-beta1))
+		utils.updateMomentum(utils.momentum.get*beta1 + grad*(1.0-beta1))
 		
-		dist.optimUtils.updateAdamInfo(dist.optimUtils.adamInfo.get*beta2 + (grad *:* grad)*(1.0-beta2))
+		utils.updateAdamInfo(utils.adamInfo.get*beta2 + (grad *:* grad)*(1.0-beta2))
 
 		val alpha_t = math.sqrt(1.0 - math.pow(beta2,t))/(1.0 - math.pow(beta1,t))
 
-		alpha_t * dist.optimUtils.momentum.get /:/ (sqrt(dist.optimUtils.adamInfo.get) + eps)
+		alpha_t * utils.momentum.get /:/ (sqrt(utils.adamInfo.get) + eps)
 	}
 
 	override def weightsDirection(posteriors: BDV[Double], weights: UpdatableWeights): BDV[Double] = {

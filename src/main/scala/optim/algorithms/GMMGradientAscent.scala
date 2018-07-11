@@ -16,9 +16,9 @@ class GMMGradientAscent extends GMMOptimizer{
 		weightsGradient(posteriors,new BDV(weights.weights))
 	}
 
-	def direction(dist: UpdatableGaussianMixtureComponent, point: BDM[Double], w: Double): BDM[Double] = {
+	def direction(grad: BDM[Double], utils: AcceleratedGradientUtils[BDM[Double]]): BDM[Double] = {
 
-		lossGradient(dist,point,w)
+		grad
 
 	}
 	
