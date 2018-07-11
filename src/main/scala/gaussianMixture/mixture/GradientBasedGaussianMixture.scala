@@ -1,6 +1,6 @@
 package com.github.nestorsag.gradientgmm
 
-import breeze.linalg.{diag, eigSym, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace}
+import breeze.linalg.{diag, eigSym, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, sum}
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.SparkContext
@@ -85,18 +85,18 @@ class GradientBasedGaussianMixture private (
       // dataSize*batchFraction is the expected current batch size
       // but it is not exact due to how spark takes samples from RDDs
       val adder = sc.broadcast(
-        StatAggregator.add(weights.weights, gaussians, optimizer, dataSize*batchFraction)_)
+        GradientAggregator.add(weights.weights, gaussians, optimizer, dataSize*batchFraction)_)
 
       //val x = batch(gConcaveData)
       //logger.debug(s"sample size: ${x.count()}")
-      val sampleStats = batch(gConcaveData).treeAggregate(StatAggregator.init(k, d))(adder.value, _ += _)
+      val sampleStats = batch(gConcaveData).treeAggregate(GradientAggregator.init(k, d))(adder.value, _ += _)
 
-      val n: Double = sampleStats.posteriors.sum // number of actual data points in current batch
+      val n: Double = sum(sampleStats.weightsGradients) // number of actual data points in current batch
       logger.debug(s"n: ${n}")
 
       // pair Gaussian components with their respective parameter gradients
       val tuples =
-          Seq.tabulate(k)(i => (sampleStats.gradients(i), 
+          Seq.tabulate(k)(i => (sampleStats.gaussianGradients(i), 
                                 gaussians(i)))
 
 
@@ -110,13 +110,13 @@ class GradientBasedGaussianMixture private (
 
         val newDists = sc.parallelize(tuples, numPartitions).map { case (grad,dist) =>
 
-          //dist.update(
-          //  bcOptim.value.gaussianUpdate(
-          //    dist.paramMat,
-          //    grad,
-          //    dist.optimUtils))
+          dist.update(
+            bcOptim.value.getGaussianUpdate(
+              dist.paramMat,
+              grad,
+              dist.optimUtils))
 
-          dist.update(dist.paramMat + bcOptim.value.direction(grad,dist.optimUtils) * bcOptim.value.learningRate)
+          //dist.update(dist.paramMat + bcOptim.value.direction(grad,dist.optimUtils) * bcOptim.value.learningRate)
 
           bcOptim.value.updateLearningRate //update learning rate in workers
 
@@ -131,7 +131,13 @@ class GradientBasedGaussianMixture private (
         val newDists = tuples.map{ 
           case (grad,dist) => 
 
-          dist.update(dist.paramMat + grad * optimizer.learningRate)
+          dist.update(
+            optimizer.getGaussianUpdate(
+              dist.paramMat,
+              grad,
+              dist.optimUtils))
+
+          //dist.update(dist.paramMat + grad * optimizer.learningRate)
           
           dist
 
@@ -143,12 +149,12 @@ class GradientBasedGaussianMixture private (
 
       gaussians = newDists
 
-      val posteriorResps = sampleStats.posteriors
+      weights.update(
+        optimizer.getWeightsUpdate(
+          Utils.toBDV(weights.weights),
+          sampleStats.weightsGradients,
+          weights.optimUtils))
 
-      //update weights in the driver
-      val current = optimizer.fromSimplex(Utils.toBDV(weights.weights))
-      val delta = optimizer.learningRate/n*optimizer.weightsDirection(Utils.toBDV(posteriorResps),weights)
-      weights.update(optimizer.toSimplex(current + delta))
 
       oldLL = newLL // current becomes previous
       newLL = sampleStats.qLoglikelihood

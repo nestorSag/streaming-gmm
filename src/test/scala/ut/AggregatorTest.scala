@@ -1,7 +1,7 @@
 import org.scalatest.FlatSpec
 
 
-import com.github.nestorsag.gradientgmm.{GMMGradientAscent,StatAggregator,UpdatableGaussianMixtureComponent}
+import com.github.nestorsag.gradientgmm.{GMMGradientAscent,GradientAggregator,UpdatableGaussianMixtureComponent}
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, norm}
 
 
@@ -28,9 +28,9 @@ class AggregatorTest extends FlatSpec{
 	val points = Array.fill(nPoints)(targetPoint).map{case v => new BDV(v.toArray ++ Array(1.0))}
 
 
-	val adder = StatAggregator.add(clusterWeights, clusterDists, optim, nPoints)_
+	val adder = GradientAggregator.add(clusterWeights, clusterDists, optim, nPoints)_
 	
-	val agg = points.foldLeft(StatAggregator.init(2,dim)){case (agg,point) => adder(agg,point)}
+	val agg = points.foldLeft(GradientAggregator.init(2,dim)){case (agg,point) => adder(agg,point)}
 
 	"the log-likelihood" should "be correclty calculated" in {
 		val correctValue = (-1.0 -math.log(2*math.Pi))

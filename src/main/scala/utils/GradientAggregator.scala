@@ -7,59 +7,59 @@ import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV,
   *
   * In each worker it computes and aggregates the current batch log-likelihood,
   * the regularization values for the current parameters and the 
-  * gradients for each data point. The class structure is based heavily on
+  * gaussianGradients for each data point. The class structure is based heavily on
   * Spark Clustering's {{{ExpectationSum}}} class. 
   * See [[https://github.com/apache/spark/blob/master/mllib/src/main/scala/org/apache/spark/mllib/clustering/GaussianMixture.scala]]
 
   * @param qLogLikelihood aggregate log-likelihood
-  * @param posteriors: aggregate posterior responsability for each component. See ''Pattern Recognition
+  * @param weightsGradients: aggregate posterior responsability for each component. See ''Pattern Recognition
   * And Machine Learning. Bishop, Chis.'', page 432
-  * @param gradients Aggregate point-wise gradients for each component
+  * @param gaussianGradients Aggregate point-wise gaussianGradients for each component
  
   */
-class StatAggregator(
+class GradientAggregator(
   var qLoglikelihood: Double,
-  val posteriors: Array[Double],
-  val gradients: Array[BDM[Double]]) extends Serializable{
+  val weightsGradients: BDV[Double],
+  val gaussianGradients: Array[BDM[Double]]) extends Serializable{
 
 /**
   * Number of components in the model
   */
-  val k = gradients.length
+  val k = gaussianGradients.length
 
 /**
-  * Adder for different {{{StatAggregator}}}
+  * Adder for different {{{GradientAggregator}}}
   *
   * Used for further aggregation between each worker's object
  
   */
-  def +=(x: StatAggregator): StatAggregator = {
+  def +=(x: GradientAggregator): GradientAggregator = {
     var i = 0
     while (i < k) {
-      gradients(i) += x.gradients(i)
-      posteriors(i) += x.posteriors(i)
+      gaussianGradients(i) += x.gaussianGradients(i)
       i += 1
     }
+    weightsGradients += x.weightsGradients
     qLoglikelihood += x.qLoglikelihood
     this
   }
 
 }
 
-object StatAggregator {
+object GradientAggregator {
 
 /**
-  * {{{StatAggregator}}} initializer
+  * {{{GradientAggregator}}} initializer
   *
   * Initializes an instance with initial statistics set as zero
   * @param k Number of components in the model
   * @param d Dimensionality of the data
  
   */
-  def init(k: Int, d: Int): StatAggregator = {
-    new StatAggregator(
+  def init(k: Int, d: Int): GradientAggregator = {
+    new GradientAggregator(
       0.0,
-      Array.fill(k)(0.0),
+      BDV.zeros[Double](k),
       Array.fill(k)(BDM.zeros[Double](d+1, d+1)))
   }
 
@@ -79,20 +79,29 @@ object StatAggregator {
       dists: Array[UpdatableGaussianMixtureComponent],
       optim: GMMOptimizer,
       n: Double)
-      (agg: StatAggregator, y: BDV[Double]): StatAggregator = {
+      (agg: GradientAggregator, y: BDV[Double]): GradientAggregator = {
 
     val q = weights.zip(dists).map {
       case (weight, dist) =>  weight * dist.gConcavePdf(y) // <--q-logLikelihood
     }
     val qSum = q.sum
+
     agg.qLoglikelihood += math.log(qSum) / n
+
+    // update aggregated weight gradient
+    val posteriors = Utils.toBDV(q) / qSum
+    agg.weightsGradients += optim.weightsGradient(posteriors,Utils.toBDV(weights)) / n
+
+    // update gaussian parameters' gradients and log-likelihood
     var i = 0
     val outer = y*y.t
     while (i < agg.k) {
       q(i) /= qSum 
-      agg.gradients(i) += optim.lossGradient( dists(i), outer , q(i)) / n
-      agg.posteriors(i) += q(i)
+
+      agg.gaussianGradients(i) += optim.gaussianGradient( dists(i), outer , q(i)) / n
+
       agg.qLoglikelihood += optim.evaluateRegularizationTerm(dists(i),weights(i)) / (n*n)
+
       i = i + 1
     }
     agg

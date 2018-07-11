@@ -1,6 +1,6 @@
 package com.github.nestorsag.gradientgmm
 
-import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
+import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV, sum}
 
 import org.apache.spark.mllib.linalg.{Vector => SV}
 import org.apache.spark.rdd.RDD
@@ -55,13 +55,29 @@ trait GMMOptimizer extends Serializable{
 	private[gradientgmm] var maxIter: Int = 100
 
 /**
-  * Compute the ascent direction 
+  * Compute the ascent direction for the parameters of the Gaussian components
+  * @param grad current batch gradient
+  * @param utils utilities for accelerated gradient descent routines
+  * @return ascent direction for the component's parameters
+  */
+	def gaussianDirection(grad: BDM[Double], utils: AcceleratedGradientUtils[BDM[Double]]): BDM[Double]
+	//def direction[T <: Any](grad: T, utils: AcceleratedGradientUtils[T]): T
+
+/**
+  * Compute the ascent direction for the weight parameters 
   * @param dist Mixture component
   * @param grad current batch gradient
   * @return ascent direction for the component's parameters
   */
-	def direction(grad: BDM[Double], utils: AcceleratedGradientUtils[BDM[Double]]): BDM[Double]
+	def weightsDirection(grad: BDV[Double], utils: AcceleratedGradientUtils[BDV[Double]]): BDV[Double]
 
+
+	//def direction[T <: {def :* : Double => T; def + : T =>T}](grad: T, utils: AcceleratedGradientUtils[T]): T
+
+	//def getUpdate[T <: {def :* : Double => T; def + : T =>T}](current: T, grad: T, utils: AcceleratedGradientUtils[T]): T = {
+	
+	//	current + direction(grad,utils) * learningRate
+	//}
 /**
   * Compute the ascent direction for the weight vector
   * @param posteriors posterior responsability for the corresponding mixture component
@@ -100,11 +116,11 @@ trait GMMOptimizer extends Serializable{
 /**
   * Computes the full loss gradient 
   */
-	private[gradientgmm] def lossGradient(dist: UpdatableGaussianMixtureComponent, point: BDM[Double], w: Double): BDM[Double] = {
+	private[gradientgmm] def gaussianGradient(dist: UpdatableGaussianMixtureComponent, point: BDM[Double], w: Double): BDM[Double] = {
 
 		regularizer match{
-			case None => basicLossGradient(dist.paramMat,point,w) 
-			case Some(_) => basicLossGradient(dist.paramMat,point,w) +
+			case None => basicGaussianGradient(dist.paramMat,point,w) 
+			case Some(_) => basicGaussianGradient(dist.paramMat,point,w) +
 				regularizer.get.gradient(dist)
 		}
 
@@ -113,7 +129,7 @@ trait GMMOptimizer extends Serializable{
 /**
   * Computes the loss gradient of the mixture component without regularization term 
   */
-	private[gradientgmm] def basicLossGradient(paramMat: BDM[Double], point: BDM[Double], w: Double): BDM[Double] = {
+	private[gradientgmm] def basicGaussianGradient(paramMat: BDM[Double], point: BDM[Double], w: Double): BDM[Double] = {
 
 		(point - paramMat) * 0.5 * w
 	}
@@ -159,6 +175,36 @@ trait GMMOptimizer extends Serializable{
 	}
 
 /**
+  * Compute full updates for the guassian parameters. Usually this has the form X_t + alpha * direction(X_t)
+  * but it differs for some algorithms, e.g. Nesterov's
+  *
+  * @param current Current parameter values
+  * @param grad Current batch gradient
+  * @param utils Wrapper for accelerated gradient ascent utilities
+  * @return updated parameter values
+  */
+
+	def getGaussianUpdate(current: BDM[Double], grad: BDM[Double],  utils: AcceleratedGradientUtils[BDM[Double]]): BDM[Double] = {
+
+		current + gaussianDirection(grad,utils) * learningRate
+	}
+
+/**
+  * Compute full updates for the guassian parameters. Usually this has the form X_t + alpha * direction(X_t)
+  * but it differs for some algorithms, e.g. Nesterov's
+  *
+  * @param current Current parameter values
+  * @param grad Current batch gradient
+  * @param utils Wrapper for accelerated gradient ascent utilities
+  * @return updated parameter values
+  */
+
+	def getWeightsUpdate(current: BDV[Double], grad: BDV[Double],  utils: AcceleratedGradientUtils[BDV[Double]]): BDV[Double] = {
+
+		current + weightsDirection(grad,utils) * learningRate
+	}
+
+/**
   * Fit a Gaussian Mixture Model (see [[https://en.wikipedia.org/wiki/Mixture_model#Gaussian_mixture_model]]).
   * The model is initialized using a K-means algorithm over a small sample and then 
   * fitting the resulting parameters to the data using this {{{GMMOptimization}}} object
@@ -183,8 +229,6 @@ trait GMMOptimizer extends Serializable{
 
 		model
 	}
-
-	def weightsDirection(posteriors: BDV[Double], weights: UpdatableWeights): BDV[Double]
 
 	def setLearningRate(learningRate: Double): this.type = { 
 		require(learningRate > 0 , "learning rate must be positive")

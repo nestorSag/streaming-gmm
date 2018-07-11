@@ -64,7 +64,7 @@ class GMMAdam extends GMMOptimizer {
 	def getEps: Double = eps
 
 
-	def direction(grad: BDM[Double], utils: AcceleratedGradientUtils[BDM[Double]]): BDM[Double] = {
+	def gaussianDirection(grad: BDM[Double], utils: AcceleratedGradientUtils[BDM[Double]]): BDM[Double] = {
 
 		t += 1
 
@@ -85,26 +85,43 @@ class GMMAdam extends GMMOptimizer {
 		alpha_t * utils.momentum.get /:/ (sqrt(utils.adamInfo.get) + eps)
 	}
 
-	override def weightsDirection(posteriors: BDV[Double], weights: UpdatableWeights): BDV[Double] = {
+	def weightsDirection(grad: BDV[Double], utils: AcceleratedGradientUtils[BDV[Double]]): BDV[Double] = {
 
-		if(!weights.optimUtils.momentum.isDefined){
-			weights.optimUtils.initializeMomentum
+		if(!utils.momentum.isDefined){
+			utils.initializeMomentum
 		}
 
-		if(!weights.optimUtils.adamInfo.isDefined){
-			weights.optimUtils.initializeAdamInfo
+		if(!utils.adamInfo.isDefined){
+			utils.initializeAdamInfo
 		}
-
-		val grad = weightsGradient(posteriors, new BDV(weights.weights))
 		
-		weights.optimUtils.updateMomentum(weights.optimUtils.momentum.get*beta1 + grad*(1.0-beta1))
+		utils.updateMomentum(utils.momentum.get*beta1 + grad*(1.0-beta1))
 
-		weights.optimUtils.updateAdamInfo(weights.optimUtils.adamInfo.get*beta2 + (grad *:* grad)*(1.0-beta2))
+		utils.updateAdamInfo(utils.adamInfo.get*beta2 + (grad *:* grad)*(1.0-beta2))
 
 		val alpha_t = math.sqrt(1.0 - math.pow(beta2,t))/(1.0 - math.pow(beta1,t))
 
-		alpha_t * weights.optimUtils.momentum.get /:/ (sqrt(weights.optimUtils.adamInfo.get) + eps)
+		alpha_t * utils.momentum.get /:/ (sqrt(utils.adamInfo.get) + eps)
 
 	}
+
+	// def direction[T <: {def * : Double => T; def + : T =>T; def /:/ : T =>T; def + : Double =>T; def *:* : T => T}](grad: T, utils: AcceleratedGradientUtils[T]): T = {
+
+	// 	if(!utils.momentum.isDefined){
+	// 		utils.initializeMomentum
+	// 	}
+
+	// 	if(!utils.adamInfo.isDefined){
+	// 		utils.initializeAdamInfo
+	// 	}
+		
+	// 	utils.updateMomentum(utils.momentum.get*beta1 + grad*(1.0-beta1))
+
+	// 	utils.updateAdamInfo(utils.adamInfo.get*beta2 + (grad *:* grad)*(1.0-beta2))
+
+	// 	val alpha_t = math.sqrt(1.0 - math.pow(beta2,t))/(1.0 - math.pow(beta1,t))
+
+	// 	utils.momentum.get /:/ (sqrt(utils.adamInfo.get) + eps) * alpha_t 
+	// }
 
 }

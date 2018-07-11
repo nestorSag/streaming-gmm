@@ -23,7 +23,8 @@ class GMMMomentumGradientAscent extends GMMOptimizer {
 		this.beta
 	}
 
-	def direction(grad: BDM[Double], utils: AcceleratedGradientUtils[BDM[Double]]): BDM[Double] = {
+
+	def gaussianDirection(grad: BDM[Double], utils: AcceleratedGradientUtils[BDM[Double]]): BDM[Double] = {
 
 		if(!utils.momentum.isDefined){
 			utils.initializeMomentum
@@ -34,18 +35,33 @@ class GMMMomentumGradientAscent extends GMMOptimizer {
 		utils.momentum.get
 	}
 
-	def weightsDirection(posteriors: BDV[Double], weights: UpdatableWeights): BDV[Double] = {
+	def weightsDirection(grad: BDV[Double], utils: AcceleratedGradientUtils[BDV[Double]]): BDV[Double] = {
 
-		if(!weights.optimUtils.momentum.isDefined){
-			weights.optimUtils.initializeMomentum
+		if(!utils.momentum.isDefined){
+			utils.initializeMomentum
 		}
-
-		val grad = weightsGradient(posteriors, new BDV(weights.weights))
 		
-		weights.optimUtils.updateMomentum(weights.optimUtils.momentum.get*beta + grad)
+		utils.updateMomentum(utils.momentum.get*beta + grad)
 
-		weights.optimUtils.momentum.get
+		utils.momentum.get
 
 	}
+
+	// override def direction[T <: {def * : Double => T; def + : T =>T}](grad: T, utils: AcceleratedGradientUtils[T]): T = {
+
+	// 	if(!utils.momentum.isDefined){
+	// 		utils.initializeMomentum
+	// 	}
+		
+	// 	utils.updateMomentum(utils.momentum.get*beta + grad)
+
+	// 	utils.momentum.get
+	// }
+
+	//def getUpdate[T <: {def * : Double => T; def + : T =>T}](current: T, grad: T, utils: AcceleratedGradientUtils[T]): T = 
+	//{
+	//	current + direction(grad,utils) * learningRate
+	//}
+
 
 }

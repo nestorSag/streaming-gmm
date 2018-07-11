@@ -28,9 +28,9 @@ class SoftmaxWeightTransformation extends GMMWeightTransformation {
 
 	def gradient(posteriors: BDV[Double], weights: BDV[Double]): BDV[Double] = {
 
-		val n = posteriors.sum
+		//val n = posteriors.sum
 
-		posteriors - weights*n
+		posteriors - weights
 	}
 
 	def fromSimplex(weights: BDV[Double]): BDV[Double] = {
