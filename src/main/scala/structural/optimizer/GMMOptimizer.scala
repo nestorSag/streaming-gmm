@@ -16,12 +16,12 @@ trait GMMOptimizer extends Serializable{
 /**
   * Optional regularization term
   */
-	private[gradientgmm] val regularizer: Option[GMMRegularizer] = None
+	private[gradientgmm] var regularizer: Option[GMMRegularizer] = None
 
 /**
   * Calculates the mapping from and to the weights' Simplex (see [[]]) and the transformation's gradient
   */
-	private[gradientgmm] val weightOptimizer: GMMWeightTransformation = new SoftmaxWeightTransformation()
+	private[gradientgmm] var weightsOptimizer: GMMWeightTransformation = new SoftmaxWeightTransformation()
 
 /**
   * Ascent procedure's learning rate
@@ -99,7 +99,7 @@ trait GMMOptimizer extends Serializable{
   * @param weights mixture weights
   */
 	def fromSimplex(weights: BDV[Double]): BDV[Double] = {
-		weightOptimizer.fromSimplex(weights)
+		weightsOptimizer.fromSimplex(weights)
 	}
 
 /**
@@ -109,7 +109,7 @@ trait GMMOptimizer extends Serializable{
   * @return valid mixture weight vector
   */
 	def toSimplex(weights: BDV[Double]): BDV[Double] = {
-		weightOptimizer.toSimplex(weights)
+		weightsOptimizer.toSimplex(weights)
 	}
 
 
@@ -142,7 +142,7 @@ trait GMMOptimizer extends Serializable{
   */
 	private[gradientgmm] def basicWeightsGradient(posteriors: BDV[Double], weights: BDV[Double]): BDV[Double] = {
 
-		weightOptimizer.gradient(posteriors,weights)
+		weightsOptimizer.gradient(posteriors,weights)
 	}
 /**
   * Computes the full loss gradient of the weights vector 
@@ -311,6 +311,20 @@ trait GMMOptimizer extends Serializable{
 	def getMaxIter: Int = {
 		maxIter
 	}
+
+  def setWeightsOptimizer(t: GMMWeightTransformation): this.type = {
+    weightsOptimizer = t
+    this
+  }
+
+  def getWeightsOptimizer: GMMWeightTransformation = weightsOptimizer
+
+  def setRegularizer(r: GMMRegularizer): this.type = {
+    regularizer = Option(r)
+    this
+  }
+
+  def getRegularizer: Option[GMMRegularizer] = regularizer
 
 
 
