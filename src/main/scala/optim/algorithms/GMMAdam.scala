@@ -12,7 +12,7 @@ class GMMAdam extends GMMOptimizer {
 /**
   * iteration counter
   */
-	var t: Int = 1
+	var t: Double = 1.0
 
 /**
   * offset term to avoid division by zero in the main direction calculations
@@ -53,7 +53,7 @@ class GMMAdam extends GMMOptimizer {
   * Reset iterator counter
   */
 	def reset: Unit = {
-		t = 0
+		t = 0.0
 	}
 
 	def setEps(x: Double): Unit = {
@@ -105,23 +105,36 @@ class GMMAdam extends GMMOptimizer {
 
 	}
 
-	// def direction[T <: {def * : Double => T; def + : T =>T; def /:/ : T =>T; def + : Double =>T; def *:* : T => T}](grad: T, utils: AcceleratedGradientUtils[T]): T = {
+	def direction[A](grad:A, utils: AcceleratedGradientUtils[A])(implicit ops: ParameterOperations[A]): A = {
 
-	// 	if(!utils.momentum.isDefined){
-	// 		utils.initializeMomentum
-	// 	}
+		t += 0.5
 
-	// 	if(!utils.adamInfo.isDefined){
-	// 		utils.initializeAdamInfo
-	// 	}
+		if(!utils.momentum.isDefined){
+			utils.initializeMomentum
+		}
+
+		if(!utils.adamInfo.isDefined){
+			utils.initializeAdamInfo
+		}
 		
-	// 	utils.updateMomentum(utils.momentum.get*beta1 + grad*(1.0-beta1))
+		utils.updateMomentum(
+			ops.sum(
+				ops.rescale(utils.momentum.get,beta1), 
+				ops.rescale(grad,(1.0-beta1))))
 
-	// 	utils.updateAdamInfo(utils.adamInfo.get*beta2 + (grad *:* grad)*(1.0-beta2))
+		utils.updateMomentum(
+			ops.sum(
+				ops.rescale(utils.adamInfo.get,beta2), 
+				ops.rescale(ops.ewProd(grad,grad),(1.0-beta2))))
 
-	// 	val alpha_t = math.sqrt(1.0 - math.pow(beta2,t))/(1.0 - math.pow(beta1,t))
+		val alpha_t = math.sqrt(1.0 - math.pow(beta2,t))/(1.0 - math.pow(beta1,t))
 
-	// 	utils.momentum.get /:/ (sqrt(utils.adamInfo.get) + eps) * alpha_t 
-	// }
+		ops.rescale(
+			ops.ewDiv(
+				utils.momentum.get,
+				ops.sumScalar(ops.ewSqrt(utils.adamInfo.get),eps)),
+			alpha_t)
+
+	}
 
 }

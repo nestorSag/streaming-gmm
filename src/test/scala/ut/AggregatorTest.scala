@@ -42,7 +42,7 @@ class AggregatorTest extends FlatSpec{
 	"the posterior membership probabilities" should "be correclty calculated" in {
 		val correctValue = Array.fill(2)(nPoints.toDouble/2)
 
-		var error = new BDV(agg.posteriors) - new BDV(correctValue)
+		var error = new BDV(agg.weightsGradient) - new BDV(correctValue)
 		assert(norm(error) < errorTol)
 	}
 
@@ -53,7 +53,7 @@ class AggregatorTest extends FlatSpec{
 			clusterDists.map{ case d => (v*v.t - d.paramMat) * 0.25}
 		}
 
-		var error = correctValue.zip(agg.gradients).map{case (a,b) => trace((a-b).t*(a-b))}.sum
+		var error = correctValue.zip(agg.gaussianGradients).map{case (a,b) => trace((a-b).t*(a-b))}.sum
 		assert(error < errorTol)
 	}
 }

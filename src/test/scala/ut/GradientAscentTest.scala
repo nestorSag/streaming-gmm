@@ -15,7 +15,12 @@ class GradientAscentTest extends OptimTestSpec{
 		//println(current.paramMat)
 		for(i <- 1 to niter){
 			//println(trace((current.paramMat-targetParamMat)*(current.paramMat-targetParamMat)))
-			current.update(current.paramMat + optim.direction(current,targetParamMat, 1.0) * optim.getLearningRate)
+			current.update(
+				optim.getGaussianUpdate(
+					current.paramMat,
+					optim.gaussianGradient(current,targetParamMat),
+					current.optimUtils))
+			//current.update(current.paramMat + optim.direction((targetParamMat-current)*0.5,) * optim.getLearningRate)
 
 		}
 
@@ -62,6 +67,10 @@ class GradientAscentTest extends OptimTestSpec{
 			var currentWeights = optim.fromSimplex(new BDV(weightObj.weights))
 			var delta = optim.weightsDirection(targetWeights,weightObj) * optim.getLearningRate
 			weightObj.update(optim.toSimplex(currentWeights + delta))
+			weightObj.update(
+				optim.getWeightsUpdate(
+					currentWeights,
+					))
 
 		}
 

@@ -21,13 +21,9 @@ class GMMGradientAscent extends GMMOptimizer{
 
 	}
 
-	// override def direction[T <: {def :* : Double => T; def + : T =>T}](grad: T, utils: AcceleratedGradientUtils[T]): T = {
-	// 	grad
-	// }
-
-	//override  def getUpdate[T <: {def :* : Double => T; def + : T =>T}](current: T, grad: T, utils: AcceleratedGradientUtils[T]): T = {
-	//	current + direction(grad,utils) * learningRate
-	//}
+	def direction[A](grad:A, utils: AcceleratedGradientUtils[A])(implicit ops: ParameterOperations[A]): A = {
+		grad
+	}
 
 
 

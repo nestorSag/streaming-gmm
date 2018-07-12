@@ -12,14 +12,14 @@ import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV,
   * See [[https://github.com/apache/spark/blob/master/mllib/src/main/scala/org/apache/spark/mllib/clustering/GaussianMixture.scala]]
 
   * @param qLogLikelihood aggregate log-likelihood
-  * @param weightsGradients: aggregate posterior responsability for each component. See ''Pattern Recognition
+  * @param weightsGradient: aggregate posterior responsability for each component. See ''Pattern Recognition
   * And Machine Learning. Bishop, Chis.'', page 432
   * @param gaussianGradients Aggregate point-wise gaussianGradients for each component
  
   */
 class GradientAggregator(
   var qLoglikelihood: Double,
-  val weightsGradients: BDV[Double],
+  val weightsGradient: BDV[Double],
   val gaussianGradients: Array[BDM[Double]]) extends Serializable{
 
 /**
@@ -39,7 +39,7 @@ class GradientAggregator(
       gaussianGradients(i) += x.gaussianGradients(i)
       i += 1
     }
-    weightsGradients += x.weightsGradients
+    weightsGradient += x.weightsGradient
     qLoglikelihood += x.qLoglikelihood
     this
   }
@@ -90,7 +90,7 @@ object GradientAggregator {
 
     // update aggregated weight gradient
     val posteriors = Utils.toBDV(q) / qSum
-    agg.weightsGradients += optim.weightsGradient(posteriors,Utils.toBDV(weights)) / n
+    agg.weightsGradient += optim.weightsGradient(posteriors,Utils.toBDV(weights)) / n
 
     // update gaussian parameters' gradients and log-likelihood
     var i = 0

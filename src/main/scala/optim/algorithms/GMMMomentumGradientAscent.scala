@@ -47,21 +47,18 @@ class GMMMomentumGradientAscent extends GMMOptimizer {
 
 	}
 
-	// override def direction[T <: {def * : Double => T; def + : T =>T}](grad: T, utils: AcceleratedGradientUtils[T]): T = {
-
-	// 	if(!utils.momentum.isDefined){
-	// 		utils.initializeMomentum
-	// 	}
+	def direction[A](grad:A, utils: AcceleratedGradientUtils[A])(implicit ops: ParameterOperations[A]): A = {
+		if(!utils.momentum.isDefined){
+			utils.initializeMomentum
+		}
 		
-	// 	utils.updateMomentum(utils.momentum.get*beta + grad)
+		utils.updateMomentum(
+			ops.sum(
+				ops.rescale(utils.momentum.get,beta),
+				grad))
 
-	// 	utils.momentum.get
-	// }
-
-	//def getUpdate[T <: {def * : Double => T; def + : T =>T}](current: T, grad: T, utils: AcceleratedGradientUtils[T]): T = 
-	//{
-	//	current + direction(grad,utils) * learningRate
-	//}
+		utils.momentum.get
+	}
 
 
 }

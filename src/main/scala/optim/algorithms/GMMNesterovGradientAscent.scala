@@ -88,13 +88,33 @@ class GMMNesterovGradientAscent extends GMMOptimizer {
 		update
 	}
 
-	// def direction[T <: {def * : Double => T; def + : T =>T}](grad: T, utils: AcceleratedGradientUtils[T]): T = {
-	// 	grad
-	// }
+	def direction[A](grad:A, utils: AcceleratedGradientUtils[A])(implicit ops: ParameterOperations[A]): A = {
+		grad
+	}
 
-	//def getUpdate[T <: {def * : Double => T; def + : T =>T}](current: T, grad: T, utils: AcceleratedGradientUtils[T]): T = 
-	//{
-	//	current + direction(grad,utils) * learningRate
-	//}
+	override def getUpdate[A](current: A, grad:A, utils: AcceleratedGradientUtils[A])(implicit ops: ParameterOperations[A]): A = {
+		
+		if(!utils.momentum.isDefined){
+			utils.initializeMomentum
+			utils.updateMomentum(current)
+		}
+
+		if(!utils.adamInfo.isDefined){
+			utils.initializeAdamInfo
+		}
+
+		utils.updateAdamInfo(
+			ops.sum(
+				current,
+				ops.rescale(grad,learningRate)))
+
+		val update = ops.sum(
+			current,
+			ops.rescale(ops.sub(utils.adamInfo.get,utils.momentum.get),gamma))
+
+		utils.updateMomentum(utils.adamInfo.get)
+
+		update
+	}
 	
 }

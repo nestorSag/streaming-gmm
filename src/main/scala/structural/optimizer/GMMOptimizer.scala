@@ -2,8 +2,25 @@ package com.github.nestorsag.gradientgmm
 
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV, sum}
 
+
 import org.apache.spark.mllib.linalg.{Vector => SV}
 import org.apache.spark.rdd.RDD
+
+/**
+  * Contains common mathematical operations that can be performed in both matrices and vectors.
+  * Its purpose is avoid duplicating code in the optimization algorithms' classes
+  */
+trait ParameterOperations[A] extends Serializable{
+
+  def sum(x: A, y: A): A
+  def sumScalar(x:A,z:Double): A
+  def rescale(x: A, d: Double): A
+  def sub(x:A, y:A): A
+
+  def ewProd(x:A,y:A): A
+  def ewDiv(x:A,y:A): A
+  def ewSqrt(x:A): A
+}
 
 /**
   * Optimizer interface that contains base hyperparameters and their getters and setters.
@@ -116,7 +133,7 @@ trait GMMOptimizer extends Serializable{
 /**
   * Computes the full loss gradient 
   */
-	private[gradientgmm] def gaussianGradient(dist: UpdatableGaussianMixtureComponent, point: BDM[Double], w: Double): BDM[Double] = {
+	def gaussianGradient(dist: UpdatableGaussianMixtureComponent, point: BDM[Double], w: Double): BDM[Double] = {
 
 		regularizer match{
 			case None => basicGaussianGradient(dist.paramMat,point,w) 
@@ -144,7 +161,7 @@ trait GMMOptimizer extends Serializable{
 /**
   * Computes the full loss gradient of the weights vector 
   */
-	private[gradientgmm] def weightsGradient(posteriors: BDV[Double], weights: BDV[Double]): BDV[Double] = {
+	def weightsGradient(posteriors: BDV[Double], weights: BDV[Double]): BDV[Double] = {
 
 		var grads = regularizer match {
 			case None => basicWeightsGradient(posteriors,weights)
@@ -173,6 +190,26 @@ trait GMMOptimizer extends Serializable{
 		}
 
 	}
+
+
+
+
+
+
+
+
+	def getUpdate[A](current: A, grad:A, utils: AcceleratedGradientUtils[A])(implicit ops: ParameterOperations[A]): A = {
+		ops.sum(current,ops.rescale(grad,learningRate))	
+	}
+
+	def direction[A](grad:A, utils: AcceleratedGradientUtils[A])(implicit ops: ParameterOperations[A]): A
+
+
+
+
+
+
+
 
 /**
   * Compute full updates for the guassian parameters. Usually this has the form X_t + alpha * direction(X_t)
