@@ -92,77 +92,80 @@ class GradientBasedGaussianMixture private (
       //logger.debug(s"sample size: ${x.count()}")
       val sampleStats = batch(gConcaveData).treeAggregate(GradientAggregator.init(k, d))(adder.value, _ += _)
 
-      val n: Double = sum(sampleStats.weightsGradient) // number of actual data points in current batch
+      val n: Int = sampleStats.counter // number of actual data points in current batch
       logger.debug(s"n: ${n}")
 
+      if(n>0){
       // pair Gaussian components with their respective parameter gradients
-      val tuples =
-          Seq.tabulate(k)(i => (sampleStats.gaussianGradients(i), 
-                                gaussians(i)))
+        val tuples =
+            Seq.tabulate(k)(i => (sampleStats.gaussianGradients(i), 
+                                  gaussians(i)))
 
 
 
-      // update gaussians
-      var newDists = if (shouldDistribute) {
-        // compute new gaussian parameters and regularization values in
-        // parallel
+        // update gaussians
+        var newDists = if (shouldDistribute) {
+          // compute new gaussian parameters and regularization values in
+          // parallel
 
-        val numPartitions = math.min(k, 1024)
+          val numPartitions = math.min(k, 1024)
 
-        val newDists = sc.parallelize(tuples, numPartitions).map { case (grad,dist) =>
+          val newDists = sc.parallelize(tuples, numPartitions).map { case (grad,dist) =>
 
-          dist.update(
-            bcOptim.value.getGaussianUpdate(
-              dist.paramMat,
-              grad,
-              dist.optimUtils))
+            dist.update(
+              bcOptim.value.getGaussianUpdate(
+                dist.paramMat,
+                grad,
+                dist.optimUtils))
 
-          //dist.update(dist.paramMat + bcOptim.value.direction(grad,dist.optimUtils) * bcOptim.value.learningRate)
+            //dist.update(dist.paramMat + bcOptim.value.direction(grad,dist.optimUtils) * bcOptim.value.learningRate)
 
-          bcOptim.value.updateLearningRate //update learning rate in workers
+            bcOptim.value.updateLearningRate //update learning rate in workers
 
-          dist
+            dist
 
-        }.collect()
+          }.collect()
 
-        newDists.toArray
+          newDists.toArray
 
-      } else {
+        } else {
 
-        val newDists = tuples.map{ 
-          case (grad,dist) => 
+          val newDists = tuples.map{ 
+            case (grad,dist) => 
 
-          dist.update(
-            optimizer.getGaussianUpdate(
-              dist.paramMat,
-              grad,
-              dist.optimUtils))
+            dist.update(
+              optimizer.getGaussianUpdate(
+                dist.paramMat,
+                grad,
+                dist.optimUtils))
+            
+            dist
 
-          //dist.update(dist.paramMat + grad * optimizer.learningRate)
-          
-          dist
+          }
+
+          newDists.toArray
 
         }
 
-        newDists.toArray
+        gaussians = newDists
 
-      }
-
-      gaussians = newDists
-
-      weights.update(
-          optimizer.getWeightsUpdate(
-            Utils.toBDV(weights.weights),
-            sampleStats.weightsGradient,
-            weights.optimUtils))
+        weights.update(
+            optimizer.getWeightsUpdate(
+              Utils.toBDV(weights.weights),
+              sampleStats.weightsGradient,
+              weights.optimUtils))
 
 
-      oldLL = newLL // current becomes previous
-      newLL = sampleStats.qLoglikelihood
-      logger.debug(s"newLL: ${newLL}")
+        oldLL = newLL // current becomes previous
+        newLL = sampleStats.qLoglikelihood
+        logger.debug(s"newLL: ${newLL}")
 
-      optimizer.updateLearningRate //update learning rate in driver
-      iter += 1
+        optimizer.updateLearningRate //update learning rate in driver
+        iter += 1
+        }else{
+          logger.debug("No points in sample. Skipping iteration")
+        }
+
       adder.destroy()
     }
 

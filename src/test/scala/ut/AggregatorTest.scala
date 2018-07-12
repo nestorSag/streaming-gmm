@@ -38,6 +38,11 @@ class AggregatorTest extends FlatSpec{
 	
 	val agg = points.foldLeft(GradientAggregator.init(2,dim)){case (agg,point) => adder(agg,point)}
 
+	"the counter" should "be equal to nPoints" in {
+		//weightsGradient should be zero
+		assert(agg.counter == nPoints)
+	}
+
 	"the log-likelihood" should "be correclty calculated" in {
 		val correctValue = (-1.0 -math.log(2*math.Pi))
 

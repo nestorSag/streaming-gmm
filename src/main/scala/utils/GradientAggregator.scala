@@ -20,7 +20,8 @@ import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV,
 class GradientAggregator(
   var qLoglikelihood: Double,
   val weightsGradient: BDV[Double],
-  val gaussianGradients: Array[BDM[Double]]) extends Serializable{
+  val gaussianGradients: Array[BDM[Double]],
+  var counter: Int) extends Serializable{
 
 /**
   * Number of components in the model
@@ -41,6 +42,7 @@ class GradientAggregator(
     }
     weightsGradient += x.weightsGradient
     qLoglikelihood += x.qLoglikelihood
+    counter += x.counter
     this
   }
 
@@ -60,7 +62,8 @@ object GradientAggregator {
     new GradientAggregator(
       0.0,
       BDV.zeros[Double](k),
-      Array.fill(k)(BDM.zeros[Double](d+1, d+1)))
+      Array.fill(k)(BDM.zeros[Double](d+1, d+1)),
+      0)
   }
 
 /**
@@ -80,6 +83,8 @@ object GradientAggregator {
       optim: GMMOptimizer,
       n: Double)
       (agg: GradientAggregator, y: BDV[Double]): GradientAggregator = {
+
+    agg.counter += 1
 
     val q = weights.zip(dists).map {
       case (weight, dist) =>  weight * dist.gConcavePdf(y) // <--q-logLikelihood
