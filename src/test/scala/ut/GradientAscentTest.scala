@@ -5,7 +5,7 @@ import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV,
 
 /**
   * Check correct trajectories for gradient ascent in expectation
-  * this means testing the procedure with duplicated samples that would represent the mean of 
+  * this means testing the procedure with a single-valued sample that would represent the mean of 
   * the actual samples
   */
 
@@ -22,10 +22,10 @@ class GradientAscentTest extends OptimTestSpec{
 		for(i <- 1 to niter){
 			//println(trace((current.paramMat-targetParamMat)*(current.paramMat-targetParamMat)))
 			current.update(
-				optim.getUpdate(
+				optim.getGaussianUpdate(
 					current.paramMat,
-					optim.gaussianGradient(current,targetParamMat,1.0),
-					current.optimUtils)(matrixOps))
+					optim.gaussianGradient(current,targetParamMat,1.0),//(targetParamMat - current.paramMat) * 0.5,
+					current.optimUtils))
 			//current.update(current.paramMat + optim.direction((targetParamMat-current)*0.5,) * optim.getLearningRate)
 
 		}
@@ -69,11 +69,10 @@ class GradientAscentTest extends OptimTestSpec{
 			//var delta = optim.direction(targetWeights,weightObj) * optim.getLearningRate
 			//weightObj.update(optim.toSimplex(currentWeights + delta))
 			weightObj.update(
-				optim.toSimplex(
-				optim.getUpdate(
-					optim.fromSimplex(currentWeights),
+				optim.getWeightsUpdate(
+					currentWeights,
 					optim.weightsGradient(targetWeights,currentWeights),
-					weightObj.optimUtils)(vectorOps)))
+					weightObj.optimUtils))
 
 		}
 

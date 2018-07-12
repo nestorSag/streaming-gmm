@@ -114,7 +114,10 @@ trait GMMOptimizer extends Serializable{
 
 
 /**
-  * Computes the full loss gradient 
+  * Computes the full loss gradient for Gaussian parameters
+  * @param dist Mixture component
+  * @param point outer product of an augmented data point x => [x 1]
+  * @param w prior responsibility of {point} by {dist}
   */
 	def gaussianGradient(dist: UpdatableGaussianMixtureComponent, point: BDM[Double], w: Double): BDM[Double] = {
 
@@ -189,7 +192,7 @@ trait GMMOptimizer extends Serializable{
 
 	def getWeightsUpdate(current: BDV[Double], grad:BDV[Double], utils: AcceleratedGradientUtils[BDV[Double]]): BDV[Double] = {
 		
-		toSimplex(fromSimplex(current) + direction(grad,utils)(vectorOps))
+		toSimplex(fromSimplex(current) + direction(grad,utils)(vectorOps) * learningRate)
 
 	}
 
@@ -209,7 +212,7 @@ trait GMMOptimizer extends Serializable{
 
 	def getGaussianUpdate(current: BDM[Double], grad:BDM[Double], utils: AcceleratedGradientUtils[BDM[Double]]): BDM[Double] = {
 		
-		current + direction(grad,utils)(matrixOps)
+		current + direction(grad,utils)(matrixOps) * learningRate
 
 	}
 
