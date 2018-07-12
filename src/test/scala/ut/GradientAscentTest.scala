@@ -2,7 +2,13 @@ import com.github.nestorsag.gradientgmm.{GMMGradientAscent, UpdatableGaussianMix
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, norm}
 
-// This test checks convergence in expectation on a single gaussian component 
+
+/**
+  * Check correct trajectories for gradient ascent in expectation
+  * this means testing the procedure with duplicated samples that would represent the mean of 
+  * the actual samples
+  */
+
 class GradientAscentTest extends OptimTestSpec{
 
 	var lr = 0.5
@@ -10,16 +16,16 @@ class GradientAscentTest extends OptimTestSpec{
 	var optim = new GMMGradientAscent().setLearningRate(lr)
 	val paramMat0 = current.paramMat
 		
-	"GradientAscent w/o reg" should "make current dist converge to target dist in expectation" in {
+	"GradientAscent" should "make current dist converge to target dist in expectation" in {
 
 		//println(current.paramMat)
 		for(i <- 1 to niter){
 			//println(trace((current.paramMat-targetParamMat)*(current.paramMat-targetParamMat)))
 			current.update(
-				optim.getGaussianUpdate(
+				optim.getUpdate(
 					current.paramMat,
-					optim.gaussianGradient(current,targetParamMat),
-					current.optimUtils))
+					optim.gaussianGradient(current,targetParamMat,1.0),
+					current.optimUtils)(matrixOps))
 			//current.update(current.paramMat + optim.direction((targetParamMat-current)*0.5,) * optim.getLearningRate)
 
 		}
@@ -42,35 +48,32 @@ class GradientAscentTest extends OptimTestSpec{
 
 		// below: deterministic calculation for gradient descent in expectation
 		// same as momentum gradient descent but with beta = 0
-		var beta = 0.0
-		var x0 = toBDV(initialWeights.toArray)
-		var m = BDV.zeros[Double](x0.length) //momentum
+		var x0 = toBDV(initialWeights)
 
-		var softx0 = toBDV(x0.toArray.map{case w => math.log(w/x0(k-1))})
+		var softx0 = optim.fromSimplex(x0)
 
 		//calculate gradient descent in expectation
 		// this will be checked against the program's results below
 		for(i <- 1 to niter){
 			var g = (targetWeights - x0) //gradient
-			g(k-1) = 0.0
-			m *= beta
-			m += g
-			softx0 += m*lr
+			g(k-1) = 0.0 //k-1 free parameters due to restriction to to simplex
+			softx0 += g*lr
 
-			var expsoftx0 = softx0.toArray.map{case w => math.exp(w)}
-			x0 = toBDV(expsoftx0.map{case w => w/expsoftx0.sum})
+			x0 = optim.toSimplex(softx0)
 		}
 
 		// get results from program
 		for(i <- 1 to niter){
 
-			var currentWeights = optim.fromSimplex(new BDV(weightObj.weights))
-			var delta = optim.weightsDirection(targetWeights,weightObj) * optim.getLearningRate
-			weightObj.update(optim.toSimplex(currentWeights + delta))
+			var currentWeights = new BDV(weightObj.weights)
+			//var delta = optim.direction(targetWeights,weightObj) * optim.getLearningRate
+			//weightObj.update(optim.toSimplex(currentWeights + delta))
 			weightObj.update(
-				optim.getWeightsUpdate(
-					currentWeights,
-					))
+				optim.toSimplex(
+				optim.getUpdate(
+					optim.fromSimplex(currentWeights),
+					optim.weightsGradient(targetWeights,currentWeights),
+					weightObj.optimUtils)(vectorOps)))
 
 		}
 

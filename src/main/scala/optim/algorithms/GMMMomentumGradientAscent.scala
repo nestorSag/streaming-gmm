@@ -23,31 +23,8 @@ class GMMMomentumGradientAscent extends GMMOptimizer {
 		this.beta
 	}
 
-
-	def gaussianDirection(grad: BDM[Double], utils: AcceleratedGradientUtils[BDM[Double]]): BDM[Double] = {
-
-		if(!utils.momentum.isDefined){
-			utils.initializeMomentum
-		}
+	def direction[A](grad:A, utils: AcceleratedGradientUtils[A])(ops: ParameterOperations[A]): A = {
 		
-		utils.updateMomentum(utils.momentum.get*beta + grad)
-
-		utils.momentum.get
-	}
-
-	def weightsDirection(grad: BDV[Double], utils: AcceleratedGradientUtils[BDV[Double]]): BDV[Double] = {
-
-		if(!utils.momentum.isDefined){
-			utils.initializeMomentum
-		}
-		
-		utils.updateMomentum(utils.momentum.get*beta + grad)
-
-		utils.momentum.get
-
-	}
-
-	def direction[A](grad:A, utils: AcceleratedGradientUtils[A])(implicit ops: ParameterOperations[A]): A = {
 		if(!utils.momentum.isDefined){
 			utils.initializeMomentum
 		}

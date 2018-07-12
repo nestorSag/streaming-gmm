@@ -64,76 +64,35 @@ class GMMAdam extends GMMOptimizer {
 	def getEps: Double = eps
 
 
-	def gaussianDirection(grad: BDM[Double], utils: AcceleratedGradientUtils[BDM[Double]]): BDM[Double] = {
+	def direction[A](grad:A, utils: AcceleratedGradientUtils[A])(ops: ParameterOperations[A]): A = {
 
-		t += 1
+	t += 0.5
 
-		if(!utils.momentum.isDefined){
-			utils.initializeMomentum
-		}
-
-		if(!utils.adamInfo.isDefined){
-			utils.initializeAdamInfo
-		}
-
-		utils.updateMomentum(utils.momentum.get*beta1 + grad*(1.0-beta1))
-		
-		utils.updateAdamInfo(utils.adamInfo.get*beta2 + (grad *:* grad)*(1.0-beta2))
-
-		val alpha_t = math.sqrt(1.0 - math.pow(beta2,t))/(1.0 - math.pow(beta1,t))
-
-		alpha_t * utils.momentum.get /:/ (sqrt(utils.adamInfo.get) + eps)
+	if(!utils.momentum.isDefined){
+		utils.initializeMomentum
 	}
 
-	def weightsDirection(grad: BDV[Double], utils: AcceleratedGradientUtils[BDV[Double]]): BDV[Double] = {
-
-		if(!utils.momentum.isDefined){
-			utils.initializeMomentum
-		}
-
-		if(!utils.adamInfo.isDefined){
-			utils.initializeAdamInfo
-		}
-		
-		utils.updateMomentum(utils.momentum.get*beta1 + grad*(1.0-beta1))
-
-		utils.updateAdamInfo(utils.adamInfo.get*beta2 + (grad *:* grad)*(1.0-beta2))
-
-		val alpha_t = math.sqrt(1.0 - math.pow(beta2,t))/(1.0 - math.pow(beta1,t))
-
-		alpha_t * utils.momentum.get /:/ (sqrt(utils.adamInfo.get) + eps)
-
+	if(!utils.adamInfo.isDefined){
+		utils.initializeAdamInfo
 	}
+	
+	utils.updateMomentum(
+		ops.sum(
+			ops.rescale(utils.momentum.get,beta1), 
+			ops.rescale(grad,(1.0-beta1))))
 
-	def direction[A](grad:A, utils: AcceleratedGradientUtils[A])(implicit ops: ParameterOperations[A]): A = {
+	utils.updateMomentum(
+		ops.sum(
+			ops.rescale(utils.adamInfo.get,beta2), 
+			ops.rescale(ops.ewProd(grad,grad),(1.0-beta2))))
 
-		t += 0.5
+	val alpha_t = math.sqrt(1.0 - math.pow(beta2,t))/(1.0 - math.pow(beta1,t))
 
-		if(!utils.momentum.isDefined){
-			utils.initializeMomentum
-		}
-
-		if(!utils.adamInfo.isDefined){
-			utils.initializeAdamInfo
-		}
-		
-		utils.updateMomentum(
-			ops.sum(
-				ops.rescale(utils.momentum.get,beta1), 
-				ops.rescale(grad,(1.0-beta1))))
-
-		utils.updateMomentum(
-			ops.sum(
-				ops.rescale(utils.adamInfo.get,beta2), 
-				ops.rescale(ops.ewProd(grad,grad),(1.0-beta2))))
-
-		val alpha_t = math.sqrt(1.0 - math.pow(beta2,t))/(1.0 - math.pow(beta1,t))
-
-		ops.rescale(
-			ops.ewDiv(
-				utils.momentum.get,
-				ops.sumScalar(ops.ewSqrt(utils.adamInfo.get),eps)),
-			alpha_t)
+	ops.rescale(
+		ops.ewDiv(
+			utils.momentum.get,
+			ops.sumScalar(ops.ewSqrt(utils.adamInfo.get),eps)),
+		alpha_t)
 
 	}
 

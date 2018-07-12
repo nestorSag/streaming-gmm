@@ -23,98 +23,56 @@ class GMMNesterovGradientAscent extends GMMOptimizer {
 		this.gamma
 	}
 
-	def gaussianDirection(grad: BDM[Double], utils: AcceleratedGradientUtils[BDM[Double]]): BDM[Double] = {
+	def direction[A](grad:A, utils: AcceleratedGradientUtils[A])(ops: ParameterOperations[A]): A = {
 
-		// if(!utils.momentum.isDefined){
-		// 	utils.initializeMomentum
-		// }
-		
-		// utils.updateMomentum(utils.momentum.get*gamma + grad)
-
-		// utils.momentum.get
-		grad
-	}
-
-	def weightsDirection(grad: BDV[Double], utils: AcceleratedGradientUtils[BDV[Double]]): BDV[Double] = {
-
-		// if(!utils.momentum.isDefined){
-		// 	utils.initializeMomentum
-		// }
-		
-		// utils.updateMomentum(utils.momentum.get*gamma + grad)
-
-		// utils.momentum.get
-		grad
+		ops.sub(
+		  ops.rescale(grad,learningRate),
+		  ops.rescale(utils.momentum.get,gamma/(1+gamma)))
 
 	}
 
-	override def getGaussianUpdate(current: BDM[Double], grad: BDM[Double],  utils: AcceleratedGradientUtils[BDM[Double]]): BDM[Double] = {
+	override def getWeightsUpdate(current: BDV[Double], grad:BDV[Double], utils: AcceleratedGradientUtils[BDV[Double]]): BDV[Double] = {
+		
+		if(!utils.adamInfo.isDefined){
+			utils.initializeAdamInfo
+		}
 
 		if(!utils.momentum.isDefined){
 			utils.initializeMomentum
 			utils.updateMomentum(current)
 		}
 
+		utils.updateAdamInfo(fromSimplex(current) + grad * learningRate)
+
+		val update = toSimplex( (fromSimplex(current) + direction(grad,utils)(vectorOps)) * (1 + gamma))
+
+		utils.updateMomentum(utils.adamInfo.get)
+
+		update
+
+	}
+
+
+	override def getGaussianUpdate(current: BDM[Double], grad:BDM[Double], utils: AcceleratedGradientUtils[BDM[Double]]): BDM[Double] = {
+		
 		if(!utils.adamInfo.isDefined){
 			utils.initializeAdamInfo
+		}
+
+		if(!utils.momentum.isDefined){
+			utils.initializeMomentum
+			utils.updateMomentum(current)
 		}
 
 		utils.updateAdamInfo(current + grad * learningRate)
 
-		val update = current + (utils.adamInfo.get - utils.momentum.get) * gamma
+		val update = (current + direction(grad,utils)(matrixOps)) * (1 + gamma)
 
 		utils.updateMomentum(utils.adamInfo.get)
 
 		update
+
 	}
 
-	override def getWeightsUpdate(current: BDV[Double], grad: BDV[Double],  utils: AcceleratedGradientUtils[BDV[Double]]): BDV[Double] = {
-
-		if(!utils.momentum.isDefined){
-			utils.initializeMomentum
-			utils.updateMomentum(current)
-		}
-
-		if(!utils.adamInfo.isDefined){
-			utils.initializeAdamInfo
-		}
-
-		utils.updateAdamInfo(current + grad * learningRate)
-
-		val update = current + (utils.adamInfo.get - utils.momentum.get) * gamma
-
-		utils.updateMomentum(utils.adamInfo.get)
-
-		update
-	}
-
-	def direction[A](grad:A, utils: AcceleratedGradientUtils[A])(implicit ops: ParameterOperations[A]): A = {
-		grad
-	}
-
-	override def getUpdate[A](current: A, grad:A, utils: AcceleratedGradientUtils[A])(implicit ops: ParameterOperations[A]): A = {
-		
-		if(!utils.momentum.isDefined){
-			utils.initializeMomentum
-			utils.updateMomentum(current)
-		}
-
-		if(!utils.adamInfo.isDefined){
-			utils.initializeAdamInfo
-		}
-
-		utils.updateAdamInfo(
-			ops.sum(
-				current,
-				ops.rescale(grad,learningRate)))
-
-		val update = ops.sum(
-			current,
-			ops.rescale(ops.sub(utils.adamInfo.get,utils.momentum.get),gamma))
-
-		utils.updateMomentum(utils.adamInfo.get)
-
-		update
-	}
 	
 }

@@ -1,26 +1,11 @@
 package com.github.nestorsag.gradientgmm
 
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV, sum}
+import breeze.numerics.sqrt
 
 
 import org.apache.spark.mllib.linalg.{Vector => SV}
 import org.apache.spark.rdd.RDD
-
-/**
-  * Contains common mathematical operations that can be performed in both matrices and vectors.
-  * Its purpose is avoid duplicating code in the optimization algorithms' classes
-  */
-trait ParameterOperations[A] extends Serializable{
-
-  def sum(x: A, y: A): A
-  def sumScalar(x:A,z:Double): A
-  def rescale(x: A, d: Double): A
-  def sub(x:A, y:A): A
-
-  def ewProd(x:A,y:A): A
-  def ewDiv(x:A,y:A): A
-  def ewSqrt(x:A): A
-}
 
 /**
   * Optimizer interface that contains base hyperparameters and their getters and setters.
@@ -29,7 +14,7 @@ trait ParameterOperations[A] extends Serializable{
 trait GMMOptimizer extends Serializable{
 
 /**
-  * Regularization term, if any
+  * Optional regularization term
   */
 	private[gradientgmm] val regularizer: Option[GMMRegularizer] = None
 
@@ -56,13 +41,13 @@ trait GMMOptimizer extends Serializable{
 	private[gradientgmm] var minLearningRate: Double = 1e-2
 
 /**
-  * Minibatch size for each iteration in the ascent procedure. If {{{None}}}, it does
-  * full batch gradient ascent.
+  * Minibatch size for each iteration in the ascent procedure. If {{{None}}}, it performs
+  * full-batch optimization
   */
 	private[gradientgmm] var batchSize: Option[Int] = None
 
 /**
-  * Maximum allowed tolerance in the change in log-likelihood for the program to finish
+  * Error tolerance in log-likelihood for the stopping criteria
   */
 	private[gradientgmm] var convergenceTol: Double = 1e-6
 
@@ -72,38 +57,36 @@ trait GMMOptimizer extends Serializable{
 	private[gradientgmm] var maxIter: Int = 100
 
 /**
-  * Compute the ascent direction for the parameters of the Gaussian components
-  * @param grad current batch gradient
-  * @param utils utilities for accelerated gradient descent routines
-  * @return ascent direction for the component's parameters
+  * Linear Algebra operations necessary for computing updates for the parameters
+    
+  * This is to avoid duplicating code for Gaussian and Weights updates in the optimization
+  * algorithms' classes
+ 
   */
-	def gaussianDirection(grad: BDM[Double], utils: AcceleratedGradientUtils[BDM[Double]]): BDM[Double]
-	//def direction[T <: Any](grad: T, utils: AcceleratedGradientUtils[T]): T
+  val vectorOps = new ParameterOperations[BDV[Double]] {
+    def sum(x: BDV[Double], y: BDV[Double]): BDV[Double] = {x + y}
+    def sumScalar(x: BDV[Double], z: Double): BDV[Double] = {x + z}
+    def rescale(x: BDV[Double], z: Double): BDV[Double] = {x*z}
+    def sub(x: BDV[Double], y: BDV[Double]): BDV[Double] = {x - y}
 
-/**
-  * Compute the ascent direction for the weight parameters 
-  * @param dist Mixture component
-  * @param grad current batch gradient
-  * @return ascent direction for the component's parameters
-  */
-	def weightsDirection(grad: BDV[Double], utils: AcceleratedGradientUtils[BDV[Double]]): BDV[Double]
+    def ewProd(x: BDV[Double], y: BDV[Double]): BDV[Double] = {x *:* y}
+    def ewDiv(x: BDV[Double], y: BDV[Double]): BDV[Double] = {x /:/ y}
+    def ewSqrt(x:BDV[Double]): BDV[Double] = {sqrt(x)}
+  }
 
+  val matrixOps = new ParameterOperations[BDM[Double]] {
+    def sum(x: BDM[Double], y: BDM[Double]): BDM[Double] = {x + y}
+    def sumScalar(x: BDM[Double], z: Double): BDM[Double] = {x + z}
+    def rescale(x: BDM[Double], z: Double): BDM[Double] = {x*z}
+    def sub(x: BDM[Double], y: BDM[Double]): BDM[Double] = {x - y}
 
-	//def direction[T <: {def :* : Double => T; def + : T =>T}](grad: T, utils: AcceleratedGradientUtils[T]): T
-
-	//def getUpdate[T <: {def :* : Double => T; def + : T =>T}](current: T, grad: T, utils: AcceleratedGradientUtils[T]): T = {
-	
-	//	current + direction(grad,utils) * learningRate
-	//}
-/**
-  * Compute the ascent direction for the weight vector
-  * @param posteriors posterior responsability for the corresponding mixture component
-  * @param weights vector fo current weights
-  * @return ascent direction for weight parameters
-  */
+    def ewProd(x: BDM[Double], y: BDM[Double]): BDM[Double] = {x *:* y}
+    def ewDiv(x: BDM[Double], y: BDM[Double]): BDM[Double] = {x /:/ y}
+    def ewSqrt(x:BDM[Double]): BDM[Double] = {sqrt(x)}
+  }
 
  /**
-  * Shrink {{{learningRate}}} by {{{shrinkageRate}}}
+  * Shrink {learningRate} by {shrinkageRate}
   *
   */
 	def updateLearningRate: Unit = {
@@ -111,7 +94,7 @@ trait GMMOptimizer extends Serializable{
 	}
 
 /**
-  * Use the {{{fromSimplex}}} method from [[GMMWeightTransformation]]
+  * Use the {fromSimplex} method from [[GMMWeightTransformation]]
   *
   * @param weights mixture weights
   */
@@ -120,7 +103,7 @@ trait GMMOptimizer extends Serializable{
 	}
 
 /**
-  * Use the {{{toSimplex}}} method from [[GMMWeightTransformation]]
+  * Use the {toSimplex} method from [[GMMWeightTransformation]]
   *
   * @param real vector
   * @return valid mixture weight vector
@@ -191,55 +174,57 @@ trait GMMOptimizer extends Serializable{
 
 	}
 
-
-
-
-
-
-
-
-	def getUpdate[A](current: A, grad:A, utils: AcceleratedGradientUtils[A])(implicit ops: ParameterOperations[A]): A = {
-		ops.sum(current,ops.rescale(grad,learningRate))	
-	}
-
-	def direction[A](grad:A, utils: AcceleratedGradientUtils[A])(implicit ops: ParameterOperations[A]): A
-
-
-
-
-
-
-
-
 /**
-  * Compute full updates for the guassian parameters. Usually this has the form X_t + alpha * direction(X_t)
-  * but it differs for some algorithms, e.g. Nesterov's
+  * Compute full updates for the weights. Usually this has the form X_t + alpha * direction(X_t)
+  * but it differs for some algorithms, e.g. Nesterov's gradient ascent.
   *
   * @param current Current parameter values
   * @param grad Current batch gradient
   * @param utils Wrapper for accelerated gradient ascent utilities
+  * @param ops Deffinitions for algebraic operations for the apropiate data structure, e.g. vector or matrix.
+  * .
   * @return updated parameter values
   */
 
-	def getGaussianUpdate(current: BDM[Double], grad: BDM[Double],  utils: AcceleratedGradientUtils[BDM[Double]]): BDM[Double] = {
 
-		current + gaussianDirection(grad,utils) * learningRate
+	def getWeightsUpdate(current: BDV[Double], grad:BDV[Double], utils: AcceleratedGradientUtils[BDV[Double]]): BDV[Double] = {
+		
+		toSimplex(fromSimplex(current) + direction(grad,utils)(vectorOps))
+
 	}
 
+
 /**
-  * Compute full updates for the guassian parameters. Usually this has the form X_t + alpha * direction(X_t)
-  * but it differs for some algorithms, e.g. Nesterov's
+  * Compute full updates for the Gaussian parameters. Usually this has the form X_t + alpha * direction(X_t)
+  * but it differs for some algorithms, e.g. Nesterov's gradient ascent.
   *
   * @param current Current parameter values
   * @param grad Current batch gradient
   * @param utils Wrapper for accelerated gradient ascent utilities
+  * @param ops Deffinitions for algebraic operations for the apropiate data structure, e.g. vector or matrix.
+  * .
   * @return updated parameter values
   */
 
-	def getWeightsUpdate(current: BDV[Double], grad: BDV[Double],  utils: AcceleratedGradientUtils[BDV[Double]]): BDV[Double] = {
 
-		current + weightsDirection(grad,utils) * learningRate
+	def getGaussianUpdate(current: BDM[Double], grad:BDM[Double], utils: AcceleratedGradientUtils[BDM[Double]]): BDM[Double] = {
+		
+		current + direction(grad,utils)(matrixOps)
+
 	}
+
+/**
+  * compute the ascent direction.
+  *
+  * @param grad Current batch gradient
+  * @param utils Wrapper for accelerated gradient ascent utilities
+  * @param ops Deffinitions for algebraic operations for the apropiate data structure, e.g. vector or matrix.
+  * .
+  * @return updated parameter values
+  */
+
+	def direction[A](grad:A, utils: AcceleratedGradientUtils[A])(ops: ParameterOperations[A]): A
+
 
 /**
   * Fit a Gaussian Mixture Model (see [[https://en.wikipedia.org/wiki/Mixture_model#Gaussian_mixture_model]]).
@@ -326,4 +311,21 @@ trait GMMOptimizer extends Serializable{
 
 
 
+}
+
+
+/**
+  * Contains common mathematical operations that can be performed in both matrices and vectors.
+  * Its purpose is avoid duplicating code in the optimization algorithms' classes
+  */
+trait ParameterOperations[A] extends Serializable{
+
+  def sum(x: A, y: A): A
+  def sumScalar(x:A,z:Double): A
+  def rescale(x: A, d: Double): A
+  def sub(x:A, y:A): A
+
+  def ewProd(x:A,y:A): A
+  def ewDiv(x:A,y:A): A
+  def ewSqrt(x:A): A
 }

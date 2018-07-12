@@ -4,7 +4,13 @@ import org.scalatest.FlatSpec
 import com.github.nestorsag.gradientgmm.{GMMGradientAscent,GradientAggregator,UpdatableGaussianMixtureComponent}
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, norm}
 
-
+/**
+  * This small test creates a Mixture model with two components 
+  * whose weights are 0.5,0.5 and are centered at (1,0), (-1,0)
+  * with identity covariance matrices.
+  * We generate several 'sample' points equal to (0,1) and test the gradient and log-likelihood calulcations.
+  * this toy case is easy to analyze and the correct results were derived with pen and paper.
+  */
 class AggregatorTest extends FlatSpec{
 	
 	
@@ -40,10 +46,8 @@ class AggregatorTest extends FlatSpec{
 	}
 
 	"the posterior membership probabilities" should "be correclty calculated" in {
-		val correctValue = Array.fill(2)(nPoints.toDouble/2)
-
-		var error = new BDV(agg.weightsGradient) - new BDV(correctValue)
-		assert(norm(error) < errorTol)
+		//weightsGradient should be zero
+		assert(norm(agg.weightsGradient) < errorTol)
 	}
 
 	"the descent direction" should "be correclty calculated" in {

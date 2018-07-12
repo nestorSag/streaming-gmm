@@ -2,7 +2,13 @@ import com.github.nestorsag.gradientgmm.{GMMMomentumGradientAscent, UpdatableGau
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, norm}
 
-// This test checks convergence in expectation on a single gaussian component 
+
+
+/**
+  * Check correct trajectories for gradient ascent in expectation
+  * this means testing the procedure with duplicated samples that would represent the mean of 
+  * the actual samples
+  */
 class MomentumTest extends OptimTestSpec{
 
 	var lr = 0.5
@@ -27,8 +33,12 @@ class MomentumTest extends OptimTestSpec{
 
 		for(i <- 1 to niter){
 
-			current.update(current.paramMat + optim.direction(current,targetParamMat, 1.0) * optim.getLearningRate)
-
+			//current.update(current.paramMat + optim.direction(current,targetParamMat, 1.0) * optim.getLearningRate)
+			current.update(
+				optim.getUpdate(
+					current.paramMat,
+					optim.gaussianGradient(current,targetParamMat,1.0),
+					current.optimUtils)(matrixOps))
 		}
 
 		// result should be 
@@ -65,9 +75,15 @@ class MomentumTest extends OptimTestSpec{
 		for(i <- 1 to niter){
 
 			var currentWeights = optim.fromSimplex(new BDV(weightObj.weights))
-			var delta = optim.weightsDirection(targetWeights,weightObj) * optim.getLearningRate
-			weightObj.update(optim.toSimplex(currentWeights + delta))
-
+			//var delta = optim.direction(targetWeights,weightObj) * optim.getLearningRate
+			
+			//weightObj.update(optim.toSimplex(currentWeights + delta))
+			weightObj.update(
+				optim.toSimplex(
+				optim.getUpdate(
+					currentWeights,
+					optim.weightsGradient(targetWeights,currentWeights),
+					weightObj.optimUtils)(vectorOps)))
 		}
 
 		var vecdiff =  x0 - toBDV(weightObj.weights)

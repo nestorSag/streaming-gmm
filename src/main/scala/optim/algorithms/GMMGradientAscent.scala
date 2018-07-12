@@ -10,22 +10,8 @@ import org.apache.spark.rdd.RDD
   */
 class GMMGradientAscent extends GMMOptimizer{ 
 
-	require(learningRate>0,"learningRate must be positive")
-
-	def weightsDirection(grad: BDV[Double], utils: AcceleratedGradientUtils[BDV[Double]]): BDV[Double] = {
+	def direction[A](grad:A, utils: AcceleratedGradientUtils[A])(ops: ParameterOperations[A]): A = {
 		grad
 	}
-
-	def gaussianDirection(grad: BDM[Double], utils: AcceleratedGradientUtils[BDM[Double]]): BDM[Double] = {
-		grad
-
-	}
-
-	def direction[A](grad:A, utils: AcceleratedGradientUtils[A])(implicit ops: ParameterOperations[A]): A = {
-		grad
-	}
-
-
-
 	
 }
