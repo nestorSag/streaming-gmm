@@ -10,6 +10,8 @@ import org.apache.spark.mllib.linalg.{Matrices => SMS, Matrix => SM, DenseMatrix
 
 // tests for ConjugatePrior class
 
+// "easy" values were selected as the prior parameters and the correct values
+// were calculated by hand
 class ConjugatePriorTest extends FlatSpec {
   
   val errorTol = 1e-8
