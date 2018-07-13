@@ -1,7 +1,5 @@
 package com.github.nestorsag.gradientgmm
 
-import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
-
 /**
   * Compute gradient ascent directions with momentum
   */
