@@ -80,7 +80,7 @@ object GradientAggregator {
   def add(
       weights: Array[Double],
       dists: Array[UpdatableGaussianMixtureComponent],
-      optim: GMMOptimizer,
+      optim: Optimizer,
       n: Double)
       (agg: GradientAggregator, y: BDV[Double]): GradientAggregator = {
 

@@ -24,7 +24,7 @@ import org.apache.log4j.Logger
 class GradientBasedGaussianMixture private (
   w:  UpdatableWeights,
   g: Array[UpdatableGaussianMixtureComponent],
-  private[gradientgmm] var optimizer: GMMOptimizer) extends UpdatableGaussianMixture(w,g) with Optimizable {
+  private[gradientgmm] var optimizer: Optimizer) extends UpdatableGaussianMixture(w,g) with Optimizable {
 
 
 /**
@@ -224,7 +224,7 @@ object GradientBasedGaussianMixture{
   def apply(
     weights: Array[Double],
     gaussians: Array[UpdatableGaussianMixtureComponent],
-    optimizer: GMMOptimizer): GradientBasedGaussianMixture = {
+    optimizer: Optimizer): GradientBasedGaussianMixture = {
     new GradientBasedGaussianMixture(new UpdatableWeights(weights),gaussians,optimizer)
   }
 
@@ -240,7 +240,7 @@ object GradientBasedGaussianMixture{
   */
   def initialize(
     data: RDD[SV],
-    optimizer: GMMOptimizer,
+    optimizer: Optimizer,
     k: Int,
     nSamples: Int,
     nIters: Int,

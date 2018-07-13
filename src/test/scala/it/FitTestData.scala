@@ -67,26 +67,26 @@ object FitTestData{
     val covs = (1 to k).map{case k => BDM.eye[Double](d)}.toArray
     val initialDists = means.zip(covs).map{case (m,s) => UpdatableGaussianMixtureComponent(m,s)}
 
-    val optim = new GMMGradientAscent()
+    val optim = new GradientAscent()
      .setLearningRate(lr)
      .setShrinkageRate(shrinkageRate)
      .setMinLearningRate(minLr)
 
-    // val optim = new GMMMomentumGradientAscent()
+    // val optim = new MomentumGradientAscent()
     //   .setBeta(0.5)
     //   .setLearningRate(lr)
     //   .setShrinkageRate(shrinkageRate)
     //   .setMinLearningRate(minLr)
 
 
-    // val optim = new GMMAdam()
+    // val optim = new ADAM()
     //   .setLearningRate(lr)
     //   .setShrinkageRate(shrinkageRate)
     //   .setMinLearningRate(minLr)
     //   .setBeta1(0.9)
     //   .setBeta2(0.99)
 
-    // val optim = new GMMNesterovGradientAscent()
+    // val optim = new NesterovGradientAscent()
     //   .setLearningRate(lr)
     //   .setShrinkageRate(shrinkageRate)
     //   .setMinLearningRate(minLr)
@@ -96,7 +96,7 @@ object FitTestData{
       optim.setBatchSize(batchSize.get)
     }
 
-    //val optim = new GMMAdam(learningRate = lr,regularizer= None,beta1=0.9,beta2=0.1).setShrinkageRate(shrinkageRate).setMinLearningRate(minLr)
+    //val optim = new ADAM(learningRate = lr,regularizer= None,beta1=0.9,beta2=0.1).setShrinkageRate(shrinkageRate).setMinLearningRate(minLr)
     var model = GradientBasedGaussianMixture(initialWeights,initialDists.clone,optim)
 
     //val model = optim.fit(parsedData,k=3)

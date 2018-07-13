@@ -11,7 +11,7 @@ import org.apache.spark.rdd.RDD
   * Optimizer interface that contains base hyperparameters and their getters and setters.
   * Optimization algorithms like Stochastic Gradient Ascent are implementations of this trait
   */
-trait GMMOptimizer extends Serializable{
+trait Optimizer extends Serializable{
 
 /**
   * Optional regularization term

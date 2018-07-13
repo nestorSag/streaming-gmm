@@ -1,7 +1,7 @@
 import org.scalatest.FlatSpec
 
 
-import com.github.nestorsag.gradientgmm.{GMMGradientAscent,GradientAggregator,UpdatableGaussianMixtureComponent}
+import com.github.nestorsag.gradientgmm.{GradientAscent,GradientAggregator,UpdatableGaussianMixtureComponent}
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, norm}
 
 /**
@@ -25,7 +25,7 @@ class AggregatorTest extends FlatSpec{
 	//val mixture = GradientBasedGaussianMixture(clusterWeights,clusterDists)
 	val clusterDists = clusterMeans.zip(clusterVars).map{ case(m,v) => UpdatableGaussianMixtureComponent(m,v)}
 
-	val optim = new GMMGradientAscent()
+	val optim = new GradientAscent()
 		.setLearningRate(0.5)
 		.setShrinkageRate(1.0)
 

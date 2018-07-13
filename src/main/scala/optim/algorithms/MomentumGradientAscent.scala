@@ -4,7 +4,7 @@ package com.github.nestorsag.gradientgmm
   * Compute gradient ascent directions with momentum
   */
 
-class GMMMomentumGradientAscent extends GMMOptimizer {
+class MomentumGradientAscent extends Optimizer {
 
 /**
   * exponential smoothing parameter. See ''Goh, "Why Momentum Really Works", Distill, 2017. http://doi.org/10.23915/distill.00006''

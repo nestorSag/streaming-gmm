@@ -6,7 +6,7 @@ import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
   * Compute gradient ascent directions with momentum
   */
 
-class GMMNesterovGradientAscent extends GMMOptimizer {
+class NesterovGradientAscent extends Optimizer {
 
 /**
   * correction parameter

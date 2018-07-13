@@ -31,7 +31,7 @@ abstract class AcceleratedGradientUtils[T <: Any](val zeroGenerator: Int => T, v
   private[gradientgmm] var adamInfo: Option[T] = None
 
 /**
-  * Set the momentum term equal to x. See [[GMMGradientAscent]]
+  * Set the momentum term equal to x. See [[GradientAscent]]
   *
   */
 
@@ -40,7 +40,7 @@ abstract class AcceleratedGradientUtils[T <: Any](val zeroGenerator: Int => T, v
   }
 
 /**
-  * Set the ADAM term equal to x. See [[GMMAdam]]
+  * Set the ADAM term equal to x. See [[ADAM]]
   *
   * @return returns this object
   */

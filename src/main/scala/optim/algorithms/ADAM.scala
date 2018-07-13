@@ -5,7 +5,7 @@ import breeze.numerics.sqrt
 /**
   * Compute ADAM algirithm directions. See ''Adam: A Method for Stochastic Optimization. Kingma, Diederik P.; Ba, Jimmy, 2014''
   */
-class GMMAdam extends GMMOptimizer {
+class ADAM extends Optimizer {
 
 /**
   * iteration counter

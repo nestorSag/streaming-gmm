@@ -1,4 +1,4 @@
-import com.github.nestorsag.gradientgmm.{GMMGradientAscent, UpdatableGaussianMixtureComponent}
+import com.github.nestorsag.gradientgmm.{GradientAscent, UpdatableGaussianMixtureComponent}
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, norm}
 
@@ -13,7 +13,7 @@ class GradientAscentTest extends OptimTestSpec{
 
 	var lr = 0.5
 	var current = UpdatableGaussianMixtureComponent(BDV.rand(dim),BDM.eye[Double](dim))
-	var optim = new GMMGradientAscent().setLearningRate(lr)
+	var optim = new GradientAscent().setLearningRate(lr)
 	val paramMat0 = current.paramMat
 		
 	"GradientAscent" should "make current dist converge to target dist in expectation" in {
