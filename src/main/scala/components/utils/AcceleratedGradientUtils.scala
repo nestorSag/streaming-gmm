@@ -1,4 +1,4 @@
-package com.github.nestorsag.gradientgmm
+package com.github.nestorsag.gradientgmm.components
 
 import breeze.linalg.{DenseVector => BDV, DenseMatrix => BDM}
 
@@ -21,31 +21,31 @@ abstract class AcceleratedGradientUtils[T <: Any](val zeroGenerator: Int => T, v
   * momentum term data structure
   *  */
 
-  private[gradientgmm] var momentum: Option[T] = None
+  var momentum: Option[T] = None
   
   /**
   * ADAM information data structure
   *
   */
 
-  private[gradientgmm] var adamInfo: Option[T] = None
+  var adamInfo: Option[T] = None
 
 /**
-  * Set the momentum term equal to x. See [[GradientAscent]]
+  * Set the momentum term equal to x. See [[com.github.nestorsag.gradientgmm.optim.algorithms.MomentumGradientAscent]]
   *
   */
 
-  private[gradientgmm] def updateMomentum(x: T): Unit = {
+  def updateMomentum(x: T): Unit = {
     momentum = Option(x)
   }
 
 /**
-  * Set the ADAM term equal to x. See [[ADAM]]
+  * Set the ADAM term equal to x. See [[com.github.nestorsag.gradientgmm.optim.algorithms.ADAM]]
   *
   * @return returns this object
   */
 
-  private[gradientgmm] def updateAdamInfo(x: T): Unit = {
+  def updateAdamInfo(x: T): Unit = {
     adamInfo = Option(x)
   }
 
@@ -55,7 +55,7 @@ abstract class AcceleratedGradientUtils[T <: Any](val zeroGenerator: Int => T, v
   * @return returns this object
   */
 
-  private[gradientgmm] def initializeMomentum: Unit = {
+  def initializeMomentum: Unit = {
     momentum = Option(zeroGenerator(d))
   }
 
@@ -65,7 +65,7 @@ abstract class AcceleratedGradientUtils[T <: Any](val zeroGenerator: Int => T, v
   * @return returns this object
   */
 
-  private[gradientgmm] def initializeAdamInfo: Unit = {
+  def initializeAdamInfo: Unit = {
     adamInfo = Option(zeroGenerator(d))
   }
 

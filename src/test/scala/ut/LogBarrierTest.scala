@@ -1,5 +1,8 @@
 import org.scalatest.FlatSpec
-import com.github.nestorsag.gradientgmm.{UpdatableGaussianMixtureComponent,LogBarrier}
+
+import com.github.nestorsag.gradientgmm.components.UpdatableGaussianMixtureComponent
+import com.github.nestorsag.gradientgmm.optim.regularization.LogBarrier
+
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, det, trace}
 
 

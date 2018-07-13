@@ -1,4 +1,4 @@
-package com.github.nestorsag.gradientgmm
+package com.github.nestorsag.gradientgmm.components
 
 import breeze.linalg.{DenseVector => BDV}
 
@@ -17,7 +17,6 @@ class UpdatableWeights(var weights: Array[Double]) extends Serializable with Vec
   require(isPositive(weights), "some weights are negative or equal to zero")
   require(isInSimplex(weights),s"new weights don't sum 1: ${weights.mkString(",")}")
 
-  //var weights = Utils.toBDV(weights)
 /**
   * Allowed deviation from 1 of the weight vector's sum
  

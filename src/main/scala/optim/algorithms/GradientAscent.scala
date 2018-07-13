@@ -1,4 +1,6 @@
-package com.github.nestorsag.gradientgmm
+package com.github.nestorsag.gradientgmm.optim.algorithms
+
+import com.github.nestorsag.gradientgmm.components.AcceleratedGradientUtils
 
 /**
   * Optimizer that performs stochastic gradient ascent

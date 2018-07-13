@@ -1,4 +1,4 @@
-package com.github.nestorsag.gradientgmm
+package com.github.nestorsag.gradientgmm.components
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 import org.apache.spark.mllib.linalg.{Matrices => SMS, Matrix => SM, DenseMatrix => SDM, Vector => SV, Vectors => SVS, DenseVector => SDV}
@@ -6,9 +6,9 @@ import org.apache.spark.mllib.linalg.{Matrices => SMS, Matrix => SM, DenseMatrix
 /**
   * Multivariate Gaussian distribution class
   *
-  * It is based on [[[[org.apache.spark.ml.stat.distribution.MultivariateGaussian]]]] and it implements 
+  * It is based on [[org.apache.spark.ml.stat.distribution.MultivariateGaussian]] and it implements 
   * much of the same functionality, but more of its internal objects, such as the covariance matrix determinant
-  * and the covariance matrix inverse, are public. 
+  * and the covariance matrix inverse, are public; many of its parameters are mutable as well. 
 
   * @param mu Mean vector
   * @param sigma: Covariance matrix

@@ -1,4 +1,4 @@
-package com.github.nestorsag.gradientgmm
+package com.github.nestorsag.gradientgmm.components
 
 import breeze.linalg.{DenseVector => BDV}
 
@@ -7,12 +7,6 @@ import breeze.linalg.{DenseVector => BDV}
  
   */
 private[gradientgmm] object Utils extends Serializable{
-
-/**
-  * Allowed deviation from 1 of the weight vector's sum
- 
-  */
-  val simplexErrorTol = 1e-8
 
 /**
   * Machine epsilon

@@ -1,4 +1,5 @@
-import com.github.nestorsag.gradientgmm.{MomentumGradientAscent, UpdatableGaussianMixtureComponent}
+import com.github.nestorsag.gradientgmm.components.UpdatableGaussianMixtureComponent
+import com.github.nestorsag.gradientgmm.optim.algorithms.MomentumGradientAscent
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, norm}
 

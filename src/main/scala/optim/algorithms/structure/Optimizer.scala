@@ -1,4 +1,8 @@
-package com.github.nestorsag.gradientgmm
+package com.github.nestorsag.gradientgmm.optim.algorithms
+
+import com.github.nestorsag.gradientgmm.optim.regularization.GMMRegularizer
+import com.github.nestorsag.gradientgmm.optim.weights.{GMMWeightTransformation,SoftmaxWeightTransformation}
+import com.github.nestorsag.gradientgmm.components.{UpdatableGaussianMixtureComponent, AcceleratedGradientUtils}
 
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV, sum}
 import breeze.numerics.sqrt
@@ -16,45 +20,45 @@ trait Optimizer extends Serializable{
 /**
   * Optional regularization term
   */
-	private[gradientgmm] var regularizer: Option[GMMRegularizer] = None
+	protected var regularizer: Option[GMMRegularizer] = None
 
 /**
-  * Calculates the mapping from and to the weights' Simplex (see [[]]) and the transformation's gradient
+  * Calculates the mapping from and to the weights' Simplex (see [[https://en.wikipedia.org/wiki/Simplex]]) and the transformation's gradient
   */
-	private[gradientgmm] var weightsOptimizer: GMMWeightTransformation = new SoftmaxWeightTransformation()
+	protected var weightsOptimizer: GMMWeightTransformation = new SoftmaxWeightTransformation()
 
 /**
   * Ascent procedure's learning rate
   */
-	private[gradientgmm] var learningRate: Double = 0.9
+	protected var learningRate: Double = 0.9
 
 /**
   * Rate at which the learning rate is decreased as the number of iterations grow.
   * After {{{t}}} iterations the learning rate will be {{{shrinkageRate^t * learningRate}}}
   */
-    private[gradientgmm] var shrinkageRate: Double = 0.95
+  protected var shrinkageRate: Double = 0.95
 
 /**
   * Minimum allowed learning rate. Once this lower bound is reached the learning rate will not
   * shrink anymore
   */
-	private[gradientgmm] var minLearningRate: Double = 1e-2
+	protected var minLearningRate: Double = 1e-2
 
 /**
   * Minibatch size for each iteration in the ascent procedure. If {{{None}}}, it performs
   * full-batch optimization
   */
-	private[gradientgmm] var batchSize: Option[Int] = None
+	protected var batchSize: Option[Int] = None
 
 /**
   * Error tolerance in log-likelihood for the stopping criteria
   */
-	private[gradientgmm] var convergenceTol: Double = 1e-6
+	protected var convergenceTol: Double = 1e-6
 
 /**
   * Maximum number of iterations allowed
   */
-	private[gradientgmm] var maxIter: Int = 100
+	protected var maxIter: Int = 100
 
 /**
   * Linear Algebra operations necessary for computing updates for the parameters
@@ -63,7 +67,7 @@ trait Optimizer extends Serializable{
   * algorithms' classes
  
   */
-  val vectorOps = new ParameterOperations[BDV[Double]] {
+  protected val vectorOps = new ParameterOperations[BDV[Double]] {
     def sum(x: BDV[Double], y: BDV[Double]): BDV[Double] = {x + y}
     def sumScalar(x: BDV[Double], z: Double): BDV[Double] = {x + z}
     def rescale(x: BDV[Double], z: Double): BDV[Double] = {x*z}
@@ -74,7 +78,7 @@ trait Optimizer extends Serializable{
     def ewSqrt(x:BDV[Double]): BDV[Double] = {sqrt(x)}
   }
 
-  val matrixOps = new ParameterOperations[BDM[Double]] {
+  protected val matrixOps = new ParameterOperations[BDM[Double]] {
     def sum(x: BDM[Double], y: BDM[Double]): BDM[Double] = {x + y}
     def sumScalar(x: BDM[Double], z: Double): BDM[Double] = {x + z}
     def rescale(x: BDM[Double], z: Double): BDM[Double] = {x*z}
@@ -94,7 +98,7 @@ trait Optimizer extends Serializable{
 	}
 
 /**
-  * Use the {fromSimplex} method from [[GMMWeightTransformation]]
+  * Use the {fromSimplex} method from [[com.github.nestorsag.gradientgmm.optim.weights.GMMWeightTransformation]]
   *
   * @param weights mixture weights
   */
@@ -103,7 +107,7 @@ trait Optimizer extends Serializable{
 	}
 
 /**
-  * Use the {toSimplex} method from [[GMMWeightTransformation]]
+  * Use the {toSimplex} method from [[com.github.nestorsag.gradientgmm.optim.weights.GMMWeightTransformation]]
   *
   * @param real vector
   * @return valid mixture weight vector
@@ -132,7 +136,7 @@ trait Optimizer extends Serializable{
 /**
   * Computes the loss gradient of the mixture component without regularization term 
   */
-	private[gradientgmm] def basicGaussianGradient(paramMat: BDM[Double], point: BDM[Double], w: Double): BDM[Double] = {
+	protected def basicGaussianGradient(paramMat: BDM[Double], point: BDM[Double], w: Double): BDM[Double] = {
 
 		(point - paramMat) * 0.5 * w
 	}
@@ -140,7 +144,7 @@ trait Optimizer extends Serializable{
 /**
   * Computes the loss gradient of the weights vector without regularization term 
   */
-	private[gradientgmm] def basicWeightsGradient(posteriors: BDV[Double], weights: BDV[Double]): BDV[Double] = {
+	protected def basicWeightsGradient(posteriors: BDV[Double], weights: BDV[Double]): BDV[Double] = {
 
 		weightsOptimizer.gradient(posteriors,weights)
 	}
@@ -229,32 +233,6 @@ trait Optimizer extends Serializable{
 	def direction[A](grad:A, utils: AcceleratedGradientUtils[A])(ops: ParameterOperations[A]): A
 
 
-/**
-  * Fit a Gaussian Mixture Model (see [[https://en.wikipedia.org/wiki/Mixture_model#Gaussian_mixture_model]]).
-  * The model is initialized using a K-means algorithm over a small sample and then 
-  * fitting the resulting parameters to the data using this {{{GMMOptimization}}} object
-  * @param data Data to fit the model
-  * @param k Number of mixture components (clusters)
-  * @param startingSampleSize Sample size for the K-means algorithm
-  * @param kMeansIters Number of iterations allowed for the K-means algorithm
-  * @param seed Random seed
-  * @return Fitted model
-  */
-	def fit(data: RDD[SV], k: Int = 2, startingSampleSize: Int = 50, kMeansIters: Int = 20, seed: Int = 0): GradientBasedGaussianMixture = {
-		
-		val model = GradientBasedGaussianMixture.initialize(
-			data,
-			this,
-			k,
-			startingSampleSize,
-			kMeansIters,
-			seed)
-		    
-		model.step(data)
-
-		model
-	}
-
 	def setLearningRate(learningRate: Double): this.type = { 
 		require(learningRate > 0 , "learning rate must be positive")
 		this.learningRate = learningRate
@@ -317,16 +295,22 @@ trait Optimizer extends Serializable{
     this
   }
 
-  def getWeightsOptimizer: GMMWeightTransformation = weightsOptimizer
-
   def setRegularizer(r: GMMRegularizer): this.type = {
     regularizer = Option(r)
     this
   }
 
-  def getRegularizer: Option[GMMRegularizer] = regularizer
+  override def toString: String = {
 
+    val reg: String = if(regularizer.isDefined){
+      s"Regularization term: ${regularizer.toString}"
+    }else{
+      "Regularization term: None"
+    }
 
+    val output = s"Algorithm: ${this.getClass} \n ${reg} \n Weight transformation: ${weightsOptimizer.toString}"
+    output
+  }
 
 }
 

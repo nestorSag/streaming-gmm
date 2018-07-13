@@ -1,7 +1,8 @@
 import org.scalatest.FlatSpec
 
 
-import com.github.nestorsag.gradientgmm.{UpdatableWeights,ParameterOperations}
+import com.github.nestorsag.gradientgmm.components.UpdatableWeights
+import com.github.nestorsag.gradientgmm.optim.algorithms.ParameterOperations
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, sum}
 import breeze.numerics.sqrt

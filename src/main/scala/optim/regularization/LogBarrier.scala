@@ -1,4 +1,6 @@
-package com.github.nestorsag.gradientgmm
+package com.github.nestorsag.gradientgmm.optim.regularization
+
+import com.github.nestorsag.gradientgmm.components.UpdatableGaussianMixtureComponent
 
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 
@@ -10,9 +12,9 @@ import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 class LogBarrier extends GMMRegularizer{ 
 
 
-	var scale = 1.0
+	private var scale = 1.0
 
-	var shift = 0.0
+	private var shift = 0.0
 
 	def setScale(scale: Double): this.type = {
 		require(scale > 0, "scale must be positive")
@@ -25,6 +27,10 @@ class LogBarrier extends GMMRegularizer{
 		this.shift = shift
 		this
 	}
+
+	def getScale = scale
+
+	def getShift = shift
 
 	def weightsGradient(weights: BDV[Double]): BDV[Double] = BDV.zeros[Double](weights.length)
 

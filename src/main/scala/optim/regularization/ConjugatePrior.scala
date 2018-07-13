@@ -1,4 +1,6 @@
-package com.github.nestorsag.gradientgmm
+package com.github.nestorsag.gradientgmm.optim.regularization
+
+import com.github.nestorsag.gradientgmm.components.UpdatableGaussianMixtureComponent
 
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace}
 

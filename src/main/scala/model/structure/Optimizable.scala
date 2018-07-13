@@ -1,6 +1,8 @@
-package com.github.nestorsag.gradientgmm
+package com.github.nestorsag.gradientgmm.model
 
-import org.apache.spark.mllib.linalg.{Matrix => SM, Vector => SV}
+import com.github.nestorsag.gradientgmm.optim.algorithms.{Optimizer}
+
+import org.apache.spark.mllib.linalg.{Vector => SV}
 import org.apache.spark.rdd.RDD
 
 /**
@@ -13,9 +15,9 @@ trait Optimizable extends Serializable {
   * optimizer object
 
   */
-  private[gradientgmm] var optimizer: Optimizer
+  protected var optimizer: Optimizer
 
-  def setOptimizer(optim: GradientAscent): this.type = {
+  def setOptimizer(optim: Optimizer): this.type = {
     optimizer = optim
     this
   }
@@ -23,7 +25,7 @@ trait Optimizable extends Serializable {
   def getOpimizer: Optimizer = optimizer
 
 /**
-  * Perform a gradient-based optimization procedure
+  * Perform a gradient-based optimization step
   * @param data Data to fit the model
   */
   def step(data: RDD[SV]): Unit

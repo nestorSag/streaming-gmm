@@ -1,4 +1,7 @@
-package com.github.nestorsag.gradientgmm
+package com.github.nestorsag.gradientgmm.model
+
+import com.github.nestorsag.gradientgmm.components.{UpdatableGaussianMixtureComponent, UpdatableWeights, Utils}
+import com.github.nestorsag.gradientgmm.optim.algorithms.{Optimizer}
 
 import breeze.linalg.{diag, eigSym, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, sum}
 import breeze.numerics.sqrt
@@ -24,7 +27,7 @@ import org.apache.log4j.Logger
 class GradientBasedGaussianMixture private (
   w:  UpdatableWeights,
   g: Array[UpdatableGaussianMixtureComponent],
-  private[gradientgmm] var optimizer: Optimizer) extends UpdatableGaussianMixture(w,g) with Optimizable {
+  var optimizer: Optimizer) extends UpdatableGaussianMixture(w,g) with Optimizable {
 
 
 /**
@@ -62,7 +65,7 @@ class GradientBasedGaussianMixture private (
     // breadcast optimizer to workers
     val bcOptim = sc.broadcast(this.optimizer)
 
-    val initialRate = optimizer.learningRate
+    val initialRate = optimizer.getLearningRate
 
     // this is to prevent that 0 size samples are too frequent
     // this is because of the way spark takes random samples
@@ -70,13 +73,16 @@ class GradientBasedGaussianMixture private (
     val dataSize = gConcaveData.count()
     val minSafeBatchSize: Double = dataSize*(1 - math.exp(math.log(1e-3)/dataSize))
 
-    batchFraction = if(optimizer.batchSize.isDefined){
-      math.max(optimizer.batchSize.get.toDouble,minSafeBatchSize)/dataSize
+    batchFraction = if(optimizer.getBatchSize.isDefined){
+      math.max(optimizer.getBatchSize.get.toDouble,minSafeBatchSize)/dataSize
       }else{
         1.0
       }
 
-    while (iter < optimizer.maxIter && math.abs(newLL-oldLL) > optimizer.convergenceTol) {
+    val maxIter = optimizer.getMaxIter
+    val convTol = optimizer.getConvergenceTol
+
+    while (iter < maxIter && math.abs(newLL-oldLL) > convTol) {
 
       //send values formatted for R processing to logs
       logger.debug(s"means: list(${gaussians.map{case g => "c(" + g.getMu.toArray.mkString(",") + ")"}.mkString(",")})")
@@ -112,11 +118,12 @@ class GradientBasedGaussianMixture private (
 
           val newDists = sc.parallelize(tuples, numPartitions).map { case (grad,dist) =>
 
-            dist.update(
-              bcOptim.value.getGaussianUpdate(
+            val newPars = bcOptim.value.getGaussianUpdate(
                 dist.paramMat,
                 grad,
-                dist.optimUtils))
+                dist.optimUtils)
+            
+            dist.update(newPars)
 
             //dist.update(dist.paramMat + bcOptim.value.direction(grad,dist.optimUtils) * bcOptim.value.learningRate)
 
@@ -149,11 +156,12 @@ class GradientBasedGaussianMixture private (
 
         gaussians = newDists
 
-        weights.update(
-            optimizer.getWeightsUpdate(
+        val newWeights = optimizer.getWeightsUpdate(
               Utils.toBDV(weights.weights),
               sampleStats.weightsGradient,
-              weights.optimUtils))
+              weights.optimUtils)
+
+        weights.update(newWeights)
 
 
         oldLL = newLL // current becomes previous
@@ -170,7 +178,7 @@ class GradientBasedGaussianMixture private (
     }
 
     bcOptim.destroy()
-    optimizer.learningRate = initialRate
+    optimizer.setLearningRate(initialRate)
 
   }
 
@@ -300,5 +308,32 @@ object GradientBasedGaussianMixture{
       (0 to k-1).map{case i => UpdatableGaussianMixtureComponent(means(i),pseudoCov(i))}.toArray,
       optimizer)
 
+  }
+
+  /**
+  * Fit a Gaussian Mixture Model (see [[https://en.wikipedia.org/wiki/Mixture_model#Gaussian_mixture_model]]).
+  * The model is initialized using a K-means algorithm over a small sample and then 
+  * fitting the resulting parameters to the data using this {{{GMMOptimization}}} object
+  * @param data Data to fit the model
+  * @param optim Optimization algorithm
+  * @param k Number of mixture components (clusters)
+  * @param startingSampleSize Sample size for the K-means algorithm
+  * @param kMeansIters Number of iterations allowed for the K-means algorithm
+  * @param seed Random seed
+  * @return Fitted model
+  */
+  def fit(data: RDD[SV], optim: Optimizer, k: Int = 2, startingSampleSize: Int = 50, kMeansIters: Int = 20, seed: Int = 0): GradientBasedGaussianMixture = {
+    
+    val model = initialize(
+                  data,
+                  optim,
+                  k,
+                  startingSampleSize,
+                  kMeansIters,
+                  seed)
+        
+    model.step(data)
+
+    model
   }
 }

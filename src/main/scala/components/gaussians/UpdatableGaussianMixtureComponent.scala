@@ -1,4 +1,4 @@
-package com.github.nestorsag.gradientgmm
+package com.github.nestorsag.gradientgmm.components
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 
@@ -7,7 +7,7 @@ import org.apache.spark.mllib.stat.distribution.{MultivariateGaussian => SMVG}
 
 /**
   * Gaussian distribution that implements an updating routine based on its g-concave reformulation 
-  * and contains gradient ascent utilities. It can only be initialized bi its companion object 
+  * and contains gradient ascent utilities necessary for accelerated ascent algorithms. 
 
   * @param _s Positive scalar
   * @param _mu Mean vector

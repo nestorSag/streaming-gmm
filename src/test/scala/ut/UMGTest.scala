@@ -1,5 +1,7 @@
 import org.scalatest.FlatSpec
-import com.github.nestorsag.gradientgmm.{UpdatableGaussianMixtureComponent}
+
+import com.github.nestorsag.gradientgmm.components.UpdatableGaussianMixtureComponent
+
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, norm, trace, det}
 
 import org.apache.spark.mllib.stat.distribution.MultivariateGaussian

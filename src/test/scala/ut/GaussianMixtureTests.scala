@@ -1,7 +1,9 @@
 import org.scalatest.{FunSuite}
 
 
-import com.github.nestorsag.gradientgmm.{UpdatableGaussianMixtureComponent, GradientBasedGaussianMixture, GradientAscent}
+import com.github.nestorsag.gradientgmm.components.UpdatableGaussianMixtureComponent
+import com.github.nestorsag.gradientgmm.model.GradientBasedGaussianMixture
+import com.github.nestorsag.gradientgmm.optim.algorithms.GradientAscent
 
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.mllib.clustering.{GaussianMixture, GaussianMixtureModel}
