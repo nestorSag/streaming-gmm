@@ -128,7 +128,7 @@ trait Optimizer extends Serializable{
 		regularizer match{
 			case None => basicGaussianGradient(dist.paramMat,point,w) 
 			case Some(_) => basicGaussianGradient(dist.paramMat,point,w) +
-				regularizer.get.gradient(dist)
+				regularizer.get.gaussianGradient(dist)
 		}
 
 	}
@@ -166,20 +166,34 @@ trait Optimizer extends Serializable{
 	}
 
 /**
-  * Evaluate regularization term, if any, with current parameters
+  * Evaluate regularization term for one of the model's components
   *
   * @param dist Mixture component
-  * @param weight Corresponding mixture weight
   * @return regularization term value
   */
-	def evaluateRegularizationTerm(dist: UpdatableGaussianMixtureComponent,weight: Double): Double = {
+	def evaluateRegularizationTerm(dist: UpdatableGaussianMixtureComponent): Double = {
 
 		regularizer match{
 			case None => 0
-			case Some(_) => regularizer.get.evaluate(dist,weight)
+			case Some(_) => regularizer.get.evaluateDist(dist)
 		}
 
 	}
+
+  /**
+  * Evaluate regularization term for the model's weights vector
+  *
+  * @param weight weights vector
+  * @return regularization term value
+  */
+  def evaluateRegularizationTerm(weights: BDV[Double]): Double = {
+
+    regularizer match{
+      case None => 0
+      case Some(_) => regularizer.get.evaluateWeights(weights)
+    }
+
+  }
 
 /**
   * Compute full updates for the weights. Usually this has the form X_t + alpha * direction(X_t)

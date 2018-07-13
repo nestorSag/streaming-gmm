@@ -5,7 +5,7 @@ import com.github.gradientgmm.components.AcceleratedGradientUtils
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 
 /**
-  * Compute gradient ascent directions with momentum
+  * Optimizer that performs stochastic gradient ascent with Nesterov's correction
   */
 
 class NesterovGradientAscent extends Optimizer {

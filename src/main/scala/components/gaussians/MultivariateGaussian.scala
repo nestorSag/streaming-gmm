@@ -6,7 +6,7 @@ import org.apache.spark.mllib.linalg.{Matrices => SMS, Matrix => SM, DenseMatrix
 /**
   * Multivariate Gaussian distribution class
   *
-  * It is based on [[org.apache.spark.ml.stat.distribution.MultivariateGaussian]] and it implements 
+  * It is based on Spark's [[https://spark.apache.org/docs/2.1.1/api/scala/index.html#org.apache.spark.ml.stat.distribution.MultivariateGaussian MultivariateGaussian]] and it implements 
   * much of the same functionality, but more of its internal objects, such as the covariance matrix determinant
   * and the covariance matrix inverse, are public; many of its parameters are mutable as well. 
 

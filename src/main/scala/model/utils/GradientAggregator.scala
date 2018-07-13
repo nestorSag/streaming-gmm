@@ -11,8 +11,7 @@ import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV,
   * In each worker it computes and aggregates the current batch log-likelihood,
   * the regularization values for the current parameters and the 
   * gaussianGradients for each data point. The class structure is based heavily on
-  * Spark Clustering's {{{ExpectationSum}}} class. 
-  * See [[https://github.com/apache/spark/blob/master/mllib/src/main/scala/org/apache/spark/mllib/clustering/GaussianMixture.scala]]
+  * Spark's [[https://github.com/apache/spark/blob/master/mllib/src/main/scala/org/apache/spark/mllib/clustering/GaussianMixture.scala ExpectationSum]]
 
   * @param qLogLikelihood aggregate log-likelihood
   * @param weightsGradient: aggregate posterior responsability for each component. See ''Pattern Recognition
@@ -54,7 +53,7 @@ class GradientAggregator(
 object GradientAggregator {
 
 /**
-  * {{{GradientAggregator}}} initializer
+  * GradientAggregator initializer
   *
   * Initializes an instance with initial statistics set as zero
   * @param k Number of components in the model
@@ -93,12 +92,16 @@ object GradientAggregator {
       case (weight, dist) =>  weight * dist.gConcavePdf(y) // <--q-logLikelihood
     }
     val qSum = q.sum
-
+    val vectorWeights = Utils.toBDV(weights)
+    
     agg.qLoglikelihood += math.log(qSum) / n
+
+    // add regularization value due to weights vector
+    agg.qLoglikelihood += optim.evaluateRegularizationTerm(vectorWeights) / (n*n)
 
     // update aggregated weight gradient
     val posteriors = Utils.toBDV(q) / qSum
-    agg.weightsGradient += optim.weightsGradient(posteriors,Utils.toBDV(weights)) / n
+    agg.weightsGradient += optim.weightsGradient(posteriors,vectorWeights) / n
 
     // update gaussian parameters' gradients and log-likelihood
     var i = 0
@@ -108,7 +111,8 @@ object GradientAggregator {
 
       agg.gaussianGradients(i) += optim.gaussianGradient( dists(i), outer , q(i)) / n
 
-      agg.qLoglikelihood += optim.evaluateRegularizationTerm(dists(i),weights(i)) / (n*n)
+      // add regularization value due to Gaussian components
+      agg.qLoglikelihood += optim.evaluateRegularizationTerm(dists(i)) / (n*n)
 
       i = i + 1
     }

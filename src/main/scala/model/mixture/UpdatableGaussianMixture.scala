@@ -12,7 +12,7 @@ import org.apache.spark.rdd.RDD
 /**
   * Implementation of a Gaussian Mixture Model with updatable components. 
 
-  * The class is strongly based on [[org.apache.spark.mllib.clustering.GaussianMixture ]], except it allows mutable components
+  * The class is strongly based on Spark's [[https://spark.apache.org/docs/2.1.1/api/scala/index.html#org.apache.spark.mllib.clustering.GaussianMixture GaussianMixture]], except it allows mutable components
   * 
   * @param w Weight vector wrapper
   * @param g Array of mixture components (distributions)

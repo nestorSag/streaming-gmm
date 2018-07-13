@@ -34,12 +34,12 @@ class LogBarrierTest extends FlatSpec {
   "gradient()" should "give correct gradient" in { 
 
     var e = BDV(Array.fill(covdim)(0.0) ++ Array(1.0))
-    var shouldBeZero = logbarrier.gradient(unitdist) - (BDM.eye[Double](covdim+1) - e * e.t) * scale
+    var shouldBeZero = logbarrier.gaussianGradient(unitdist) - (BDM.eye[Double](covdim+1) - e * e.t) * scale
 
     assert(trace(shouldBeZero.t*shouldBeZero) < errorTol)
 
     e = umgdist.paramMat(::,umgdist.paramMat.cols - 1)
-    shouldBeZero = logbarrier.gradient(umgdist) - (umgdist.paramMat - e * e.t) * scale
+    shouldBeZero = logbarrier.gaussianGradient(umgdist) - (umgdist.paramMat - e * e.t) * scale
 
     assert(trace(shouldBeZero.t*shouldBeZero) < errorTol)
 
@@ -47,7 +47,7 @@ class LogBarrierTest extends FlatSpec {
 
   "evaluate()" should "return correct regularization term values" in { 
 
-    var reg = logbarrier.evaluate(umgdist,1.0)
+    var reg = logbarrier.evaluateDist(umgdist) + logbarrier.evaluateWeights(new BDV(Array(1.0))) // evaluate dist and weight separately
 
     var diff = reg - scale * (math.log(det(umgdist.paramMat)) - umgdist.getS)
 

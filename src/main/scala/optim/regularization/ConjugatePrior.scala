@@ -2,7 +2,9 @@ package com.github.gradientgmm.optim.regularization
 
 import com.github.gradientgmm.components.UpdatableGaussianMixtureComponent
 
-import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace}
+import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, sum}
+
+import breeze.numerics.log
 
 import org.apache.log4j.Logger
 
@@ -105,7 +107,7 @@ class ConjugatePrior extends GMMRegularizer{
 	var regularizingMatrix = buildRegMatrix(df,muPriorMean,sigmaPriorMean)
 
 
-	def gradient(dist:UpdatableGaussianMixtureComponent): BDM[Double] = {
+	def gaussianGradient(dist:UpdatableGaussianMixtureComponent): BDM[Double] = {
 		(this.regularizingMatrix - df*dist.paramMat)*0.5
 		//updateRegularizer(paramMat)
 	}
@@ -114,24 +116,12 @@ class ConjugatePrior extends GMMRegularizer{
 		(BDV.ones[Double](k) - weights*k.toDouble)*weightConcentrationPar
 	}
 
-	def evaluate(dist: UpdatableGaussianMixtureComponent, weight: Double): Double = {
-		evaluateGaussian(dist) + evaluateWeight(weight)
-	}
-
-/**
-  * Evaluate regularization term of current component parameters
-
-  */
-	private def evaluateGaussian(dist:UpdatableGaussianMixtureComponent): Double = {
+	def evaluateDist(dist: UpdatableGaussianMixtureComponent): Double = {
 		- 0.5*(df*(dist.logDetSigma + math.log(dist.getS)) + symProdTrace(regularizingMatrix,dist.invParamMat))
 	}
 
-/**
-  * Evaluate regularization term of current component's corresponding weight parameter
-
-  */
-	private def evaluateWeight(weight: Double): Double = {
-		weightConcentrationPar*math.log(weight)
+	def evaluateWeights(weights: BDV[Double]): Double = {
+		weightConcentrationPar*sum(log(weights))
 	}
 	
 /**

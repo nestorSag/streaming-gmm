@@ -3,7 +3,7 @@ package com.github.gradientgmm.optim.algorithms
 import com.github.gradientgmm.components.AcceleratedGradientUtils
 
 /**
-  * Compute gradient ascent directions with momentum
+  * Optimizer that performs stochastic gradient ascent with momentum
   */
 
 class MomentumGradientAscent extends Optimizer {

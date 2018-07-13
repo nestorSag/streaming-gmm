@@ -5,7 +5,7 @@ import com.github.gradientgmm.components.AcceleratedGradientUtils
 import breeze.numerics.sqrt
 
 /**
-  * Compute ADAM algirithm directions. See ''Adam: A Method for Stochastic Optimization. Kingma, Diederik P.; Ba, Jimmy, 2014''
+  * Optimizer that performs gradient ascent using the ADAM algorithm. See ''Adam: A Method for Stochastic Optimization. Kingma, Diederik P.; Ba, Jimmy, 2014''
   */
 class ADAM extends Optimizer {
 

@@ -20,7 +20,7 @@ trait GMMRegularizer extends Serializable {
   * @return gradient
  
   */
-	def gradient(dist:UpdatableGaussianMixtureComponent): BDM[Double]
+	def gaussianGradient(dist:UpdatableGaussianMixtureComponent): BDM[Double]
 
 
 /**
@@ -34,13 +34,21 @@ trait GMMRegularizer extends Serializable {
 
 
 /**
-  * Evaluate regularization term for the current component and corresponding weight
+  * Evaluate regularization term for a mixture component
   *
   * @param dist Mixture component
-  * @param weight component's weight
   * @return regularization value
  
   */
-	def evaluate(dist: UpdatableGaussianMixtureComponent, weight: Double): Double
+	def evaluateDist(dist: UpdatableGaussianMixtureComponent): Double
+
+/**
+  * Evaluate regularization term for the weights vector
+  *
+  * @param weights model weights vector
+  * @return regularization value
+ 
+  */
+  def evaluateWeights(weights: BDV[Double]): Double
 
 }

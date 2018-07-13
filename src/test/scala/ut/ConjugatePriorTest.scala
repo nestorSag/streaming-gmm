@@ -73,20 +73,21 @@ class ConjugatePriorTest extends FlatSpec {
 
     var testdist = UpdatableGaussianMixtureComponent(covdim,mu,cov) // when paramMat = regularizingMatrix
 
+    val vectorWeight = new BDV(Array(1.0))
     //Tr(regMat*paramMat) = dim(regMat) = dim(paramMat) = covdim + 1
     //weightGrad(1.0) = 0
-    var shouldBeZero = prior.evaluate(testdist,1.0) - (-0.5*prior.getDf*logdet(testdist.paramMat) - 0.5*(covdim+1))
+    var shouldBeZero = prior.evaluateDist(testdist) + prior.evaluateWeights(vectorWeight) - (-0.5*prior.getDf*logdet(testdist.paramMat) - 0.5*(covdim+1))
     assert(math.pow(shouldBeZero,2) < errorTol)
 
     // try moving the weight 
-    shouldBeZero = prior.evaluate(testdist,0.5) - (-0.5*prior.getDf*logdet(testdist.paramMat) - 0.5*(covdim+1) + prior.getWeightConcentrationPar*math.log(0.5))
+    shouldBeZero = prior.evaluateDist(testdist) + prior.evaluateWeights(vectorWeight*0.5) - (-0.5*prior.getDf*logdet(testdist.paramMat) - 0.5*(covdim+1) + prior.getWeightConcentrationPar*math.log(0.5))
     assert(math.pow(shouldBeZero,2) < errorTol)
 
     // when paramMat = identity, logdet should cancel out
     testdist = UpdatableGaussianMixtureComponent(BDV.zeros[Double](covdim),BDM.eye[Double](covdim))
 
     //logdet(paramMat) = log(1) = 0
-    shouldBeZero = prior.evaluate(testdist,1.0) - (- 0.5*trace(prior.regularizingMatrix))
+    shouldBeZero = prior.evaluateDist(testdist) + prior.evaluateWeights(vectorWeight) - (- 0.5*trace(prior.regularizingMatrix))
     assert(math.pow(shouldBeZero,2) < errorTol)
 
 
@@ -99,7 +100,7 @@ class ConjugatePriorTest extends FlatSpec {
       .setK(k)
 
 
-    shouldBeZero = prior.evaluate(testdist,1.0) - (- 0.5*(covdim+testdist.getS*prior.getDf))
+    shouldBeZero = prior.evaluateDist(testdist) + prior.evaluateWeights(vectorWeight) - (- 0.5*(covdim+testdist.getS*prior.getDf))
     assert(math.pow(shouldBeZero,2) < errorTol)
   }
   // gradient methods are simple enough

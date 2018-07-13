@@ -34,7 +34,7 @@ class LogBarrier extends GMMRegularizer{
 
 	def weightsGradient(weights: BDV[Double]): BDV[Double] = BDV.zeros[Double](weights.length)
 
-	def gradient(dist: UpdatableGaussianMixtureComponent): BDM[Double] = {
+	def gaussianGradient(dist: UpdatableGaussianMixtureComponent): BDM[Double] = {
 
 		val lastCol = dist.paramMat(::,dist.paramMat.cols-1)
 
@@ -49,27 +49,15 @@ class LogBarrier extends GMMRegularizer{
 		}
 	}
 
-	def evaluate(dist: UpdatableGaussianMixtureComponent, weight: Double): Double = {
-		scale * (evaluateGaussian(dist) + evaluateWeight(weight))
-	}
-
-/**
-  * Evaluate regularization term of current component parameters
-
-  */
-	private def evaluateGaussian(dist:UpdatableGaussianMixtureComponent): Double = {
-
+	def evaluateDist(dist: UpdatableGaussianMixtureComponent): Double = {
 		if(shift >0){
-			math.log(dist.detSigma - shift) + math.log(dist.getS) - dist.getS
+			scale * (math.log(dist.detSigma - shift) + math.log(dist.getS) - dist.getS)
 		}else{
-			dist.logDetSigma + math.log(dist.getS) - dist.getS
+			scale * (dist.logDetSigma + math.log(dist.getS) - dist.getS)
 		}
 	}
-/**
-  * Evaluate regularization term of current component's corresponding weight parameter
 
-  */
-	private def evaluateWeight(weights: Double): Double = {
+	def evaluateWeights(weights: BDV[Double]): Double = {
 		0.0
 	}
 

@@ -123,7 +123,7 @@ object UpdatableGaussianMixtureComponent {
   }
 
 /**
-  * Creates an {{{UpdatableGaussianMixtureComponent}}} instance from an [[[org.apache.spark.ml.stat.distribution.MultivariateGaussian]]]
+  * Creates an {{{UpdatableGaussianMixtureComponent}}} instance from a [[[https://spark.apache.org/docs/2.1.1/api/scala/index.html#org.apache.spark.ml.stat.distribution.MultivariateGaussian MultivariateGaussian]]] instance
   * instance
 
   * @param g Spark's Multivariate Gaussian instance
