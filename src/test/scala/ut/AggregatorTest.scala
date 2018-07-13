@@ -1,9 +1,9 @@
 import org.scalatest.FlatSpec
 
 
-import com.github.nestorsag.gradientgmm.optim.algorithms.GradientAscent
-import com.github.nestorsag.gradientgmm.model.GradientAggregator
-import com.github.nestorsag.gradientgmm.components.UpdatableGaussianMixtureComponent
+import com.github.gradientgmm.optim.algorithms.GradientAscent
+import com.github.gradientgmm.model.GradientAggregator
+import com.github.gradientgmm.components.UpdatableGaussianMixtureComponent
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, norm}
 

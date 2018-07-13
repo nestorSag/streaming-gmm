@@ -1,6 +1,6 @@
-package com.github.nestorsag.gradientgmm.model
+package com.github.gradientgmm.model
 
-import com.github.nestorsag.gradientgmm.optim.algorithms.{Optimizer}
+import com.github.gradientgmm.optim.algorithms.{Optimizer}
 
 import org.apache.spark.mllib.linalg.{Vector => SV}
 import org.apache.spark.rdd.RDD

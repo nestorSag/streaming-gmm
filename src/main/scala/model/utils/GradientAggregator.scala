@@ -1,7 +1,7 @@
-package com.github.nestorsag.gradientgmm.model
+package com.github.gradientgmm.model
 
-import com.github.nestorsag.gradientgmm.components.{UpdatableGaussianMixtureComponent, Utils}
-import com.github.nestorsag.gradientgmm.optim.algorithms.Optimizer 
+import com.github.gradientgmm.components.{UpdatableGaussianMixtureComponent, Utils}
+import com.github.gradientgmm.optim.algorithms.Optimizer 
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 

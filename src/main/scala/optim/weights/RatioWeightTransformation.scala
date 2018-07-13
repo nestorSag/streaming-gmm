@@ -1,6 +1,6 @@
-package com.github.nestorsag.gradientgmm.optim.weights
+package com.github.gradientgmm.optim.weights
 
-import com.github.nestorsag.gradientgmm.components.Utils
+import com.github.gradientgmm.components.Utils
 
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV, max, min, sum}
 

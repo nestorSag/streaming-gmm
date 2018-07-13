@@ -1,8 +1,8 @@
 // import org.scalatest.FlatSpec
 
-// import com.github.nestorsag.gradientgmm.components._
-// import com.github.nestorsag.gradientgmm.model._
-// import com.github.nestorsag.gradientgmm.optim.algorithms._
+// import com.github.gradientgmm.components._
+// import com.github.gradientgmm.model._
+// import com.github.gradientgmm.optim.algorithms._
 
 
 // import org.apache.spark.{SparkConf, SparkContext}

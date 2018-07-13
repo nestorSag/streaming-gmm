@@ -1,8 +1,8 @@
-package com.github.nestorsag.gradientgmm.optim.algorithms
+package com.github.gradientgmm.optim.algorithms
 
-import com.github.nestorsag.gradientgmm.optim.regularization.GMMRegularizer
-import com.github.nestorsag.gradientgmm.optim.weights.{GMMWeightTransformation,SoftmaxWeightTransformation}
-import com.github.nestorsag.gradientgmm.components.{UpdatableGaussianMixtureComponent, AcceleratedGradientUtils}
+import com.github.gradientgmm.optim.regularization.GMMRegularizer
+import com.github.gradientgmm.optim.weights.{GMMWeightTransformation,SoftmaxWeightTransformation}
+import com.github.gradientgmm.components.{UpdatableGaussianMixtureComponent, AcceleratedGradientUtils}
 
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV, sum}
 import breeze.numerics.sqrt
@@ -98,7 +98,7 @@ trait Optimizer extends Serializable{
 	}
 
 /**
-  * Use the {fromSimplex} method from [[com.github.nestorsag.gradientgmm.optim.weights.GMMWeightTransformation]]
+  * Use the {fromSimplex} method from [[com.github.gradientgmm.optim.weights.GMMWeightTransformation]]
   *
   * @param weights mixture weights
   */
@@ -107,7 +107,7 @@ trait Optimizer extends Serializable{
 	}
 
 /**
-  * Use the {toSimplex} method from [[com.github.nestorsag.gradientgmm.optim.weights.GMMWeightTransformation]]
+  * Use the {toSimplex} method from [[com.github.gradientgmm.optim.weights.GMMWeightTransformation]]
   *
   * @param real vector
   * @return valid mixture weight vector

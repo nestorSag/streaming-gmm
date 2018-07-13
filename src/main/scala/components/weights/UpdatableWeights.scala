@@ -1,4 +1,4 @@
-package com.github.nestorsag.gradientgmm.components
+package com.github.gradientgmm.components
 
 import breeze.linalg.{DenseVector => BDV}
 
