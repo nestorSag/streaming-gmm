@@ -7,7 +7,7 @@ import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
   * fit the weights of a mixture model
 
   */
-trait GMMWeightTransformation extends Serializable {
+trait WeightsTransformation extends Serializable {
 
 
 /**

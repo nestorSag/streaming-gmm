@@ -1,7 +1,7 @@
 package com.github.gradientgmm.optim.algorithms
 
-import com.github.gradientgmm.optim.regularization.GMMRegularizer
-import com.github.gradientgmm.optim.weights.{GMMWeightTransformation,SoftmaxWeightTransformation}
+import com.github.gradientgmm.optim.regularization.Regularizer
+import com.github.gradientgmm.optim.weights.{WeightsTransformation,SoftmaxWeightTransformation}
 import com.github.gradientgmm.components.{UpdatableGaussianMixtureComponent, AcceleratedGradientUtils}
 
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV, sum}
@@ -20,12 +20,12 @@ trait Optimizer extends Serializable{
 /**
   * Optional regularization term
   */
-	protected var regularizer: Option[GMMRegularizer] = None
+	protected var regularizer: Option[Regularizer] = None
 
 /**
   * Calculates the mapping from and to the weights' Simplex (see [[https://en.wikipedia.org/wiki/Simplex]]) and the transformation's gradient
   */
-	protected var weightsOptimizer: GMMWeightTransformation = new SoftmaxWeightTransformation()
+	protected var weightsOptimizer: WeightsTransformation = new SoftmaxWeightTransformation()
 
 /**
   * Ascent procedure's learning rate
@@ -98,7 +98,7 @@ trait Optimizer extends Serializable{
 	}
 
 /**
-  * Use the {fromSimplex} method from [[com.github.gradientgmm.optim.weights.GMMWeightTransformation]]
+  * Use the {fromSimplex} method from [[com.github.gradientgmm.optim.weights.WeightsTransformation]]
   *
   * @param weights mixture weights
   */
@@ -107,7 +107,7 @@ trait Optimizer extends Serializable{
 	}
 
 /**
-  * Use the {toSimplex} method from [[com.github.gradientgmm.optim.weights.GMMWeightTransformation]]
+  * Use the {toSimplex} method from [[com.github.gradientgmm.optim.weights.WeightsTransformation]]
   *
   * @param real vector
   * @return valid mixture weight vector
@@ -304,12 +304,12 @@ trait Optimizer extends Serializable{
 		maxIter
 	}
 
-  def setWeightsOptimizer(t: GMMWeightTransformation): this.type = {
+  def setWeightsOptimizer(t: WeightsTransformation): this.type = {
     weightsOptimizer = t
     this
   }
 
-  def setRegularizer(r: GMMRegularizer): this.type = {
+  def setRegularizer(r: Regularizer): this.type = {
     regularizer = Option(r)
     this
   }

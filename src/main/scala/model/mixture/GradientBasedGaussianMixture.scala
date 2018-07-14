@@ -165,7 +165,7 @@ class GradientBasedGaussianMixture private (
 
 
         oldLL = newLL // current becomes previous
-        newLL = sampleStats.qLoglikelihood
+        newLL = sampleStats.loss
         logger.debug(s"newLL: ${newLL}")
 
         optimizer.updateLearningRate //update learning rate in driver

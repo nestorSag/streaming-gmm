@@ -10,7 +10,7 @@ import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV, max,
   * The precise mapping is {{{w_i => w_i/w_last}}}
 
   */
-class RatioWeightTransformation extends GMMWeightTransformation {
+class RatioWeightTransformation extends WeightsTransformation {
 
 /**
   * machine's epsilon

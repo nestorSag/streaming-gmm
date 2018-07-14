@@ -19,7 +19,7 @@ import org.apache.log4j.Logger
   * See [[https://en.wikipedia.org/wiki/Dirichlet_distribution]]
 
   */
-class ConjugatePrior extends GMMRegularizer{
+class ConjugatePrior extends Regularizer{
 
 /**
   * Number of mixture components

@@ -9,7 +9,7 @@ import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 
   */
 
-class LogBarrier extends GMMRegularizer{ 
+class LogBarrier extends Regularizer{ 
 
 
 	private var scale = 1.0

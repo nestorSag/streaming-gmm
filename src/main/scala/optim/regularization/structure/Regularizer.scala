@@ -11,7 +11,7 @@ import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
   * 
 
   */
-trait GMMRegularizer extends Serializable {
+trait Regularizer extends Serializable {
 
 /**
   * Computes the loss function's gradient w.r.t a component's parameters

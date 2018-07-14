@@ -3,7 +3,7 @@ package com.github.gradientgmm.model
 import com.github.gradientgmm.components.{UpdatableGaussianMixtureComponent, Utils}
 import com.github.gradientgmm.optim.algorithms.Optimizer 
 
-import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
+import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, sum}
 
 /**
   * Distributed aggregator of relevant statistics
@@ -13,14 +13,14 @@ import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV,
   * gaussianGradients for each data point. The class structure is based heavily on
   * Spark's [[https://github.com/apache/spark/blob/master/mllib/src/main/scala/org/apache/spark/mllib/clustering/GaussianMixture.scala ExpectationSum]]
 
-  * @param qLogLikelihood aggregate log-likelihood
+  * @param loss aggregate log-likelihood
   * @param weightsGradient: aggregate posterior responsability for each component. See ''Pattern Recognition
   * And Machine Learning. Bishop, Chis.'', page 432
   * @param gaussianGradients Aggregate point-wise gaussianGradients for each component
  
   */
 class GradientAggregator(
-  var qLoglikelihood: Double,
+  var loss: Double,
   val weightsGradient: BDV[Double],
   val gaussianGradients: Array[BDM[Double]],
   var counter: Int) extends Serializable{
@@ -43,7 +43,7 @@ class GradientAggregator(
       i += 1
     }
     weightsGradient += x.weightsGradient
-    qLoglikelihood += x.qLoglikelihood
+    loss += x.loss
     counter += x.counter
     this
   }
@@ -88,34 +88,39 @@ object GradientAggregator {
 
     agg.counter += 1
 
-    val q = weights.zip(dists).map {
-      case (weight, dist) =>  weight * dist.gConcavePdf(y) // <--q-logLikelihood
-    }
-    val qSum = q.sum
+    var posteriors = getPosteriors(y,dists,weights)
+    
     val vectorWeights = Utils.toBDV(weights)
     
-    agg.qLoglikelihood += math.log(qSum) / n
+    agg.loss += math.log(sum(posteriors)) / n
 
     // add regularization value due to weights vector
-    agg.qLoglikelihood += optim.evaluateRegularizationTerm(vectorWeights) / (n*n)
+    agg.loss += optim.evaluateRegularizationTerm(vectorWeights) / (n*n)
 
     // update aggregated weight gradient
-    val posteriors = Utils.toBDV(q) / qSum
+    posteriors /= sum(posteriors)
     agg.weightsGradient += optim.weightsGradient(posteriors,vectorWeights) / n
 
     // update gaussian parameters' gradients and log-likelihood
     var i = 0
     val outer = y*y.t
     while (i < agg.k) {
-      q(i) /= qSum 
 
-      agg.gaussianGradients(i) += optim.gaussianGradient( dists(i), outer , q(i)) / n
+      agg.gaussianGradients(i) += optim.gaussianGradient( dists(i), outer , posteriors(i)) / n
 
       // add regularization value due to Gaussian components
-      agg.qLoglikelihood += optim.evaluateRegularizationTerm(dists(i)) / (n*n)
+      agg.loss += optim.evaluateRegularizationTerm(dists(i)) / (n*n)
 
       i = i + 1
     }
     agg
   }
+
+  def getPosteriors(point: BDV[Double], dists: Array[UpdatableGaussianMixtureComponent], weights: Array[Double]): BDV[Double] = {
+    val q = weights.zip(dists).map {
+      case (weight, dist) =>  weight * dist.gConcavePdf(point) // <--q-logLikelihood
+    }
+    Utils.toBDV(q)
+  }
+
 }

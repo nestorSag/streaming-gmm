@@ -12,7 +12,7 @@ import breeze.numerics.{exp, log}
   * (see [[https://arxiv.org/abs/1706.03267]]).
 
   */
-class SoftmaxWeightTransformation extends GMMWeightTransformation {
+class SoftmaxWeightTransformation extends WeightsTransformation {
 	
 	/**
   * upper and lower bounds for allowed values before applying {{{toSimplex}}}

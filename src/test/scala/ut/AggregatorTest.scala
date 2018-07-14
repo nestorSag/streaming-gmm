@@ -49,7 +49,7 @@ class AggregatorTest extends FlatSpec{
 	"the log-likelihood" should "be correclty calculated" in {
 		val correctValue = (-1.0 -math.log(2*math.Pi))
 
-		var error = math.pow(agg.qLoglikelihood - correctValue,2)
+		var error = math.pow(agg.loss - correctValue,2)
 		assert(error < errorTol)
 	}
 
