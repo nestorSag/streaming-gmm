@@ -12,7 +12,7 @@ import breeze.linalg.{DenseVector => BDV}
   * @param weights weight vector
   */
 
-class UpdatableWeights(var weights: Array[Double]) extends Serializable with VectorOptimUtils{
+class UpdatableWeights(var weights: Array[Double]) extends Serializable with VectorParamUpdate{
 
   require(isPositive(weights), "some weights are negative or equal to zero")
   require(isInSimplex(weights),s"new weights don't sum 1: ${weights.mkString(",")}")
@@ -46,9 +46,9 @@ class UpdatableWeights(var weights: Array[Double]) extends Serializable with Vec
   
   * @param newWeights new weight vector
   */
-  def update(newWeights: BDV[Double]): Unit = {
+  def update(newParam: BDV[Double]): Unit = {
     // recenter soft weights to avoid under or overflow
-    val newW = newWeights.toArray
+    val newW = newParam.toArray
     require(isInSimplex(newW),s"new weights don't sum 1: ${newW.mkString(",")}")
     weights = newW
 

@@ -1,6 +1,6 @@
 package com.github.gradientgmm.optim.regularization
 
-import com.github.gradientgmm.components.UpdatableGaussianMixtureComponent
+import com.github.gradientgmm.components.UpdatableGaussianComponent
 
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 
@@ -20,7 +20,7 @@ trait Regularizer extends Serializable {
   * @return gradient
  
   */
-	def gaussianGradient(dist:UpdatableGaussianMixtureComponent): BDM[Double]
+	def gaussianGradient(dist:UpdatableGaussianComponent): BDM[Double]
 
 
 /**
@@ -40,7 +40,7 @@ trait Regularizer extends Serializable {
   * @return regularization value
  
   */
-	def evaluateDist(dist: UpdatableGaussianMixtureComponent): Double
+	def evaluateDist(dist: UpdatableGaussianComponent): Double
 
 /**
   * Evaluate regularization term for the weights vector

@@ -27,28 +27,28 @@ class NesterovGradientAscent extends Optimizer {
 
 	def direction[A](grad:A, utils: AcceleratedGradientUtils[A])(ops: ParameterOperations[A]): A = {
 
-		ops.sub(
-		  ops.rescale(grad,learningRate),
-		  ops.rescale(utils.momentum.get,gamma/(1+gamma)))
+		val delta = ops.rescale(grad,learningRate)
+
+		val res = ops.sub(
+		         delta,
+		        ops.rescale(utils.momentum.get,gamma/(1+gamma)))
+
+		utils.updateMomentum(delta)
+
+		res
+
 
 	}
 
 	override def getWeightsUpdate(current: BDV[Double], grad:BDV[Double], utils: AcceleratedGradientUtils[BDV[Double]]): BDV[Double] = {
-		
-		if(!utils.adamInfo.isDefined){
-			utils.initializeAdamInfo
-		}
 
 		if(!utils.momentum.isDefined){
-			utils.initializeMomentum
 			utils.updateMomentum(current)
 		}
 
-		utils.updateAdamInfo(fromSimplex(current) + grad * learningRate)
-
 		val update = toSimplex( (fromSimplex(current) + direction(grad,utils)(vectorOps)) * (1 + gamma))
 
-		utils.updateMomentum(utils.adamInfo.get)
+		utils.updateMomentum(current + utils.momentum.get)
 
 		update
 
@@ -56,21 +56,14 @@ class NesterovGradientAscent extends Optimizer {
 
 
 	override def getGaussianUpdate(current: BDM[Double], grad:BDM[Double], utils: AcceleratedGradientUtils[BDM[Double]]): BDM[Double] = {
-		
-		if(!utils.adamInfo.isDefined){
-			utils.initializeAdamInfo
-		}
 
 		if(!utils.momentum.isDefined){
-			utils.initializeMomentum
 			utils.updateMomentum(current)
 		}
 
-		utils.updateAdamInfo(current + grad * learningRate)
-
 		val update = (current + direction(grad,utils)(matrixOps)) * (1 + gamma)
 
-		utils.updateMomentum(utils.adamInfo.get)
+		utils.updateMomentum(current + utils.momentum.get)
 
 		update
 

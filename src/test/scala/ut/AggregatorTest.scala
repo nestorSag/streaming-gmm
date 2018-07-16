@@ -3,7 +3,7 @@ import org.scalatest.FlatSpec
 
 import com.github.gradientgmm.optim.algorithms.GradientAscent
 import com.github.gradientgmm.model.GradientAggregator
-import com.github.gradientgmm.components.UpdatableGaussianMixtureComponent
+import com.github.gradientgmm.components.UpdatableGaussianComponent
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, norm}
 
@@ -26,7 +26,7 @@ class AggregatorTest extends FlatSpec{
 	val clusterVars = Array.fill(2)(BDM.eye[Double](dim))
 
 	//val mixture = GradientBasedGaussianMixture(clusterWeights,clusterDists)
-	val clusterDists = clusterMeans.zip(clusterVars).map{ case(m,v) => UpdatableGaussianMixtureComponent(m,v)}
+	val clusterDists = clusterMeans.zip(clusterVars).map{ case(m,v) => UpdatableGaussianComponent(m,v)}
 
 	val optim = new GradientAscent()
 		.setLearningRate(0.5)

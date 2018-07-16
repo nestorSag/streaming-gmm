@@ -1,6 +1,6 @@
 package com.github.gradientgmm.model
 
-import com.github.gradientgmm.components.{UpdatableGaussianMixtureComponent, Utils}
+import com.github.gradientgmm.components.{UpdatableGaussianComponent, Utils}
 import com.github.gradientgmm.optim.algorithms.Optimizer 
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, sum}
@@ -81,7 +81,7 @@ object GradientAggregator {
   */
   def add(
       weights: Array[Double],
-      dists: Array[UpdatableGaussianMixtureComponent],
+      dists: Array[UpdatableGaussianComponent],
       optim: Optimizer,
       n: Double)
       (agg: GradientAggregator, y: BDV[Double]): GradientAggregator = {
@@ -116,7 +116,17 @@ object GradientAggregator {
     agg
   }
 
-  def getPosteriors(point: BDV[Double], dists: Array[UpdatableGaussianMixtureComponent], weights: Array[Double]): BDV[Double] = {
+/**
+  * compute posterior membership probabilities for a data point
+  *
+  * Used for reducing individual data points and aggregating the ir statistics
+  * @param point Data point
+  * @param dists Current model components
+  * @param weights current model's weights
+  * @return Vector of posterior membership probabilities
+ 
+  */
+  def getPosteriors(point: BDV[Double], dists: Array[UpdatableGaussianComponent], weights: Array[Double]): BDV[Double] = {
     val q = weights.zip(dists).map {
       case (weight, dist) =>  weight * dist.gConcavePdf(point) // <--q-logLikelihood
     }

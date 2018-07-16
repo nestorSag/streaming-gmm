@@ -1,6 +1,6 @@
 import org.scalatest.FlatSpec
 
-import com.github.gradientgmm.components.UpdatableGaussianMixtureComponent
+import com.github.gradientgmm.components.UpdatableGaussianComponent
 import com.github.gradientgmm.optim.regularization.ConjugatePrior
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, norm, det}
@@ -73,7 +73,7 @@ class ConjugatePriorTest extends FlatSpec {
       .setWeightConcentrationPar(1.0/k)
       .setK(k)
 
-    var testdist = UpdatableGaussianMixtureComponent(covdim,mu,cov) // when paramMat = regularizingMatrix
+    var testdist = UpdatableGaussianComponent(covdim,mu,cov) // when paramMat = regularizingMatrix
 
     val vectorWeight = new BDV(Array(1.0))
     //Tr(regMat*paramMat) = dim(regMat) = dim(paramMat) = covdim + 1
@@ -86,7 +86,7 @@ class ConjugatePriorTest extends FlatSpec {
     assert(math.pow(shouldBeZero,2) < errorTol)
 
     // when paramMat = identity, logdet should cancel out
-    testdist = UpdatableGaussianMixtureComponent(BDV.zeros[Double](covdim),BDM.eye[Double](covdim))
+    testdist = UpdatableGaussianComponent(BDV.zeros[Double](covdim),BDM.eye[Double](covdim))
 
     //logdet(paramMat) = log(1) = 0
     shouldBeZero = prior.evaluateDist(testdist) + prior.evaluateWeights(vectorWeight) - (- 0.5*trace(prior.regularizingMatrix))

@@ -1,6 +1,6 @@
 package com.github.gradientgmm.optim.regularization
 
-import com.github.gradientgmm.components.UpdatableGaussianMixtureComponent
+import com.github.gradientgmm.components.UpdatableGaussianComponent
 
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 
@@ -34,7 +34,7 @@ class LogBarrier extends Regularizer{
 
 	def weightsGradient(weights: BDV[Double]): BDV[Double] = BDV.zeros[Double](weights.length)
 
-	def gaussianGradient(dist: UpdatableGaussianMixtureComponent): BDM[Double] = {
+	def gaussianGradient(dist: UpdatableGaussianComponent): BDM[Double] = {
 
 		val lastCol = dist.paramMat(::,dist.paramMat.cols-1)
 
@@ -49,7 +49,7 @@ class LogBarrier extends Regularizer{
 		}
 	}
 
-	def evaluateDist(dist: UpdatableGaussianMixtureComponent): Double = {
+	def evaluateDist(dist: UpdatableGaussianComponent): Double = {
 		if(shift >0){
 			scale * (math.log(dist.detSigma - shift) + math.log(dist.getS) - dist.getS)
 		}else{

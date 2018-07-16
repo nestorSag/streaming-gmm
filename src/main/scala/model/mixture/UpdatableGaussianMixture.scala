@@ -1,6 +1,6 @@
 package com.github.gradientgmm.model
 
-import com.github.gradientgmm.components.{UpdatableGaussianMixtureComponent, UpdatableWeights, Utils}
+import com.github.gradientgmm.components.{UpdatableGaussianComponent, UpdatableWeights, Utils}
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 
@@ -21,11 +21,11 @@ import org.apache.spark.rdd.RDD
   */
 class UpdatableGaussianMixture(
   private[gradientgmm] var weights: UpdatableWeights,
-  private[gradientgmm] var gaussians: Array[UpdatableGaussianMixtureComponent]) extends Serializable {
+  private[gradientgmm] var gaussians: Array[UpdatableGaussianComponent]) extends Serializable {
 
 
   def getWeights: Array[Double] = weights.weights
-  def getGaussians: Array[UpdatableGaussianMixtureComponent] = gaussians
+  def getGaussians: Array[UpdatableGaussianComponent] = gaussians
 
 /**
   * number of componenrs
@@ -120,7 +120,7 @@ class UpdatableGaussianMixture(
   */
   private def computeSoftAssignments(
       pt: BDV[Double],
-      dists: Array[UpdatableGaussianMixtureComponent],
+      dists: Array[UpdatableGaussianComponent],
       weights: Array[Double],
       k: Int): Array[Double] = {
     val p = weights.zip(dists).map {

@@ -1,7 +1,7 @@
 import org.scalatest.{FunSuite}
 
 
-import com.github.gradientgmm.components.UpdatableGaussianMixtureComponent
+import com.github.gradientgmm.components.UpdatableGaussianComponent
 import com.github.gradientgmm.model.GradientBasedGaussianMixture
 import com.github.gradientgmm.optim.algorithms.GradientAscent
 

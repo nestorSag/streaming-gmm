@@ -67,7 +67,7 @@
 //     val means = Array(BDV(-1.0,0.0),BDV(0.0,-1.0),BDV(1.0,0.0))
 //     //val means = (1 to k).map{case i => BDV.rand(2)}.toArray
 //     val covs = (1 to k).map{case k => BDM.eye[Double](d)}.toArray
-//     val initialDists = means.zip(covs).map{case (m,s) => UpdatableGaussianMixtureComponent(m,s)}
+//     val initialDists = means.zip(covs).map{case (m,s) => UpdatableGaussianComponent(m,s)}
 
 //     // val optim = new GradientAscent()
 //     //  .setLearningRate(lr)

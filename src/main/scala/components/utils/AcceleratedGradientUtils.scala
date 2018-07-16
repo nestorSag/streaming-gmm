@@ -99,8 +99,10 @@ class VectorGradientUtils(
   *
  
   */
-trait VectorOptimUtils extends Serializable{
+trait VectorParamUpdate extends Serializable{
   val optimUtils: VectorGradientUtils
+
+  def update(newParam: BDV[Double]): Unit
 }
 
 /**
@@ -121,7 +123,8 @@ class MatrixGradientUtils(
   *
  
   */
-trait MatrixOptimUtils extends Serializable{
+trait MatrixParamUpdate extends Serializable{
   val optimUtils: MatrixGradientUtils
-}
 
+  def update(newParam: BDM[Double]): Unit
+}

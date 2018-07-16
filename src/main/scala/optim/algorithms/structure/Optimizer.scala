@@ -2,7 +2,7 @@ package com.github.gradientgmm.optim.algorithms
 
 import com.github.gradientgmm.optim.regularization.Regularizer
 import com.github.gradientgmm.optim.weights.{WeightsTransformation,SoftmaxWeightTransformation}
-import com.github.gradientgmm.components.{UpdatableGaussianMixtureComponent, AcceleratedGradientUtils}
+import com.github.gradientgmm.components.{UpdatableGaussianComponent, AcceleratedGradientUtils}
 
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV, sum}
 import breeze.numerics.sqrt
@@ -123,7 +123,7 @@ trait Optimizer extends Serializable{
   * @param point outer product of an augmented data point x => [x 1]
   * @param w prior responsibility of {point} by {dist}
   */
-	def gaussianGradient(dist: UpdatableGaussianMixtureComponent, point: BDM[Double], w: Double): BDM[Double] = {
+	def gaussianGradient(dist: UpdatableGaussianComponent, point: BDM[Double], w: Double): BDM[Double] = {
 
 		regularizer match{
 			case None => basicGaussianGradient(dist.paramMat,point,w) 
@@ -171,7 +171,7 @@ trait Optimizer extends Serializable{
   * @param dist Mixture component
   * @return regularization term value
   */
-	def evaluateRegularizationTerm(dist: UpdatableGaussianMixtureComponent): Double = {
+	def evaluateRegularizationTerm(dist: UpdatableGaussianComponent): Double = {
 
 		regularizer match{
 			case None => 0

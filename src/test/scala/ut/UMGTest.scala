@@ -1,13 +1,13 @@
 import org.scalatest.FlatSpec
 
-import com.github.gradientgmm.components.UpdatableGaussianMixtureComponent
+import com.github.gradientgmm.components.UpdatableGaussianComponent
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, norm, trace, det}
 
 import org.apache.spark.mllib.stat.distribution.MultivariateGaussian
 import org.apache.spark.mllib.linalg.{Matrices => SMS, Matrix => SM, DenseMatrix => SDM, Vector => SV, Vectors => SVS, DenseVector => SDV}
 
-// tests for UpdatableGaussianMixtureComponent class
+// tests for UpdatableGaussianComponent class
 
 class UMGTest extends FlatSpec {
   
@@ -23,7 +23,7 @@ class UMGTest extends FlatSpec {
 
   val mu = BDV.rand(covdim)
 
-  var umgdist = UpdatableGaussianMixtureComponent(mu,cov)
+  var umgdist = UpdatableGaussianComponent(mu,cov)
   val mldist = new MultivariateGaussian(SVS.dense(mu.toArray),SMS.dense(covdim,covdim,cov.toArray))
 
   val btp = BDV.rand(covdim) //breeze test point

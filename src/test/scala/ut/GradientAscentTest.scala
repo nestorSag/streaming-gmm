@@ -1,5 +1,5 @@
 import com.github.gradientgmm.optim.algorithms.GradientAscent
-import com.github.gradientgmm.components.UpdatableGaussianMixtureComponent
+import com.github.gradientgmm.components.UpdatableGaussianComponent
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, norm}
 
@@ -13,7 +13,7 @@ import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV,
 class GradientAscentTest extends OptimTestSpec{
 
 	var lr = 0.5
-	var current = UpdatableGaussianMixtureComponent(BDV.rand(dim),BDM.eye[Double](dim))
+	var current = UpdatableGaussianComponent(BDV.rand(dim),BDM.eye[Double](dim))
 	var optim = new GradientAscent().setLearningRate(lr)
 	val paramMat0 = current.paramMat
 		

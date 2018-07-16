@@ -1,6 +1,6 @@
 package com.github.gradientgmm.optim.regularization
 
-import com.github.gradientgmm.components.UpdatableGaussianMixtureComponent
+import com.github.gradientgmm.components.UpdatableGaussianComponent
 
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, sum}
 
@@ -107,7 +107,7 @@ class ConjugatePrior extends Regularizer{
 	var regularizingMatrix = buildRegMatrix(df,muPriorMean,sigmaPriorMean)
 
 
-	def gaussianGradient(dist:UpdatableGaussianMixtureComponent): BDM[Double] = {
+	def gaussianGradient(dist:UpdatableGaussianComponent): BDM[Double] = {
 		(this.regularizingMatrix - df*dist.paramMat)*0.5
 		//updateRegularizer(paramMat)
 	}
@@ -116,7 +116,7 @@ class ConjugatePrior extends Regularizer{
 		(BDV.ones[Double](k) - weights*k.toDouble)*weightConcentrationPar
 	}
 
-	def evaluateDist(dist: UpdatableGaussianMixtureComponent): Double = {
+	def evaluateDist(dist: UpdatableGaussianComponent): Double = {
 		- 0.5*(df*(dist.logDetSigma + math.log(dist.getS)) + symProdTrace(regularizingMatrix,dist.invParamMat))
 	}
 

@@ -1,7 +1,7 @@
 package com.github.gradientgmm.model
 
-import com.github.gradientgmm.components.{UpdatableGaussianMixtureComponent, UpdatableWeights, Utils}
-import com.github.gradientgmm.optim.algorithms.{Optimizer}
+import com.github.gradientgmm.components.{UpdatableGaussianComponent, UpdatableWeights, Utils}
+import com.github.gradientgmm.optim.algorithms.{Optimizer, GradientAscent}
 
 import breeze.linalg.{diag, eigSym, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, sum}
 import breeze.numerics.sqrt
@@ -26,7 +26,7 @@ import org.apache.log4j.Logger
   */
 class GradientBasedGaussianMixture private (
   w:  UpdatableWeights,
-  g: Array[UpdatableGaussianMixtureComponent],
+  g: Array[UpdatableGaussianComponent],
   var optimizer: Optimizer) extends UpdatableGaussianMixture(w,g) with Optimizable {
 
 
@@ -221,6 +221,22 @@ class GradientBasedGaussianMixture private (
 }
 
 object GradientBasedGaussianMixture{
+/**
+  * Creates a new {{{GradientBasedGaussianMixture}}} instance
+  * @param weights Array of weights
+  * @param gaussians Array of mixture components
+  * @param optimizer Optimizer object
+ 
+  */
+  def apply(
+    weights: Array[Double],
+    gaussians: Array[UpdatableGaussianComponent]): GradientBasedGaussianMixture = {
+
+    new GradientBasedGaussianMixture(
+      new UpdatableWeights(weights),
+      gaussians,
+      new GradientAscent())
+  }
 
 /**
   * Creates a new {{{GradientBasedGaussianMixture}}} instance
@@ -231,9 +247,13 @@ object GradientBasedGaussianMixture{
   */
   def apply(
     weights: Array[Double],
-    gaussians: Array[UpdatableGaussianMixtureComponent],
+    gaussians: Array[UpdatableGaussianComponent],
     optimizer: Optimizer): GradientBasedGaussianMixture = {
-    new GradientBasedGaussianMixture(new UpdatableWeights(weights),gaussians,optimizer)
+
+    new GradientBasedGaussianMixture(
+      new UpdatableWeights(weights),
+      gaussians,
+      optimizer)
   }
 
 /**
@@ -305,7 +325,7 @@ object GradientBasedGaussianMixture{
 
     new GradientBasedGaussianMixture(
       new UpdatableWeights(proportions.map{case p => p/(n+k)}), 
-      (0 to k-1).map{case i => UpdatableGaussianMixtureComponent(means(i),pseudoCov(i))}.toArray,
+      (0 to k-1).map{case i => UpdatableGaussianComponent(means(i),pseudoCov(i))}.toArray,
       optimizer)
 
   }
@@ -322,7 +342,13 @@ object GradientBasedGaussianMixture{
   * @param seed Random seed
   * @return Fitted model
   */
-  def fit(data: RDD[SV], optim: Optimizer, k: Int = 2, startingSampleSize: Int = 50, kMeansIters: Int = 20, seed: Int = 0): GradientBasedGaussianMixture = {
+  def fit(
+    data: RDD[SV], 
+    optim: Optimizer = new GradientAscent(), 
+    k: Int = 2, 
+    startingSampleSize: Int = 50,
+    kMeansIters: Int = 20, 
+    seed: Int = 0): GradientBasedGaussianMixture = {
     
     val model = initialize(
                   data,
