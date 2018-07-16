@@ -1,7 +1,7 @@
 package com.github.gradientgmm.model
 
 import com.github.gradientgmm.components.{UpdatableGaussianComponent, UpdatableWeights, Utils}
-import com.github.gradientgmm.optim.algorithms.{Optimizer, GradientAscent}
+import com.github.gradientgmm.optim.algorithms.{Optimizable, Optimizer, GradientAscent}
 
 import breeze.linalg.{diag, eigSym, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, sum}
 import breeze.numerics.sqrt
@@ -79,6 +79,9 @@ class GradientBasedGaussianMixture private (
         1.0
       }
 
+    //a bit of syntactic sugar
+    def toSimplex: BDV[Double] => BDV[Double] = optimizer.weightsOptimizer.toSimplex
+    def fromSimplex: BDV[Double] => BDV[Double] = optimizer.weightsOptimizer.fromSimplex
     val maxIter = optimizer.getMaxIter
     val convTol = optimizer.getConvergenceTol
 
@@ -107,8 +110,6 @@ class GradientBasedGaussianMixture private (
             Seq.tabulate(k)(i => (sampleStats.gaussianGradients(i), 
                                   gaussians(i)))
 
-
-
         // update gaussians
         var newDists = if (shouldDistribute) {
           // compute new gaussian parameters and regularization values in
@@ -118,7 +119,7 @@ class GradientBasedGaussianMixture private (
 
           val newDists = sc.parallelize(tuples, numPartitions).map { case (grad,dist) =>
 
-            val newPars = bcOptim.value.getGaussianUpdate(
+            val newPars = bcOptim.value.getUpdate(
                 dist.paramMat,
                 grad,
                 dist.optimUtils)
@@ -141,7 +142,7 @@ class GradientBasedGaussianMixture private (
             case (grad,dist) => 
 
             dist.update(
-              optimizer.getGaussianUpdate(
+              optimizer.getUpdate(
                 dist.paramMat,
                 grad,
                 dist.optimUtils))
@@ -156,12 +157,12 @@ class GradientBasedGaussianMixture private (
 
         gaussians = newDists
 
-        val newWeights = optimizer.getWeightsUpdate(
-              Utils.toBDV(weights.weights),
+        val newWeights = optimizer.getUpdate(
+              fromSimplex(Utils.toBDV(weights.weights)),
               sampleStats.weightsGradient,
               weights.optimUtils)
 
-        weights.update(newWeights)
+        weights.update(toSimplex(newWeights))
 
 
         oldLL = newLL // current becomes previous

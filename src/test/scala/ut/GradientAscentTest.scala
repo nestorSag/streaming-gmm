@@ -23,7 +23,7 @@ class GradientAscentTest extends OptimTestSpec{
 		for(i <- 1 to niter){
 			//println(trace((current.paramMat-targetParamMat)*(current.paramMat-targetParamMat)))
 			current.update(
-				optim.getGaussianUpdate(
+				optim.getUpdate(
 					current.paramMat,
 					optim.gaussianGradient(current,targetParamMat,1.0),//(targetParamMat - current.paramMat) * 0.5,
 					current.optimUtils))
@@ -49,9 +49,10 @@ class GradientAscentTest extends OptimTestSpec{
 
 		// below: deterministic calculation for gradient descent in expectation
 		// same as momentum gradient descent but with beta = 0
+
 		var x0 = toBDV(initialWeights)
 
-		var softx0 = optim.fromSimplex(x0)
+		var softx0 = fromSimplex(x0)
 
 		//calculate gradient descent in expectation
 		// this will be checked against the program's results below
@@ -60,7 +61,7 @@ class GradientAscentTest extends OptimTestSpec{
 			g(k-1) = 0.0 //k-1 free parameters due to restriction to to simplex
 			softx0 += g*lr
 
-			x0 = optim.toSimplex(softx0)
+			x0 = toSimplex(softx0)
 		}
 
 		// get results from program
@@ -69,11 +70,13 @@ class GradientAscentTest extends OptimTestSpec{
 			var currentWeights = new BDV(weightObj.weights)
 			//var delta = optim.direction(targetWeights,weightObj) * optim.getLearningRate
 			//weightObj.update(optim.toSimplex(currentWeights + delta))
-			weightObj.update(
-				optim.getWeightsUpdate(
-					currentWeights,
+
+			val newWeights = optim.getUpdate(
+					optim.fromSimplex(currentWeights),
 					optim.weightsGradient(targetWeights,currentWeights),
-					weightObj.optimUtils))
+					weightObj.optimUtils)
+
+			weightObj.update(optim.toSimplex(newWeights))
 
 		}
 

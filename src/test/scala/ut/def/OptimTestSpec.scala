@@ -5,7 +5,8 @@ import com.github.gradientgmm.components.UpdatableWeights
 import com.github.gradientgmm.optim.algorithms.ParameterOperations
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, sum}
-import breeze.numerics.sqrt
+import breeze.numerics.{sqrt, exp, log}
+
 
 
 trait OptimTestSpec extends FlatSpec{
@@ -37,17 +38,23 @@ trait OptimTestSpec extends FlatSpec{
   	}
 
   	val targetWeights = BDV.rand(k)
-	targetWeights /= sum(targetWeights)
+	  targetWeights /= sum(targetWeights)
 
-	val initialWeights = (1 to k).map{ case x => 1.0/k}.toArray
+	  val initialWeights = (1 to k).map{ case x => 1.0/k}.toArray
 
-	var weightObj = new UpdatableWeights(initialWeights)
+	  var weightObj = new UpdatableWeights(initialWeights)
 
+    def toSimplex(x: BDV[Double]): BDV[Double] = {
+      val y = exp(x)
+      y/sum(y)
+    }
 
+    def fromSimplex(x: BDV[Double]): BDV[Double] = {
+      val d = x.length
+        log(x/x(d-1))
+    }
 
-
-
-	val vectorOps = new ParameterOperations[BDV[Double]] {
+	implicit val vectorOps = new ParameterOperations[BDV[Double]] {
 
       def sum(x: BDV[Double], y: BDV[Double]): BDV[Double] = {x + y}
       def sumScalar(x: BDV[Double], z: Double): BDV[Double] = {x + z}
@@ -59,7 +66,7 @@ trait OptimTestSpec extends FlatSpec{
       def ewSqrt(x:BDV[Double]): BDV[Double] = {sqrt(x)}
   }
 
-  val matrixOps = new ParameterOperations[BDM[Double]] {
+  implicit val matrixOps = new ParameterOperations[BDM[Double]] {
 
       def sum(x: BDM[Double], y: BDM[Double]): BDM[Double] = {x + y}
       def sumScalar(x: BDM[Double], z: Double): BDM[Double] = {x + z}

@@ -5,7 +5,6 @@ import com.github.gradientgmm.optim.weights.{WeightsTransformation,SoftmaxWeight
 import com.github.gradientgmm.components.{UpdatableGaussianComponent, AcceleratedGradientUtils}
 
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV, sum}
-import breeze.numerics.sqrt
 
 
 import org.apache.spark.mllib.linalg.{Vector => SV}
@@ -21,11 +20,6 @@ trait Optimizer extends Serializable{
   * Optional regularization term
   */
 	protected var regularizer: Option[Regularizer] = None
-
-/**
-  * Calculates the mapping from and to the weights' Simplex (see [[https://en.wikipedia.org/wiki/Simplex]]) and the transformation's gradient
-  */
-	protected var weightsOptimizer: WeightsTransformation = new SoftmaxWeightTransformation()
 
 /**
   * Ascent procedure's learning rate
@@ -61,33 +55,10 @@ trait Optimizer extends Serializable{
 	protected var maxIter: Int = 100
 
 /**
-  * Linear Algebra operations necessary for computing updates for the parameters
-    
-  * This is to avoid duplicating code for Gaussian and Weights updates in the optimization
-  * algorithms' classes
- 
+  * Calculates the mapping from and to the weights' Simplex (see [[https://en.wikipedia.org/wiki/Simplex]]) and the transformation's gradient
   */
-  protected val vectorOps = new ParameterOperations[BDV[Double]] {
-    def sum(x: BDV[Double], y: BDV[Double]): BDV[Double] = {x + y}
-    def sumScalar(x: BDV[Double], z: Double): BDV[Double] = {x + z}
-    def rescale(x: BDV[Double], z: Double): BDV[Double] = {x*z}
-    def sub(x: BDV[Double], y: BDV[Double]): BDV[Double] = {x - y}
+  private[gradientgmm] var weightsOptimizer: WeightsTransformation = new SoftmaxWeightTransformation()
 
-    def ewProd(x: BDV[Double], y: BDV[Double]): BDV[Double] = {x *:* y}
-    def ewDiv(x: BDV[Double], y: BDV[Double]): BDV[Double] = {x /:/ y}
-    def ewSqrt(x:BDV[Double]): BDV[Double] = {sqrt(x)}
-  }
-
-  protected val matrixOps = new ParameterOperations[BDM[Double]] {
-    def sum(x: BDM[Double], y: BDM[Double]): BDM[Double] = {x + y}
-    def sumScalar(x: BDM[Double], z: Double): BDM[Double] = {x + z}
-    def rescale(x: BDM[Double], z: Double): BDM[Double] = {x*z}
-    def sub(x: BDM[Double], y: BDM[Double]): BDM[Double] = {x - y}
-
-    def ewProd(x: BDM[Double], y: BDM[Double]): BDM[Double] = {x *:* y}
-    def ewDiv(x: BDM[Double], y: BDM[Double]): BDM[Double] = {x /:/ y}
-    def ewSqrt(x:BDM[Double]): BDM[Double] = {sqrt(x)}
-  }
 
  /**
   * Shrink {learningRate} by {shrinkageRate}
@@ -195,8 +166,9 @@ trait Optimizer extends Serializable{
 
   }
 
+
 /**
-  * Compute full updates for the weights. Usually this has the form X_t + alpha * direction(X_t)
+  * Compute full updates for the model's parameters. Usually this has the form X_t + alpha * direction(X_t)
   * but it differs for some algorithms, e.g. Nesterov's gradient ascent.
   *
   * @param current Current parameter values
@@ -208,31 +180,11 @@ trait Optimizer extends Serializable{
   */
 
 
-	def getWeightsUpdate(current: BDV[Double], grad:BDV[Double], utils: AcceleratedGradientUtils[BDV[Double]]): BDV[Double] = {
-		
-		toSimplex(fromSimplex(current) + direction(grad,utils)(vectorOps) * learningRate)
+  def getUpdate[A](current: A, grad:A, utils: AcceleratedGradientUtils[A])(implicit ops: ParameterOperations[A]): A = {
+    
+    ops.sum(current,ops.rescale(direction(grad,utils)(ops),learningRate))
 
-	}
-
-
-/**
-  * Compute full updates for the Gaussian parameters. Usually this has the form X_t + alpha * direction(X_t)
-  * but it differs for some algorithms, e.g. Nesterov's gradient ascent.
-  *
-  * @param current Current parameter values
-  * @param grad Current batch gradient
-  * @param utils Wrapper for accelerated gradient ascent utilities
-  * @param ops Deffinitions for algebraic operations for the apropiate data structure, e.g. vector or matrix.
-  * .
-  * @return updated parameter values
-  */
-
-
-	def getGaussianUpdate(current: BDM[Double], grad:BDM[Double], utils: AcceleratedGradientUtils[BDM[Double]]): BDM[Double] = {
-		
-		current + direction(grad,utils)(matrixOps) * learningRate
-
-	}
+  }
 
 /**
   * compute the ascent direction.
@@ -326,21 +278,4 @@ trait Optimizer extends Serializable{
     output
   }
 
-}
-
-
-/**
-  * Contains common mathematical operations that can be performed in both matrices and vectors.
-  * Its purpose is avoid duplicating code in the optimization algorithms' classes
-  */
-trait ParameterOperations[A] extends Serializable{
-
-  def sum(x: A, y: A): A
-  def sumScalar(x:A,z:Double): A
-  def rescale(x: A, d: Double): A
-  def sub(x:A, y:A): A
-
-  def ewProd(x:A,y:A): A
-  def ewDiv(x:A,y:A): A
-  def ewSqrt(x:A): A
 }

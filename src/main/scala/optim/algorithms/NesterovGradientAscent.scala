@@ -36,38 +36,22 @@ class NesterovGradientAscent extends Optimizer {
 		utils.updateMomentum(delta)
 
 		res
-
-
 	}
 
-	override def getWeightsUpdate(current: BDV[Double], grad:BDV[Double], utils: AcceleratedGradientUtils[BDV[Double]]): BDV[Double] = {
-
-		if(!utils.momentum.isDefined){
+	override def getUpdate[A](current: A, grad:A, utils: AcceleratedGradientUtils[A])(implicit ops: ParameterOperations[A]): A = {
+    
+        if(!utils.momentum.isDefined){
 			utils.updateMomentum(current)
 		}
 
-		val update = toSimplex( (fromSimplex(current) + direction(grad,utils)(vectorOps)) * (1 + gamma))
+		//val update = (current + direction(grad,utils)(ops)) * (1 + gamma)
+		val update = ops.rescale(ops.sum(current,direction(grad,utils)(ops)),1+gamma)
 
-		utils.updateMomentum(current + utils.momentum.get)
-
-		update
-
-	}
-
-
-	override def getGaussianUpdate(current: BDM[Double], grad:BDM[Double], utils: AcceleratedGradientUtils[BDM[Double]]): BDM[Double] = {
-
-		if(!utils.momentum.isDefined){
-			utils.updateMomentum(current)
-		}
-
-		val update = (current + direction(grad,utils)(matrixOps)) * (1 + gamma)
-
-		utils.updateMomentum(current + utils.momentum.get)
+		utils.updateMomentum(ops.sum(current,utils.momentum.get))
 
 		update
 
-	}
+  }
 
 	
 }

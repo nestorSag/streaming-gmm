@@ -36,7 +36,7 @@ class MomentumTest extends OptimTestSpec{
 
 			//current.update(current.paramMat + optim.direction(current,targetParamMat, 1.0) * optim.getLearningRate)
 			current.update(
-				optim.getGaussianUpdate(
+				optim.getUpdate(
 					current.paramMat,
 					optim.gaussianGradient(current,targetParamMat,1.0),
 					current.optimUtils))
@@ -79,11 +79,12 @@ class MomentumTest extends OptimTestSpec{
 			//var delta = optim.direction(targetWeights,weightObj) * optim.getLearningRate
 			
 			//weightObj.update(optim.toSimplex(currentWeights + delta))
-			weightObj.update(
-				optim.getWeightsUpdate(
-					currentWeights,
+			val newWeights = optim.getUpdate(
+					fromSimplex(currentWeights),
 					optim.weightsGradient(targetWeights,currentWeights),
-					weightObj.optimUtils))
+					weightObj.optimUtils)
+			
+			weightObj.update(toSimplex(newWeights))
 		}
 
 		var vecdiff =  x0 - toBDV(weightObj.weights)
