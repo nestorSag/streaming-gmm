@@ -2,7 +2,7 @@ import org.scalatest.FlatSpec
 
 
 import com.github.gradientgmm.optim.algorithms.GradientAscent
-import com.github.gradientgmm.model.GradientAggregator
+import com.github.gradientgmm.models.GradientAggregator
 import com.github.gradientgmm.components.UpdatableGaussianComponent
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, norm}

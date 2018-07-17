@@ -1,4 +1,4 @@
-package com.github.gradientgmm.model
+package com.github.gradientgmm.models
 
 import com.github.gradientgmm.components.{UpdatableGaussianComponent, UpdatableWeights, Utils}
 import com.github.gradientgmm.optim.algorithms.{Optimizable, Optimizer, GradientAscent}
@@ -24,7 +24,7 @@ import org.apache.log4j.Logger
   * @param optim Optimization object
  
   */
-class GradientGaussianMixture private (
+class GradientGaussianMixture private[models] (
   w:  UpdatableWeights,
   g: Array[UpdatableGaussianComponent],
   var optim: Optimizer) extends UpdatableGaussianMixture(w,g) with Optimizable {
@@ -204,6 +204,14 @@ class GradientGaussianMixture private (
         case g => new SMG(
           SVS.dense(g.getMu.toArray),
           SMS.dense(d,d,g.getSigma.toArray))})
+  }
+
+/**
+  * Create a StreamingGaussianMixture object using the model's current state 
+ 
+  */
+  def streamingModel: StreamingGaussianMixture = {
+    StreamingGaussianMixture(weights.weights,gaussians,optim)
   }
 
 

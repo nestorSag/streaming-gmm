@@ -2,7 +2,7 @@ import org.scalatest.{FunSuite}
 
 
 import com.github.gradientgmm.components.UpdatableGaussianComponent
-import com.github.gradientgmm.model.GradientGaussianMixture
+import com.github.gradientgmm.models.GradientGaussianMixture
 import com.github.gradientgmm.optim.algorithms.GradientAscent
 
 import org.apache.spark.{SparkConf, SparkContext}

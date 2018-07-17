@@ -1,4 +1,4 @@
-package com.github.gradientgmm.model
+package com.github.gradientgmm.models
 
 import com.github.gradientgmm.components.{UpdatableGaussianComponent, UpdatableWeights, Utils}
 
@@ -19,7 +19,7 @@ import org.apache.spark.rdd.RDD
   * @param optimizer Optimization object
  
   */
-class UpdatableGaussianMixture(
+private[models] class UpdatableGaussianMixture(
   private[gradientgmm] var weights: UpdatableWeights,
   private[gradientgmm] var gaussians: Array[UpdatableGaussianComponent]) extends Serializable {
 
