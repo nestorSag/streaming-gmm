@@ -66,7 +66,7 @@ class UpdatableWeights(var weights: Array[Double]) extends Serializable with Vec
   }
 
 /**
-  * Checks that the initial weight vector does not contains any single negative or null weight element, in which case it returns {{{false}}}
+  * Checks that the initial weight vector does not contains any single negative or null weight element, in which case it returns false
   * @param w weight vector
 
   */

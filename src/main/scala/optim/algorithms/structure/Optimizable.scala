@@ -7,13 +7,13 @@ import org.apache.spark.mllib.linalg.{Vector => SV}
 import org.apache.spark.rdd.RDD
 
 /**
-  * Contains the basic functionality for an object to be modified by {{{Optimizer}}}
+  * Contains the basic functionality for an object to be modified by Optimizer
 
   */
 trait Optimizable extends Serializable {
 
 /**
-  * Minibatch size for each iteration in the ascent procedure. If {{{None}}}, it performs
+  * Minibatch size for each iteration in the ascent procedure. If None, it performs
   * full-batch optimization
   */
   protected var batchSize: Option[Int] = None

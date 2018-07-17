@@ -9,8 +9,8 @@ import org.apache.spark.mllib.linalg.{Matrices => SMS, Matrix => SM, DenseMatrix
   *
   * For an arbitrary Gaussian distribution, its g-concave reformulation have zero mean and an
   * augmented covariance matrix which is a function of the original mean, covariance matrix
-  * and an additional positive scalar {{{s}}}. Original data points {{{x}}} are mapped to 
-  * {{{y = [x 1]}}} to be evaluated under the new distribution. When {{{s = 1}}}, the density
+  * and an additional positive scalar s. Original data points x are mapped to 
+  * y = [x 1] to be evaluated under the new distribution. When s = 1, the density
   * of the original distirbution and the reformulation are equal for all points.
 
   * @param s Positive scalar

@@ -71,11 +71,11 @@ object FitTestData{
     val covs = (1 to k).map{case k => BDM.eye[Double](d)}.toArray
     val initialDists = means.zip(covs).map{case (m,s) => UpdatableGaussianComponent(m,s)}
 
-    val optim = new GradientAscent()
+    val optim = new NesterovGradientAscent()
      .setLearningRate(lr)
      .setShrinkageRate(shrinkageRate)
      .setMinLearningRate(minLr)
-     .setRegularizer(new ConjugatePrior(x.size,3))
+     .setRegularizer(new LogBarrier().setScale(1.0))
 
     // val optim = new MomentumGradientAscent()
     //   .setBeta(0.5)
@@ -118,4 +118,4 @@ object FitTestData{
 //     FitTestData.run
 //     assert(true)
 //   }
-//}
+// }

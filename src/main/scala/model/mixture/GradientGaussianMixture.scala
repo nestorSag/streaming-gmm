@@ -166,7 +166,7 @@ class GradientGaussianMixture private (
 
         val newWeights = optim.getUpdate(
               fromSimplex(Utils.toBDV(weights.weights)),
-              sampleStats.weightsGradient / ebs, //aberage gradients
+              sampleStats.weightsGradient / ebs, //average gradients
               weights.optimUtils)
 
         weights.update(toSimplex(newWeights))
@@ -215,7 +215,7 @@ class GradientGaussianMixture private (
 
 
 /**
-  * take sample for the current mini-batch, or pass the whole dataset if {{{optim.batchSize = None}}}
+  * take sample for the current mini-batch, or pass the whole dataset if optim.batchSize = None
  
   */
   private def batch(data: RDD[BDV[Double]]): RDD[BDV[Double]] = {
@@ -230,7 +230,7 @@ class GradientGaussianMixture private (
 
 object GradientGaussianMixture{
 /**
-  * Creates a new {{{GradientGaussianMixture}}} instance
+  * Creates a new GradientGaussianMixture instance
   * @param weights Array of weights
   * @param gaussians Array of mixture components
   * @param optim Optimizer object
@@ -247,7 +247,7 @@ object GradientGaussianMixture{
   }
 
 /**
-  * Creates a new {{{GradientGaussianMixture}}} instance
+  * Creates a new GradientGaussianMixture instance
   * @param weights Array of weights
   * @param gaussians Array of mixture components
   * @param optim Optimizer object
@@ -265,7 +265,7 @@ object GradientGaussianMixture{
   }
 
 /**
-  * Creates a new {{{GradientGaussianMixture}}} instance initialized with the
+  * Creates a new GradientGaussianMixture instance initialized with the
   * results of a K-means model fitted with a sample of the data
   * @param data training data in the form of an RDD of Spark vectors
   * @param optim Optimizer object
@@ -341,10 +341,13 @@ object GradientGaussianMixture{
   /**
   * Fit a Gaussian Mixture Model (see [[https://en.wikipedia.org/wiki/Mixture_model#Gaussian_mixture_model]]).
   * The model is initialized using a K-means algorithm over a small sample and then 
-  * fitting the resulting parameters to the data using this {{{GMMOptimization}}} object
+  * fitting the resulting parameters to the data using this {GMMOptimization} object
   * @param data Data to fit the model
   * @param optim Optimization algorithm
   * @param k Number of mixture components (clusters)
+  * @param batchSize number of samples processed per iteration
+  * @param maxIter maximum number of gradient ascent steps allowed
+  * @param convTol log-likelihood change tolerance for stopping criteria
   * @param startingSampleSize Sample size for the K-means algorithm
   * @param kMeansIters Number of iterations allowed for the K-means algorithm
   * @param seed Random seed
@@ -353,7 +356,10 @@ object GradientGaussianMixture{
   def fit(
     data: RDD[SV], 
     optim: Optimizer = new GradientAscent(), 
-    k: Int = 2, 
+    k: Int = 2,
+    batchSize: Option[Int] = None,
+    maxIter: Int = 100,
+    convTol: Double = 1e-6, 
     startingSampleSize: Int = 50,
     kMeansIters: Int = 20, 
     seed: Int = 0): GradientGaussianMixture = {
@@ -365,8 +371,15 @@ object GradientGaussianMixture{
                   startingSampleSize,
                   kMeansIters,
                   seed)
-        
-    model.step(data)
+    
+    if(batchSize.isDefined){
+      model.setBatchSize(batchSize.get)
+    }
+
+    model
+    .setMaxIter(maxIter)
+    .setConvergenceTol(convTol)
+    .step(data)
 
     model
   }

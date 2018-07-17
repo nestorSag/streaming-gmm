@@ -28,7 +28,7 @@ trait Optimizer extends Serializable{
 
 /**
   * Rate at which the learning rate is decreased as the number of iterations grow.
-  * After {{{t}}} iterations the learning rate will be {{{shrinkageRate^t * learningRate}}}
+  * After t iterations the learning rate will be shrinkageRate^t * learningRate
   */
   protected var shrinkageRate: Double = 0.95
 

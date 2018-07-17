@@ -52,7 +52,7 @@ class UpdatableGaussianComponent private(
 object UpdatableGaussianComponent {
 
 /**
-  * Creates an {{{UpdatableGaussianComponent}}} instance.
+  * Creates an UpdatableGaussianComponent instance.
 
 
   * @param s Positive scalar
@@ -65,7 +65,7 @@ object UpdatableGaussianComponent {
   }
 
 /**
-  * Creates an {{{UpdatableGaussianComponent}}} instance with default parameter {{{s = 1}}}.
+  * Creates an UpdatableGaussianComponent instance with default parameter s = 1.
 
 
   * @param mu Mean vector
@@ -77,7 +77,7 @@ object UpdatableGaussianComponent {
   }
 
 /**
-  * Creates an {{{UpdatableGaussianComponent}}} instance with default parameter {{{s = 1}}}.
+  * Creates an UpdatableGaussianComponent instance with default parameter s = 1.
 
 
   * @param mu Mean vector
@@ -89,7 +89,7 @@ object UpdatableGaussianComponent {
   }
 
 /**
-  * Creates an {{{UpdatableGaussianComponent}}} instance.
+  * Creates an UpdatableGaussianComponent instance.
 
 
   * @param s Positive scalar
@@ -105,7 +105,7 @@ object UpdatableGaussianComponent {
   }
 
 /**
-  * Creates an {{{UpdatableGaussianComponent}}} instance from a block matrix.
+  * Creates an UpdatableGaussianComponent instance from a block matrix.
 
 
   * @param mat Matrix with augmented parameter matrix structure
@@ -123,7 +123,7 @@ object UpdatableGaussianComponent {
   }
 
 /**
-  * Creates an {{{UpdatableGaussianComponent}}} instance from a [[[https://spark.apache.org/docs/2.1.1/api/scala/index.html#org.apache.spark.ml.stat.distribution.MultivariateGaussian MultivariateGaussian]]] instance
+  * Creates an UpdatableGaussianComponent instance from a [[[https://spark.apache.org/docs/2.1.1/api/scala/index.html#org.apache.spark.ml.stat.distribution.MultivariateGaussian MultivariateGaussian]]] instance
   * instance
 
   * @param g Spark's Multivariate Gaussian instance

@@ -7,7 +7,7 @@ import breeze.numerics.{exp, log}
 /**
   * Implements a Softmax mapping to optimize the weight vector
 
-  *The precise mapping is {{{w_i => log(w_i/w_last)}}} and is an implementation of the procedure 
+  *The precise mapping is w_i => log(w_i/w_last) and is an implementation of the procedure 
   * described in ''Hosseini, Reshad & Sra, Suvrit. (2017). An Alternative to EM for Gaussian Mixture Models: Batch and Stochastic Riemannian Optimization''
   * (see [[https://arxiv.org/abs/1706.03267]]).
 
@@ -15,7 +15,7 @@ import breeze.numerics.{exp, log}
 class SoftmaxWeightTransformation extends WeightsTransformation {
 	
 	/**
-  * upper and lower bounds for allowed values before applying {{{toSimplex}}}
+  * upper and lower bounds for allowed values before applying toSimplex
 
   */
 	private val (upperBound,lowerBound) = findBounds
@@ -47,7 +47,7 @@ class SoftmaxWeightTransformation extends WeightsTransformation {
 	}
 
 /**
-  * Use the machine's epsilon to find maximum and minimum allowed values before applying {{{toSimplex}}}
+  * Use the machine's epsilon to find maximum and minimum allowed values before applying toSimplex
 
   */
 	private def findBounds: (Double,Double) = {

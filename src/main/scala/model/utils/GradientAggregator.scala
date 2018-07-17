@@ -31,7 +31,7 @@ class GradientAggregator(
   val k = gaussianGradients.length
 
 /**
-  * Adder for different {{{GradientAggregator}}}
+  * Adder for different GradientAggregator
   *
   * Used for further aggregation between each worker's object
  

@@ -7,7 +7,7 @@ import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV, max,
 /**
   * Implements a ratio mapping to optimize the weight vector
 
-  * The precise mapping is {{{w_i => w_i/w_last}}}
+  * The precise mapping is w_i => w_i/w_last
 
   */
 class RatioWeightTransformation extends WeightsTransformation {

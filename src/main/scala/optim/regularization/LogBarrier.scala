@@ -5,7 +5,7 @@ import com.github.gradientgmm.components.UpdatableGaussianComponent
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 
 /**
-  * Regularization term of the form {{{scale*log(det(cov) - shift)}}}
+  * Regularization term of the form scale*log(det(cov) - shift)
 
   */
 
