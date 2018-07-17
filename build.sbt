@@ -44,9 +44,9 @@ libraryDependencies  ++= Seq(
   "org.scalanlp" % "breeze-viz_2.11" % "0.13.2",
 
   // spark dependencies
-  "org.apache.spark" % "spark-mllib_2.11" % "2.2.1",
+  "org.apache.spark" % "spark-mllib_2.11" % "2.3.1",
 
-  "org.apache.spark" % "spark-core_2.11" % "2.2.1"
+  "org.apache.spark" % "spark-core_2.11" % "2.3.1"
 
   //logging dependencies
   //"ch.qos.logback" % "logback-classic" % "1.2.3",
@@ -64,7 +64,9 @@ dependencyOverrides ++= Seq(
 
   "commons-io" % "commons-io" % "2.4",
 
-  "com.google.guava" % "guava" % "11.0.2"
+  "com.google.guava" % "guava" % "11.0.2",
+
+  "com.google.code.findbugs" % "jsr305" % "3.0.2"
 )
 
 
