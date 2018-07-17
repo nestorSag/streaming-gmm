@@ -31,13 +31,12 @@ class ConjugatePriorTest extends FlatSpec {
 
   "regularizingMatrix" should "be well-formed" in { 
 
-    // same kind of structure as un dist.ParamMat
+    // same kind of structure as dist.ParamMat
     
-    var prior = new ConjugatePrior()
+    var prior = new ConjugatePrior(covdim,k)
       .setDf(covdim)
       .setGaussianParsPriorMeans(mu,cov)
       .setWeightConcentrationPar(1.0/k)
-      .setK(k)
 
     val lcv = BDV(Array.fill(covdim)(0.0) ++ Array(1.0)) // last canonical vector e_d = (0,...,0,1)
 
@@ -67,11 +66,10 @@ class ConjugatePriorTest extends FlatSpec {
 
 
     // -df/2*log det paramMat - 0.5*trace(psi*sInv)
-    var prior = new ConjugatePrior()
+    var prior = new ConjugatePrior(covdim,k)
       .setDf(covdim)
       .setGaussianParsPriorMeans(mu,cov)
       .setWeightConcentrationPar(1.0/k)
-      .setK(k)
 
     var testdist = UpdatableGaussianComponent(covdim,mu,cov) // when paramMat = regularizingMatrix
 
@@ -95,11 +93,10 @@ class ConjugatePriorTest extends FlatSpec {
 
     // when paramMat = identity and regularizingMatrix = almost identity (last diagonal entry = df, which cant equal one
     // if regularization is a true conjugate prior unless the problem's dimensionality is one)
-    prior = new ConjugatePrior()
+    prior = new ConjugatePrior(covdim,k)
       .setDf(covdim)
       .setGaussianParsPriorMeans(BDV.zeros[Double](covdim),BDM.eye[Double](covdim))
       .setWeightConcentrationPar(1.0/k)
-      .setK(k)
 
 
     shouldBeZero = prior.evaluateDist(testdist) + prior.evaluateWeights(vectorWeight) - (- 0.5*(covdim+testdist.getS*prior.getDf))

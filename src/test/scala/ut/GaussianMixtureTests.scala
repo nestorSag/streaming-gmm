@@ -2,7 +2,7 @@ import org.scalatest.{FunSuite}
 
 
 import com.github.gradientgmm.components.UpdatableGaussianComponent
-import com.github.gradientgmm.model.GradientBasedGaussianMixture
+import com.github.gradientgmm.model.GradientGaussianMixture
 import com.github.gradientgmm.optim.algorithms.GradientAscent
 
 import org.apache.spark.{SparkConf, SparkContext}
@@ -16,7 +16,7 @@ import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV,
 trait SparkTester extends FunSuite{
     var sc : SparkContext = _
 
-    val conf = new SparkConf().setAppName("GradientBasedGaussianMixture-test").setMaster("local[4]")
+    val conf = new SparkConf().setAppName("GradientGaussianMixture-test").setMaster("local[4]")
 
     val errorTol = 1e-8
     val k = 3
@@ -25,7 +25,7 @@ trait SparkTester extends FunSuite{
     val data = sc.textFile("src/test/resources/testdata.csv")// Trains Gaussian Mixture Model
     val parsedData = data.map(s => SVS.dense(s.trim.split(' ').map(_.toDouble))).cache()
 
-    val mygmm = GradientBasedGaussianMixture.initialize(parsedData,new GradientAscent(),k,50,20,0)
+    val mygmm = GradientGaussianMixture.initialize(parsedData,new GradientAscent(),k,50,20,0)
 
     val weights = mygmm.getWeights
     val gaussians = mygmm.getGaussians.map{

@@ -15,7 +15,7 @@ import org.apache.spark.rdd.RDD
   * Optimization algorithms like Stochastic Gradient Ascent are implementations of this trait
   */
 trait Optimizer extends Serializable{
-
+  
 /**
   * Optional regularization term
   */
@@ -39,27 +39,15 @@ trait Optimizer extends Serializable{
 	protected var minLearningRate: Double = 1e-2
 
 /**
-  * Minibatch size for each iteration in the ascent procedure. If {{{None}}}, it performs
-  * full-batch optimization
-  */
-	protected var batchSize: Option[Int] = None
-
-/**
-  * Error tolerance in log-likelihood for the stopping criteria
-  */
-	protected var convergenceTol: Double = 1e-6
-
-/**
-  * Maximum number of iterations allowed
-  */
-	protected var maxIter: Int = 100
-
-/**
   * Calculates the mapping from and to the weights' Simplex (see [[https://en.wikipedia.org/wiki/Simplex]]) and the transformation's gradient
   */
   private[gradientgmm] var weightsOptimizer: WeightsTransformation = new SoftmaxWeightTransformation()
 
-
+/**
+  * Expected batch size. This is needed to correctly weight regularizers' contributions to
+  * gradients and loss function
+  */
+  private var n: Double = 1.0
  /**
   * Shrink {learningRate} by {shrinkageRate}
   *
@@ -96,11 +84,13 @@ trait Optimizer extends Serializable{
   */
 	def gaussianGradient(dist: UpdatableGaussianComponent, point: BDM[Double], w: Double): BDM[Double] = {
 
-		regularizer match{
-			case None => basicGaussianGradient(dist.paramMat,point,w) 
-			case Some(_) => basicGaussianGradient(dist.paramMat,point,w) +
-				regularizer.get.gaussianGradient(dist)
-		}
+    var grad = basicGaussianGradient(dist.paramMat,point,w)
+
+    if(regularizer.isDefined){
+      grad += regularizer.get.gaussianGradient(dist)/n
+    }
+
+    grad
 
 	}
 
@@ -124,13 +114,13 @@ trait Optimizer extends Serializable{
   */
 	def weightsGradient(posteriors: BDV[Double], weights: BDV[Double]): BDV[Double] = {
 
-		var grads = regularizer match {
-			case None => basicWeightsGradient(posteriors,weights)
-			case Some(_) => basicWeightsGradient(posteriors,weights) +
-		 			regularizer.get.weightsGradient(weights)
-		}
+    var grads = basicWeightsGradient(posteriors,weights)
 
-		grads(weights.length - 1) = 0.0
+    if(regularizer.isDefined){
+      grads += regularizer.get.weightsGradient(weights)/n
+    }
+
+    grads(weights.length - 1) = 0.0 // last weight's auxiliar variable is fixed because of the simplex cosntraint
 
 		grads
 
@@ -146,7 +136,7 @@ trait Optimizer extends Serializable{
 
 		regularizer match{
 			case None => 0
-			case Some(_) => regularizer.get.evaluateDist(dist)
+			case Some(_) => regularizer.get.evaluateDist(dist)/n
 		}
 
 	}
@@ -161,7 +151,7 @@ trait Optimizer extends Serializable{
 
     regularizer match{
       case None => 0
-      case Some(_) => regularizer.get.evaluateWeights(weights)
+      case Some(_) => regularizer.get.evaluateWeights(weights)/n
     }
 
   }
@@ -225,35 +215,8 @@ trait Optimizer extends Serializable{
 		this
 	}
 
-	def getBatchSize: Option[Int] = batchSize
-
-	def setBatchSize(n: Int): this.type = {
-		require(n>0,"n must be a positive integer")
-		batchSize = Option(n)
-		this
-	}
-
 	def getShrinkageRate: Double = { 
 		shrinkageRate
-	}
-
-    def getConvergenceTol: Double = convergenceTol
-
-	def setConvergenceTol(x: Double): this.type = {
-		require(x>0,"convergenceTol must be positive")
-		convergenceTol = x
-		this
-	}
-
-
-	def setMaxIter(m: Int): this.type = {
-		require(m > 0 ,s"maxIter needs to be a positive integer; got ${m}")
-		maxIter = m
-		this
-	}
-
-	def getMaxIter: Int = {
-		maxIter
 	}
 
   def setWeightsOptimizer(t: WeightsTransformation): this.type = {
@@ -265,6 +228,13 @@ trait Optimizer extends Serializable{
     regularizer = Option(r)
     this
   }
+
+  def setN(n: Double): this.type = {
+    this.n = n
+    this
+  }
+
+  def getN = n
 
   override def toString: String = {
 

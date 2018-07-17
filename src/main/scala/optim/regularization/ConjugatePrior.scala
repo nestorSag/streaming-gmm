@@ -18,35 +18,34 @@ import org.apache.log4j.Logger
 
   * See [[https://en.wikipedia.org/wiki/Dirichlet_distribution]]
 
-  */
-class ConjugatePrior extends Regularizer{
-
-/**
-  * Number of mixture components
+  * @param dim Data dimensionality
 
   */
-	private var k: Int = 2
+class ConjugatePrior(val dim: Int, var k: Int) extends Regularizer{
+
+	require(dim>0,"dimensionality must be a positive integer")
+	require(k>0,"number of clusters must be a positive integer")
 
 /**
   * prior mean for components' mean vector
 
   */
-	private var muPriorMean: BDV[Double] = BDV.zeros[Double](k)
+	private var muPriorMean: BDV[Double] = BDV.zeros[Double](dim)
 
 /**
   * prior mean for components' covariance matrix
 
   */
-	private var sigmaPriorMean: BDM[Double] = BDM.eye[Double](k)
+	private var sigmaPriorMean: BDM[Double] = BDM.eye[Double](dim)
 
 /**
   * Degrees of freedom for the covariance prior
 
   */
-	private var df: Double = 3 
+	private var df: Double = dim + 1
 
 /**
-  * COncentration parameter for the weight vector prior
+  * Concentration parameter for the weight vector prior
 
   */
 	private var weightConcentrationPar: Double = 0.5 

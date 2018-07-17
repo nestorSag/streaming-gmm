@@ -13,17 +13,33 @@ import org.apache.spark.rdd.RDD
 trait Optimizable extends Serializable {
 
 /**
+  * Minibatch size for each iteration in the ascent procedure. If {{{None}}}, it performs
+  * full-batch optimization
+  */
+  protected var batchSize: Option[Int] = None
+
+/**
+  * Error tolerance in log-likelihood for the stopping criteria
+  */
+  protected var convergenceTol: Double = 1e-6
+
+/**
+  * Maximum number of iterations allowed
+  */
+  protected var maxIter: Int = 100
+
+/**
   * optimizer object
 
   */
-  protected var optimizer: Optimizer
+  protected var optim: Optimizer
 
-  def setOptimizer(optim: Optimizer): this.type = {
-    optimizer = optim
+  def setOptim(optim: Optimizer): this.type = {
+    this.optim = optim
     this
   }
 
-  def getOpimizer: Optimizer = optimizer
+  def getOptim: Optimizer = optim
 
 /**
   * Perform a gradient-based optimization step
@@ -58,6 +74,34 @@ trait Optimizable extends Serializable {
     def ewProd(x: BDM[Double], y: BDM[Double]): BDM[Double] = {x *:* y}
     def ewDiv(x: BDM[Double], y: BDM[Double]): BDM[Double] = {x /:/ y}
     def ewSqrt(x:BDM[Double]): BDM[Double] = {sqrt(x)}
+  }
+
+
+  def getConvergenceTol: Double = convergenceTol
+
+  def setConvergenceTol(x: Double): this.type = {
+    require(x>0,"convergenceTol must be positive")
+    convergenceTol = x
+    this
+  }
+
+
+  def setMaxIter(m: Int): this.type = {
+    require(m > 0 ,s"maxIter needs to be a positive integer; got ${m}")
+    maxIter = m
+    this
+  }
+
+  def getMaxIter: Int = {
+    maxIter
+  }
+
+  def getBatchSize: Option[Int] = batchSize
+
+  def setBatchSize(n: Int): this.type = {
+    require(n>0,"n must be a positive integer")
+    batchSize = Option(n)
+    this
   }
 
 }

@@ -82,8 +82,7 @@ object GradientAggregator {
   def add(
       weights: Array[Double],
       dists: Array[UpdatableGaussianComponent],
-      optim: Optimizer,
-      n: Double)
+      optim: Optimizer)
       (agg: GradientAggregator, y: BDV[Double]): GradientAggregator = {
 
     agg.counter += 1
@@ -92,24 +91,23 @@ object GradientAggregator {
     
     val vectorWeights = Utils.toBDV(weights)
     
-    agg.loss += math.log(sum(posteriors)) / n
+    agg.loss += math.log(sum(posteriors))
 
     // add regularization value due to weights vector
-    agg.loss += optim.evaluateRegularizationTerm(vectorWeights) / (n*n)
+    agg.loss += optim.evaluateRegularizationTerm(vectorWeights)
 
     // update aggregated weight gradient
     posteriors /= sum(posteriors)
-    agg.weightsGradient += optim.weightsGradient(posteriors,vectorWeights) / n
-
+    agg.weightsGradient += optim.weightsGradient(posteriors,vectorWeights)
     // update gaussian parameters' gradients and log-likelihood
     var i = 0
     val outer = y*y.t
     while (i < agg.k) {
 
-      agg.gaussianGradients(i) += optim.gaussianGradient( dists(i), outer , posteriors(i)) / n
+      agg.gaussianGradients(i) += optim.gaussianGradient( dists(i), outer , posteriors(i))
 
       // add regularization value due to Gaussian components
-      agg.loss += optim.evaluateRegularizationTerm(dists(i)) / (n*n)
+      agg.loss += optim.evaluateRegularizationTerm(dists(i))
 
       i = i + 1
     }

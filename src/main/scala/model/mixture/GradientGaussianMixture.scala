@@ -21,18 +21,19 @@ import org.apache.log4j.Logger
   * See ''Hosseini, Reshad & Sra, Suvrit. (2017). An Alternative to EM for Gaussian Mixture Models: Batch and Stochastic Riemannian Optimization''
   * @param w Weight vector wrapper
   * @param g Array of mixture components (distributions)
-  * @param optimizer Optimization object
+  * @param optim Optimization object
  
   */
-class GradientBasedGaussianMixture private (
+class GradientGaussianMixture private (
   w:  UpdatableWeights,
   g: Array[UpdatableGaussianComponent],
-  var optimizer: Optimizer) extends UpdatableGaussianMixture(w,g) with Optimizable {
+  var optim: Optimizer) extends UpdatableGaussianMixture(w,g) with Optimizable {
 
 
 /**
   * mini-batch size as fraction of the complete training data
- 
+  * Spark needs a double in [0,1] to take samples, so we need
+  * to translate a given batch size to a fraction of the data size
   */
   var batchFraction = 1.0
 
@@ -62,30 +63,36 @@ class GradientBasedGaussianMixture private (
     var oldLL = 0.0  // previous log-likelihood
     var iter = 0
     
-    // breadcast optimizer to workers
-    val bcOptim = sc.broadcast(this.optimizer)
+    // broadcast optim to workers
+    val bcOptim = sc.broadcast(this.optim)
 
-    val initialRate = optimizer.getLearningRate
+    val initialRate = optim.getLearningRate
 
-    // this is to prevent that 0 size samples are too frequent
-    // this is because of the way spark takes random samples
-    //Prob(0 size sample) <= 1e-3
-    val dataSize = gConcaveData.count()
-    val minSafeBatchSize: Double = dataSize*(1 - math.exp(math.log(1e-3)/dataSize))
 
-    batchFraction = if(optimizer.getBatchSize.isDefined){
-      math.max(optimizer.getBatchSize.get.toDouble,minSafeBatchSize)/dataSize
+
+    val(ebs,fraction): (Double,Double) = { //ebs = epected batch size
+      val dataSize = gConcaveData.count()
+
+      if(batchSize.isDefined){
+        // this is to prevent that 0 size samples are too frequent
+        // this is because of the way spark takes random samples
+        // we want Prob(0 size sample) <= 1e-3
+        val safeBatchSize: Double = dataSize*(1 - math.exp(math.log(1e-3)/dataSize))
+        val correctedBatchSize = math.max(batchSize.get.toDouble,safeBatchSize)
+        (correctedBatchSize,correctedBatchSize/dataSize)
       }else{
-        1.0
+        (dataSize,1.0)
       }
-
+    }
+    logger.debug(s"ebs: ${ebs}, fraction: ${fraction}")
+    batchFraction = fraction
+    optim.setN(ebs)
+    
     //a bit of syntactic sugar
-    def toSimplex: BDV[Double] => BDV[Double] = optimizer.weightsOptimizer.toSimplex
-    def fromSimplex: BDV[Double] => BDV[Double] = optimizer.weightsOptimizer.fromSimplex
-    val maxIter = optimizer.getMaxIter
-    val convTol = optimizer.getConvergenceTol
+    def toSimplex: BDV[Double] => BDV[Double] = optim.weightsOptimizer.toSimplex
+    def fromSimplex: BDV[Double] => BDV[Double] = optim.weightsOptimizer.fromSimplex
 
-    while (iter < maxIter && math.abs(newLL-oldLL) > convTol) {
+    while (iter < maxIter && math.abs(newLL-oldLL) > convergenceTol) {
 
       //send values formatted for R processing to logs
       logger.debug(s"means: list(${gaussians.map{case g => "c(" + g.getMu.toArray.mkString(",") + ")"}.mkString(",")})")
@@ -95,7 +102,7 @@ class GradientBasedGaussianMixture private (
       // dataSize*batchFraction is the expected current batch size
       // but it is not exact due to how spark takes samples from RDDs
       val adder = sc.broadcast(
-        GradientAggregator.add(weights.weights, gaussians, optimizer, dataSize*batchFraction)_)
+        GradientAggregator.add(weights.weights, gaussians, optim)_)
 
       //val x = batch(gConcaveData)
       //logger.debug(s"sample size: ${x.count()}")
@@ -107,7 +114,7 @@ class GradientBasedGaussianMixture private (
       if(n>0){
       // pair Gaussian components with their respective parameter gradients
         val tuples =
-            Seq.tabulate(k)(i => (sampleStats.gaussianGradients(i), 
+            Seq.tabulate(k)(i => (sampleStats.gaussianGradients(i) / ebs, //average gradients 
                                   gaussians(i)))
 
         // update gaussians
@@ -142,7 +149,7 @@ class GradientBasedGaussianMixture private (
             case (grad,dist) => 
 
             dist.update(
-              optimizer.getUpdate(
+              optim.getUpdate(
                 dist.paramMat,
                 grad,
                 dist.optimUtils))
@@ -157,19 +164,19 @@ class GradientBasedGaussianMixture private (
 
         gaussians = newDists
 
-        val newWeights = optimizer.getUpdate(
+        val newWeights = optim.getUpdate(
               fromSimplex(Utils.toBDV(weights.weights)),
-              sampleStats.weightsGradient,
+              sampleStats.weightsGradient / ebs, //aberage gradients
               weights.optimUtils)
 
         weights.update(toSimplex(newWeights))
 
 
         oldLL = newLL // current becomes previous
-        newLL = sampleStats.loss
+        newLL = sampleStats.loss / ebs //average loss
         logger.debug(s"newLL: ${newLL}")
 
-        optimizer.updateLearningRate //update learning rate in driver
+        optim.updateLearningRate //update learning rate in driver
         iter += 1
         }else{
           logger.debug("No points in sample. Skipping iteration")
@@ -179,7 +186,7 @@ class GradientBasedGaussianMixture private (
     }
 
     bcOptim.destroy()
-    optimizer.setLearningRate(initialRate)
+    optim.setLearningRate(initialRate)
 
   }
 
@@ -208,7 +215,7 @@ class GradientBasedGaussianMixture private (
 
 
 /**
-  * take sample for the current mini-batch, or pass the whole dataset if {{{optimizer.batchSize = None}}}
+  * take sample for the current mini-batch, or pass the whole dataset if {{{optim.batchSize = None}}}
  
   */
   private def batch(data: RDD[BDV[Double]]): RDD[BDV[Double]] = {
@@ -221,47 +228,47 @@ class GradientBasedGaussianMixture private (
 
 }
 
-object GradientBasedGaussianMixture{
+object GradientGaussianMixture{
 /**
-  * Creates a new {{{GradientBasedGaussianMixture}}} instance
+  * Creates a new {{{GradientGaussianMixture}}} instance
   * @param weights Array of weights
   * @param gaussians Array of mixture components
-  * @param optimizer Optimizer object
+  * @param optim Optimizer object
  
   */
   def apply(
     weights: Array[Double],
-    gaussians: Array[UpdatableGaussianComponent]): GradientBasedGaussianMixture = {
+    gaussians: Array[UpdatableGaussianComponent]): GradientGaussianMixture = {
 
-    new GradientBasedGaussianMixture(
+    new GradientGaussianMixture(
       new UpdatableWeights(weights),
       gaussians,
       new GradientAscent())
   }
 
 /**
-  * Creates a new {{{GradientBasedGaussianMixture}}} instance
+  * Creates a new {{{GradientGaussianMixture}}} instance
   * @param weights Array of weights
   * @param gaussians Array of mixture components
-  * @param optimizer Optimizer object
+  * @param optim Optimizer object
  
   */
   def apply(
     weights: Array[Double],
     gaussians: Array[UpdatableGaussianComponent],
-    optimizer: Optimizer): GradientBasedGaussianMixture = {
+    optim: Optimizer): GradientGaussianMixture = {
 
-    new GradientBasedGaussianMixture(
+    new GradientGaussianMixture(
       new UpdatableWeights(weights),
       gaussians,
-      optimizer)
+      optim)
   }
 
 /**
-  * Creates a new {{{GradientBasedGaussianMixture}}} instance initialized with the
+  * Creates a new {{{GradientGaussianMixture}}} instance initialized with the
   * results of a K-means model fitted with a sample of the data
   * @param data training data in the form of an RDD of Spark vectors
-  * @param optimizer Optimizer object
+  * @param optim Optimizer object
   * @param k Number of components in the mixture
   * @param nSamples Number of data points to train the K-means model
   * @param nIters Number of iterations allowed for the K-means model
@@ -269,11 +276,11 @@ object GradientBasedGaussianMixture{
   */
   def initialize(
     data: RDD[SV],
-    optimizer: Optimizer,
+    optim: Optimizer,
     k: Int,
     nSamples: Int,
     nIters: Int,
-    seed: Long = 0): GradientBasedGaussianMixture = {
+    seed: Long = 0): GradientGaussianMixture = {
     
     val sc = data.sparkContext
     val d = data.take(1)(0).size
@@ -324,10 +331,10 @@ object GradientBasedGaussianMixture{
       .collect()
       .map{case (k,m) => m}
 
-    new GradientBasedGaussianMixture(
+    new GradientGaussianMixture(
       new UpdatableWeights(proportions.map{case p => p/(n+k)}), 
       (0 to k-1).map{case i => UpdatableGaussianComponent(means(i),pseudoCov(i))}.toArray,
-      optimizer)
+      optim)
 
   }
 
@@ -349,7 +356,7 @@ object GradientBasedGaussianMixture{
     k: Int = 2, 
     startingSampleSize: Int = 50,
     kMeansIters: Int = 20, 
-    seed: Int = 0): GradientBasedGaussianMixture = {
+    seed: Int = 0): GradientGaussianMixture = {
     
     val model = initialize(
                   data,

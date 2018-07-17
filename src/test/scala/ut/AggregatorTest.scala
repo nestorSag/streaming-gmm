@@ -25,7 +25,7 @@ class AggregatorTest extends FlatSpec{
 	val clusterWeights = Array(0.5,0.5)
 	val clusterVars = Array.fill(2)(BDM.eye[Double](dim))
 
-	//val mixture = GradientBasedGaussianMixture(clusterWeights,clusterDists)
+	//val mixture = GradientGaussianMixture(clusterWeights,clusterDists)
 	val clusterDists = clusterMeans.zip(clusterVars).map{ case(m,v) => UpdatableGaussianComponent(m,v)}
 
 	val optim = new GradientAscent()
@@ -36,8 +36,9 @@ class AggregatorTest extends FlatSpec{
 	// do y = [x 1]
 	val points = Array.fill(nPoints)(targetPoint).map{case v => new BDV(v.toArray ++ Array(1.0))}
 
+	optim.setN(nPoints)
 
-	val adder = GradientAggregator.add(clusterWeights, clusterDists, optim, nPoints)_
+	val adder = GradientAggregator.add(clusterWeights, clusterDists, optim)_
 	
 	val agg = points.foldLeft(GradientAggregator.init(2,dim)){case (agg,point) => adder(agg,point)}
 
@@ -48,14 +49,16 @@ class AggregatorTest extends FlatSpec{
 
 	"the log-likelihood" should "be correclty calculated" in {
 		val correctValue = (-1.0 -math.log(2*math.Pi))
+		val avgLoss = agg.loss/nPoints
 
-		var error = math.pow(agg.loss - correctValue,2)
+		var error = math.pow(avgLoss - correctValue,2)
 		assert(error < errorTol)
 	}
 
 	"the posterior membership probabilities" should "be correclty calculated" in {
 		//weightsGradient should be zero
-		assert(norm(agg.weightsGradient) < errorTol)
+		val avgWeightGrad = agg.weightsGradient/nPoints.toDouble
+		assert(norm(avgWeightGrad) < errorTol)
 	}
 
 	"the descent direction" should "be correclty calculated" in {
@@ -65,7 +68,9 @@ class AggregatorTest extends FlatSpec{
 			clusterDists.map{ case d => (v*v.t - d.paramMat) * 0.25}
 		}
 
-		var error = correctValue.zip(agg.gaussianGradients).map{case (a,b) => trace((a-b).t*(a-b))}.sum
+		val avgGrads = agg.gaussianGradients.map{case g => g/nPoints.toDouble}
+
+		var error = correctValue.zip(avgGrads).map{case (a,b) => {trace((a-b).t*(a-b))}}.sum
 		assert(error < errorTol)
 	}
 }
