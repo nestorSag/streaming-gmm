@@ -50,12 +50,12 @@ class GradientGaussianMixture private[models] (
     // if you want to see them
     val logger: Logger = Logger.getLogger("modelPath")
 
+    val d = data.first().size
+
     val sc = data.sparkContext
 
     //map original vectors to points for the g-concave formulation
     val gConcaveData = data.map{x => new BDV[Double](x.toArray ++ Array[Double](1.0))} // y = [x 1]
-    
-    val d = gConcaveData.first().length - 1
 
     val shouldDistribute = shouldDistributeGaussians(k, d)
 
@@ -84,19 +84,23 @@ class GradientGaussianMixture private[models] (
         (dataSize,1.0)
       }
     }
-    logger.debug(s"ebs: ${ebs}, fraction: ${fraction}")
-    batchFraction = fraction
+    logger.debug(s"expected batch size: ${ebs}, fraction: ${fraction}")
+    batchFraction = math.min(fraction,1.0) //in case batches are larger than whole dataset
     optim.setN(ebs)
     
     //a bit of syntactic sugar
     def toSimplex: BDV[Double] => BDV[Double] = optim.weightsOptimizer.toSimplex
     def fromSimplex: BDV[Double] => BDV[Double] = optim.weightsOptimizer.fromSimplex
 
-    while (iter < maxIter && math.abs(newLL-oldLL) > convergenceTol) {
 
-      //send values formatted for R processing to logs
-      logger.debug(s"means: list(${gaussians.map{case g => "c(" + g.getMu.toArray.mkString(",") + ")"}.mkString(",")})")
-      logger.debug(s"weights: ${"c(" + weights.weights.mkString(",") + ")"}")
+    while (iter < maxIter && math.abs(newLL-oldLL) > convergenceTol) {
+      val t0 = System.nanoTime
+
+      if(d==2){
+        //send values formatted for R processing to logs
+        logger.debug(s"means: list(${gaussians.map{case g => "c(" + g.getMu.toArray.mkString(",") + ")"}.mkString(",")})")
+        logger.debug(s"weights: ${"c(" + weights.weights.mkString(",") + ")"}")
+      }
 
       // initialize curried adder that will aggregate the necessary statistics in the workers
       // dataSize*batchFraction is the expected current batch size
@@ -109,7 +113,6 @@ class GradientGaussianMixture private[models] (
       val sampleStats = batch(gConcaveData).treeAggregate(GradientAggregator.init(k, d))(adder.value, _ += _)
 
       val n: Int = sampleStats.counter // number of actual data points in current batch
-      logger.debug(s"n: ${n}")
 
       if(n>0){
       // pair Gaussian components with their respective parameter gradients
@@ -174,7 +177,7 @@ class GradientGaussianMixture private[models] (
 
         oldLL = newLL // current becomes previous
         newLL = sampleStats.loss / ebs //average loss
-        logger.debug(s"newLL: ${newLL}")
+        logger.trace(s"newLL: ${newLL}")
 
         optim.updateLearningRate //update learning rate in driver
         iter += 1
@@ -183,6 +186,8 @@ class GradientGaussianMixture private[models] (
         }
 
       adder.destroy()
+      val elapsed = (System.nanoTime - t0)/1e9d
+      logger.info(s"iteration took ${elapsed} seconds for ${n} samples")
     }
 
     bcOptim.destroy()
@@ -278,7 +283,7 @@ object GradientGaussianMixture{
   * @param data training data in the form of an RDD of Spark vectors
   * @param optim Optimizer object
   * @param k Number of components in the mixture
-  * @param nSamples Number of data points to train the K-means model
+  * @param pointsPerCl The K-Means model will be trained with k*pointsPerCl points
   * @param nIters Number of iterations allowed for the K-means model
   * @param seed random seed
   */
@@ -286,13 +291,15 @@ object GradientGaussianMixture{
     data: RDD[SV],
     optim: Optimizer,
     k: Int,
-    nSamples: Int,
-    nIters: Int,
+    pointsPerCl: Int = 50,
+    nIters: Int = 20,
     seed: Long = 0): GradientGaussianMixture = {
     
+    val dataSize = data.count()
+
     val sc = data.sparkContext
-    val d = data.take(1)(0).size
-    val n = math.max(nSamples,2*k)
+    val d = data.take(1)(0).size //get data dimensionality
+    val n = math.min(dataSize,pointsPerCl*k).toInt
     var samples = sc.parallelize(data.takeSample(withReplacement = false, n, seed))
 
     //create kmeans model
@@ -356,7 +363,7 @@ object GradientGaussianMixture{
   * @param batchSize number of samples processed per iteration
   * @param maxIter maximum number of gradient ascent steps allowed
   * @param convTol log-likelihood change tolerance for stopping criteria
-  * @param startingSampleSize Sample size for the K-means algorithm
+  * @param pointsPerCl The K-Means model will be trained with k*pointsPerCl points
   * @param kMeansIters Number of iterations allowed for the K-means algorithm
   * @param seed Random seed
   * @return Fitted model
@@ -368,7 +375,7 @@ object GradientGaussianMixture{
     batchSize: Option[Int] = None,
     maxIter: Int = 100,
     convTol: Double = 1e-6, 
-    startingSampleSize: Int = 50,
+    pointsPerCl: Int = 50,
     kMeansIters: Int = 20, 
     seed: Int = 0): GradientGaussianMixture = {
     
@@ -376,7 +383,7 @@ object GradientGaussianMixture{
                   data,
                   optim,
                   k,
-                  startingSampleSize,
+                  pointsPerCl,
                   kMeansIters,
                   seed)
     

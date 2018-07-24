@@ -118,6 +118,7 @@ private[models] class UpdatableGaussianMixture(
   * process individual points to compute soft cluster assignments
  
   */
+
   private def computeSoftAssignments(
       pt: BDV[Double],
       dists: Array[UpdatableGaussianComponent],
