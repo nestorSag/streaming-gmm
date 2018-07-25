@@ -33,7 +33,7 @@ class StreamingGaussianMixture private[models] (
   * @param data Streaming data
  
   */
-	def sUpdate(data: DStream[SV]) {
+	def step(data: DStream[SV]) {
 	    data.foreachRDD { (rdd, time) =>
 	      step(rdd)
 	    }
@@ -45,7 +45,7 @@ class StreamingGaussianMixture private[models] (
   * @param data Streaming data
  
   */
-  def sPredict(data: DStream[SV]) {
+  def predict(data: DStream[SV]) {
     data.foreachRDD { (rdd, time) =>
       predict(rdd)
     }
@@ -57,7 +57,7 @@ class StreamingGaussianMixture private[models] (
   * @param data Streaming data
  
   */
-  def sPredictSoft(data: DStream[SV]) {
+  def predictSoft(data: DStream[SV]) {
     data.foreachRDD { (rdd, time) =>
       predictSoft(rdd)
     }

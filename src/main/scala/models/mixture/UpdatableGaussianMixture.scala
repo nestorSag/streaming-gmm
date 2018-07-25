@@ -38,7 +38,7 @@ private[models] class UpdatableGaussianMixture(
   require(weights.length == gaussians.length, "Length of weight and Gaussian arrays must match")
 
   /**
-  * Cluster membership prediction for an RDD o Spark vectors
+  * Cluster membership prediction
 
   * @return RDD with the points' labels
  
@@ -49,7 +49,7 @@ private[models] class UpdatableGaussianMixture(
   }
 
   /**
-  * Cluster membership prediction for a single Spark vector
+  * Cluster membership prediction
 
   * @return vector membership label
  
@@ -60,7 +60,7 @@ private[models] class UpdatableGaussianMixture(
   }
 
   /**
-  * Cluster membership prediction for a JavaRDD o Spark vectors
+  * Cluster membership prediction
 
   * @return RDD with the points' labels
  
@@ -69,7 +69,7 @@ private[models] class UpdatableGaussianMixture(
     predict(points.rdd).toJavaRDD().asInstanceOf[JavaRDD[java.lang.Integer]]
 
   /**
-  * Soft cluster membership prediction for a RDD of Spark vectors
+  * Soft cluster membership prediction
 
   * @return RDD with arrays giving the membership probabilities for each cluster
  
@@ -84,7 +84,7 @@ private[models] class UpdatableGaussianMixture(
   }
 
   /**
-  * Soft cluster membership prediction for a single Spark vector
+  * Soft cluster membership prediction
 
   * @return RDD with arrays giving the membership probabilities for each cluster
  
@@ -94,7 +94,7 @@ private[models] class UpdatableGaussianMixture(
   }
 
   /**
-  * Soft cluster membership prediction for a single Breeze vector
+  * Soft cluster membership prediction
 
   * @return vector membership label
  
@@ -105,7 +105,7 @@ private[models] class UpdatableGaussianMixture(
   }
 
   /**
-  * Soft cluster membership prediction for a single Breeze vector
+  * Soft cluster membership prediction
 
   * @return Array giving the membership probabilities for each cluster
  

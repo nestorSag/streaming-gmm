@@ -4,6 +4,7 @@ import breeze.linalg.{diag, eigSym, DenseMatrix => BDM, DenseVector => BDV, Vect
 import breeze.numerics.sqrt
 
 import org.apache.spark.mllib.linalg.{Vector => SV}
+import org.apache.spark.api.java.JavaRDD
 import org.apache.spark.rdd.RDD
 
 /**
@@ -46,6 +47,14 @@ trait Optimizable extends Serializable {
   * @param data Data to fit the model
   */
   def step(data: RDD[SV]): Unit
+
+/**
+  * Perform a gradient-based optimization step
+  * @param data Data to fit the model
+  */
+  def step(data: JavaRDD[SV]): Unit = {
+    step(data.rdd)
+  }
 
   /**
   * Linear Algebra operations necessary for computing updates for the parameters
