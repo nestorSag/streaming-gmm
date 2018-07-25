@@ -9,6 +9,7 @@ import breeze.numerics.sqrt
 import org.apache.spark.rdd.RDD
 import org.apache.spark.SparkContext
 import org.apache.spark.api.java.JavaRDD
+import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.mllib.linalg.{Matrix => SM, Vector => SV, Vectors => SVS, Matrices => SMS}
 import org.apache.spark.mllib.clustering.{KMeans, KMeansModel, GaussianMixtureModel}
 import org.apache.spark.mllib.stat.distribution.{MultivariateGaussian => SMG}
@@ -55,7 +56,8 @@ class GradientGaussianMixture private[models] (
     val sc = data.sparkContext
 
     //map original vectors to points for the g-concave formulation
-    val gConcaveData = data.map{x => new BDV[Double](x.toArray ++ Array[Double](1.0))} // y = [x 1]
+    // y = [x 1]
+    val gConcaveData = data.map{x => new BDV[Double](x.toArray ++ Array[Double](1.0))}.cache()
 
     val shouldDistribute = shouldDistributeGaussians(k, d)
 
@@ -191,6 +193,8 @@ class GradientGaussianMixture private[models] (
     }
 
     bcOptim.destroy()
+
+    //set learning rate to original value in case it was shrunk
     optim.setLearningRate(initialRate)
 
   }
@@ -212,11 +216,39 @@ class GradientGaussianMixture private[models] (
   }
 
 /**
-  * Create a StreamingGaussianMixture object using the model's current state 
+  * Update model parameters using streaming data
+  * See ''Hosseini, Reshad & Sra, Suvrit. (2017). An Alternative to EM for Gaussian Mixture Models: Batch and Stochastic Riemannian Optimization''
+  * @param data Streaming data
  
   */
-  def asStreamingModel: StreamingGaussianMixture = {
-    StreamingGaussianMixture(weights.weights,gaussians,optim)
+  def step(data: DStream[SV]) {
+    data.foreachRDD { (rdd, time) =>
+      step(rdd)
+    }
+  }
+
+/**
+  * Cluster membership prediction for streaming data
+  * See ''Hosseini, Reshad & Sra, Suvrit. (2017). An Alternative to EM for Gaussian Mixture Models: Batch and Stochastic Riemannian Optimization''
+  * @param data Streaming data
+ 
+  */
+  def predict(data: DStream[SV]) {
+    data.foreachRDD { (rdd, time) =>
+      predict(rdd)
+    }
+  }
+
+/**
+  * Soft cluster membership prediction for streaming data
+  * See ''Hosseini, Reshad & Sra, Suvrit. (2017). An Alternative to EM for Gaussian Mixture Models: Batch and Stochastic Riemannian Optimization''
+  * @param data Streaming data
+ 
+  */
+  def predictSoft(data: DStream[SV]) {
+    data.foreachRDD { (rdd, time) =>
+      predictSoft(rdd)
+    }
   }
 
 

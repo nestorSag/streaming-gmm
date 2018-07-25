@@ -19,7 +19,7 @@ import org.apache.spark.rdd.RDD
   * @param optimizer Optimization object
  
   */
-private[models] class UpdatableGaussianMixture(
+class UpdatableGaussianMixture(
   private[gradientgmm] var weights: UpdatableWeights,
   private[gradientgmm] var gaussians: Array[UpdatableGaussianComponent]) extends Serializable {
 
