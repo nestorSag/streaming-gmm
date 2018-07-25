@@ -3,7 +3,7 @@ package com.github.gradientgmm.models
 import com.github.gradientgmm.components.{UpdatableGaussianComponent, UpdatableWeights, Utils}
 import com.github.gradientgmm.optim.algorithms.{Optimizable, Optimizer, GradientAscent}
 
-import breeze.linalg.{diag, eigSym, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, sum}
+import breeze.linalg.{diag, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, sum}
 import breeze.numerics.sqrt
 
 import org.apache.spark.rdd.RDD
@@ -215,7 +215,7 @@ class GradientGaussianMixture private[models] (
   * Create a StreamingGaussianMixture object using the model's current state 
  
   */
-  def streamingModel: StreamingGaussianMixture = {
+  def asStreamingModel: StreamingGaussianMixture = {
     StreamingGaussianMixture(weights.weights,gaussians,optim)
   }
 
@@ -299,7 +299,7 @@ object GradientGaussianMixture{
 
     val sc = data.sparkContext
     val d = data.take(1)(0).size //get data dimensionality
-    val n = math.min(dataSize,pointsPerCl*k).toInt
+    val n = math.min(dataSize,pointsPerCl*k).toInt //in case the data has too few points
     var samples = sc.parallelize(data.takeSample(withReplacement = false, n, seed))
 
     //create kmeans model

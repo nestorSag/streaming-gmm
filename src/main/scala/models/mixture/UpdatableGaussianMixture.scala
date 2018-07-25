@@ -2,7 +2,7 @@ package com.github.gradientgmm.models
 
 import com.github.gradientgmm.components.{UpdatableGaussianComponent, UpdatableWeights, Utils}
 
-import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
+import breeze.linalg.{diag, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 
 import org.apache.spark.SparkContext
 import org.apache.spark.api.java.JavaRDD

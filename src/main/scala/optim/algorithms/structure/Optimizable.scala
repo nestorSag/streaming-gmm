@@ -1,6 +1,6 @@
 package com.github.gradientgmm.optim.algorithms
 
-import breeze.linalg.{diag, eigSym, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, sum}
+import breeze.linalg.{diag, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, sum}
 import breeze.numerics.sqrt
 
 import org.apache.spark.mllib.linalg.{Vector => SV}
