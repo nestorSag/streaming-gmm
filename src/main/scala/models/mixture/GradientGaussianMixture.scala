@@ -98,12 +98,13 @@ class GradientGaussianMixture private[models] (
     while (iter < maxIter && math.abs(newLL-oldLL) > convergenceTol) {
       val t0 = System.nanoTime
 
-      // if model parameters can be plotted (specific dimensionality and k)
+      // if model parameters can be plotted (specific d and k)
       // and logger is set to debug, send parameters' trajectory to logs
       if(d==2 && k == 3){
         //send values formatted for R processing to logs
         logger.debug(s"means: list(${gaussians.map{case g => "c(" + g.getMu.toArray.mkString(",") + ")"}.mkString(",")})")
         logger.debug(s"weights: ${"c(" + weights.weights.mkString(",") + ")"}")
+        logger.debug(s"covs: list(${gaussians.map{case g => "c(" + g.getSigma.toArray.mkString(",") + ")"}.mkString(",")})")
       }
 
       // initialize curried adder that will aggregate the necessary statistics in the workers
@@ -111,7 +112,7 @@ class GradientGaussianMixture private[models] (
       // but it is not exact due to how spark takes samples from RDDs
       val adder = sc.broadcast(
         GradientAggregator.add(weights.weights, gaussians, optim)_)
-
+      
       //val x = batch(gConcaveData)
       //logger.debug(s"sample size: ${x.count()}")
       val sampleStats = batch(gConcaveData).treeAggregate(GradientAggregator.init(k, d))(adder.value, _ += _)
