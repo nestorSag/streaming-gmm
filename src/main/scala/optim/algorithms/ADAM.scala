@@ -79,12 +79,12 @@ class ADAM extends Optimizer {
 	utils.updateMomentum(
 		ops.sum(
 			ops.rescale(utils.momentum.get,beta1), 
-			ops.rescale(grad,(1.0-beta1))))
+			ops.rescale(grad,1.0-beta1)))
 
-	utils.updateMomentum(
+	utils.updateAdamInfo(
 		ops.sum(
 			ops.rescale(utils.adamInfo.get,beta2), 
-			ops.rescale(ops.ewProd(grad,grad),(1.0-beta2))))
+			ops.rescale(ops.ewProd(grad,grad),1.0-beta2)))
 
 	val alpha_t = math.sqrt(1.0 - math.pow(beta2,t))/(1.0 - math.pow(beta1,t))
 
