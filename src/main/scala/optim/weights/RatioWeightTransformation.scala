@@ -49,7 +49,9 @@ class RatioWeightTransformation extends WeightsTransformation {
   
 	private def trim(weights: BDV[Double]): BDV[Double] = {
 		for(i <- 1 to weights.length){
-		  weights(i-1) = math.max(math.min(weights(i-1),Double.MaxValue),eps)
+			//rescaling by 100 to account for the summation at the denominator of the weight mapping
+			// assuming k <= 100
+		  weights(i-1) = math.max(math.min(weights(i-1),1e2/eps),eps*1e2)
 		}
 		weights
 	}

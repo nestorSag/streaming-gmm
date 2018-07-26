@@ -1,5 +1,7 @@
 package com.github.gradientgmm.optim.weights
 
+import com.github.gradientgmm.components.Utils
+
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV, max, min, sum}
 
 import breeze.numerics.{exp, log}
@@ -18,7 +20,12 @@ class SoftmaxWeightTransformation extends WeightsTransformation {
   * upper and lower bounds for allowed values before applying toSimplex
 
   */
-	private val (upperBound,lowerBound) = findBounds
+	private val (upperBound,lowerBound) = {
+		val eps = Utils.EPS
+		//offseting by log(100) to account for the summation at the denominator of the softmax func.
+		// assuming k <= 100
+		(-log(eps) - log(100), log(eps) + log(100))
+	}
 	
 	def toSimplex(soft: BDV[Double]): BDV[Double] = {
 
@@ -47,26 +54,11 @@ class SoftmaxWeightTransformation extends WeightsTransformation {
 	}
 
 /**
-  * Use the machine's epsilon to find maximum and minimum allowed values before applying toSimplex
-
-  */
-	private def findBounds: (Double,Double) = {
-		val bound = {
-		  var eps = 1.0
-		  while (!math.exp(eps).isInfinite) {
-		    eps += 1
-		  }
-		  eps
-		}
-
-		(bound-1,-bound+1)
-	}
-
-/**
   * Trim extreme values to avoid over or underflows
 
   */
 	private def trim(weights: BDV[Double]): BDV[Double] = {
+
 		for(i <- 1 to weights.length){
 		  weights(i-1) = math.max(math.min(weights(i-1),upperBound),lowerBound)
 		}

@@ -112,7 +112,7 @@ class GradientGaussianMixture private[models] (
       // but it is not exact due to how spark takes samples from RDDs
       val adder = sc.broadcast(
         GradientAggregator.add(weights.weights, gaussians, optim)_)
-      
+
       //val x = batch(gConcaveData)
       //logger.debug(s"sample size: ${x.count()}")
       val sampleStats = batch(gConcaveData).treeAggregate(GradientAggregator.init(k, d))(adder.value, _ += _)
@@ -122,7 +122,7 @@ class GradientGaussianMixture private[models] (
       if(n>0){
       // pair Gaussian components with their respective parameter gradients
         val tuples =
-            Seq.tabulate(k)(i => (sampleStats.gaussianGradients(i) / ebs, //average gradients 
+            Seq.tabulate(k)(i => (sampleStats.gaussianGradients(i) / n.toDouble, //average gradients 
                                   gaussians(i)))
 
         // update gaussians
@@ -172,9 +172,11 @@ class GradientGaussianMixture private[models] (
 
         gaussians = newDists
 
+        //logger.debug(s"weight gradient: ${sampleStats.weightsGradient / n.toDouble}")
+
         val newWeights = optim.getUpdate(
               fromSimplex(Utils.toBDV(weights.weights)),
-              sampleStats.weightsGradient / ebs, //average gradients
+              sampleStats.weightsGradient / n.toDouble, //average gradients
               weights.optimUtils)
 
         weights.update(toSimplex(newWeights))
@@ -192,7 +194,7 @@ class GradientGaussianMixture private[models] (
 
       adder.destroy()
       val elapsed = (System.nanoTime - t0)/1e9d
-      logger.info(s"iteration took ${elapsed} seconds for ${n} samples")
+      logger.info(s"iteration ${iter} took ${elapsed} seconds for ${n} samples")
     }
 
     bcOptim.destroy()
