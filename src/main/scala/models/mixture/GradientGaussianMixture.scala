@@ -94,8 +94,13 @@ class GradientGaussianMixture private[models] (
     def toSimplex: BDV[Double] => BDV[Double] = optim.weightsOptimizer.toSimplex
     def fromSimplex: BDV[Double] => BDV[Double] = optim.weightsOptimizer.fromSimplex
 
+    //sampling seed
+    implicit var seed: Long = 0
 
     while (iter < maxIter && math.abs(newLL-oldLL) > convergenceTol) {
+
+      seed += 1
+
       val t0 = System.nanoTime
 
       // if model parameters can be plotted (specific d and k)
@@ -113,8 +118,6 @@ class GradientGaussianMixture private[models] (
       val adder = sc.broadcast(
         GradientAggregator.add(weights.weights, gaussians, optim)_)
 
-      //val x = batch(gConcaveData)
-      //logger.debug(s"sample size: ${x.count()}")
       val sampleStats = batch(gConcaveData).treeAggregate(GradientAggregator.init(k, d))(adder.value, _ += _)
 
       val n: Int = sampleStats.counter // number of actual data points in current batch
@@ -268,9 +271,9 @@ class GradientGaussianMixture private[models] (
   * take sample for the current mini-batch, or pass the whole dataset if optim.batchSize = None
  
   */
-  private def batch(data: RDD[BDV[Double]]): RDD[BDV[Double]] = {
+  private def batch(data: RDD[BDV[Double]])(implicit seed: Long): RDD[BDV[Double]] = {
     if(batchFraction < 1.0){
-      data.sample(false,batchFraction)
+      data.sample(false,batchFraction,seed)
     }else{
       data
     }
