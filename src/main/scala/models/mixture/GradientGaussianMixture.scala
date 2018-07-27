@@ -95,11 +95,11 @@ class GradientGaussianMixture private[models] (
     def fromSimplex: BDV[Double] => BDV[Double] = optim.weightsOptimizer.fromSimplex
 
     //sampling seed
-    implicit var seed: Long = 0
+    implicit var batchSeed: Long = this.seed
 
     while (iter < maxIter && math.abs(newLL-oldLL) > convergenceTol) {
 
-      seed += 1
+      batchSeed += 1
 
       val t0 = System.nanoTime
 
@@ -271,9 +271,9 @@ class GradientGaussianMixture private[models] (
   * take sample for the current mini-batch, or pass the whole dataset if optim.batchSize = None
  
   */
-  private def batch(data: RDD[BDV[Double]])(implicit seed: Long): RDD[BDV[Double]] = {
+  private def batch(data: RDD[BDV[Double]])(implicit batchSeed: Long): RDD[BDV[Double]] = {
     if(batchFraction < 1.0){
-      data.sample(false,batchFraction,seed)
+      data.sample(false,batchFraction,batchSeed)
     }else{
       data
     }

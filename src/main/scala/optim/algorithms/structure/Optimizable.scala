@@ -35,6 +35,12 @@ trait Optimizable extends Serializable {
   */
   protected var optim: Optimizer
 
+/**
+  * random seed for mini-batch sampling
+
+  */
+  protected var seed: Long = 0
+
   def setOptim(optim: Optimizer): this.type = {
     this.optim = optim
     this
@@ -112,6 +118,13 @@ trait Optimizable extends Serializable {
     batchSize = Option(n)
     this
   }
+
+  def setSeed(s: Long): this.type = {
+    seed = s
+    this
+  }
+
+  def getSeed: Long = seed
 
 }
 
