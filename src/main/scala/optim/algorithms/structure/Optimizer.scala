@@ -188,6 +188,20 @@ trait Optimizer extends Serializable{
 
 	def direction[A](grad:A, utils: AcceleratedGradientUtils[A])(ops: ParameterOperations[A]): A
 
+/**
+  * Alternative method to set step size's shrinkage rate. it will be automatically calculated to shrink
+  * the step size by half every n iterations.
+  *
+  * @param n positive intger
+  * @return this
+  */
+  def halveStepEvery(n: Int): this.type = {
+    require(n>0, "n must be a positive integer")
+
+    shrinkageRate = math.pow(2.0,-1.0/n)
+    this
+
+  }
 
 	def setLearningRate(learningRate: Double): this.type = { 
 		require(learningRate > 0 , "learning rate must be positive")
