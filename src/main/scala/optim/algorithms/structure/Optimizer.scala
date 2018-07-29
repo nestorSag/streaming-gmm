@@ -171,7 +171,7 @@ trait Optimizer extends Serializable{
 
 
   def getUpdate[A](current: A, grad:A, utils: AcceleratedGradientUtils[A])(implicit ops: ParameterOperations[A]): A = {
-    
+    // performing gradient ascent (not descent) despite the name of the classes
     ops.sum(current,ops.rescale(direction(grad,utils)(ops),learningRate))
 
   }

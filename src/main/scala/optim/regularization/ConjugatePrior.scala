@@ -50,6 +50,12 @@ class ConjugatePrior(val dim: Int, var k: Int) extends Regularizer{
   */
 	private var weightConcentrationPar: Double = 0.5 
 
+/**
+  * degrees of freedom for the Inverse-Wishart prior
+
+  * @param df Degrees of freedom
+
+  */
 	def setDf(df: Double): this.type = {
 		require(df>sigmaPriorMean.cols-1,"degrees of freedom must me greater than dim(sigmaPriorMean)")
 		this.df = df
@@ -60,10 +66,11 @@ class ConjugatePrior(val dim: Int, var k: Int) extends Regularizer{
 	def getDf = this.df
 
 /**
+  * Set mean and covariance parameters' prior means.
   * The Gaussian parameter prior means must be set at the same time to check correctness, since their dimension must match
 
   */
-	def setGaussianParsPriorMeans(muPriorMean: BDV[Double], sigmaPriorMean: BDM[Double]): this.type = {
+	def setGaussianPriorMeans(muPriorMean: BDV[Double], sigmaPriorMean: BDM[Double]): this.type = {
 		val logger: Logger = Logger.getLogger("conjugatePrior")
 
 		require(sigmaPriorMean.cols == sigmaPriorMean.rows, "sigma prior mean is not a square matrix")

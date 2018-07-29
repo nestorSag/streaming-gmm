@@ -1,7 +1,7 @@
 import org.scalatest.FlatSpec
 
 
-import com.github.gradientgmm.optim.algorithms.GradientAscent
+import com.github.gradientgmm.optim.algorithms.GradientDescent
 import com.github.gradientgmm.models.GradientAggregator
 import com.github.gradientgmm.components.UpdatableGaussianComponent
 
@@ -28,7 +28,7 @@ class AggregatorTest extends FlatSpec{
 	//val mixture = GradientGaussianMixture(clusterWeights,clusterDists)
 	val clusterDists = clusterMeans.zip(clusterVars).map{ case(m,v) => UpdatableGaussianComponent(m,v)}
 
-	val optim = new GradientAscent()
+	val optim = new GradientDescent()
 		.setLearningRate(0.5)
 		.setShrinkageRate(1.0)
 
