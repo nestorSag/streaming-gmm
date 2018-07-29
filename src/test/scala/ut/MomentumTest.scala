@@ -1,5 +1,5 @@
 import com.github.gradientgmm.components.UpdatableGaussianComponent
-import com.github.gradientgmm.optim.algorithms.MomentumGradientDescent
+import com.github.gradientgmm.optim.algorithms.MomentumGradientAscent
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, norm}
 
@@ -15,9 +15,9 @@ class MomentumTest extends OptimTestSpec{
 	var lr = 0.5
 	var beta = 0.9
 	var current = UpdatableGaussianComponent(BDV.rand(dim),BDM.eye[Double](dim))
-	var optim = new MomentumGradientDescent().setLearningRate(lr).setBeta(beta)
+	var optim = new MomentumGradientAscent().setLearningRate(lr).setBeta(beta)
 
-	"MomentumGradientDescent w/o reg" should "follow the right path in expectation to target Gaussian parameters" in {
+	"MomentumGradientAscent w/o reg" should "follow the right path in expectation to target Gaussian parameters" in {
 		
 		var x0 = current.paramMat.copy
 

@@ -8,7 +8,7 @@ import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
   * Optimizer that performs stochastic gradient ascent with Nesterov's correction
   */
 
-class NesterovGradientDescent extends Optimizer {
+class NesterovGradientAscent extends Optimizer {
 
 /**
   * correction parameter

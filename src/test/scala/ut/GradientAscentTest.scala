@@ -1,4 +1,4 @@
-import com.github.gradientgmm.optim.algorithms.GradientDescent
+import com.github.gradientgmm.optim.algorithms.GradientAscent
 import com.github.gradientgmm.components.UpdatableGaussianComponent
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, norm}
@@ -10,14 +10,14 @@ import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV,
   * the actual samples
   */
 
-class GradientDescentTest extends OptimTestSpec{
+class GradientAscentTest extends OptimTestSpec{
 
 	var lr = 0.5
 	var current = UpdatableGaussianComponent(BDV.rand(dim),BDM.eye[Double](dim))
-	var optim = new GradientDescent().setLearningRate(lr)
+	var optim = new GradientAscent().setLearningRate(lr)
 	val paramMat0 = current.paramMat
 		
-	"GradientDescent" should "make current dist converge to target dist in expectation" in {
+	"GradientAscent" should "make current dist converge to target dist in expectation" in {
 
 		//println(current.paramMat)
 		for(i <- 1 to niter){

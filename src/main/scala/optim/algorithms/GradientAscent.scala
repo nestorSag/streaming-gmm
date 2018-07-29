@@ -5,7 +5,7 @@ import com.github.gradientgmm.components.AcceleratedGradientUtils
 /**
   * Optimizer that performs stochastic gradient ascent
   */
-class GradientDescent extends Optimizer{ 
+class GradientAscent extends Optimizer{ 
 
 	def direction[A](grad:A, utils: AcceleratedGradientUtils[A])(ops: ParameterOperations[A]): A = {
 		grad

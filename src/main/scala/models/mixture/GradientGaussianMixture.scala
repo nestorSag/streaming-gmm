@@ -1,7 +1,7 @@
 package com.github.gradientgmm.models
 
 import com.github.gradientgmm.components.{UpdatableGaussianComponent, UpdatableWeights, Utils}
-import com.github.gradientgmm.optim.algorithms.{Optimizable, Optimizer, GradientDescent}
+import com.github.gradientgmm.optim.algorithms.{Optimizable, Optimizer, GradientAscent}
 
 import breeze.linalg.{diag, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, sum}
 import breeze.numerics.sqrt
@@ -296,7 +296,7 @@ object GradientGaussianMixture{
     new GradientGaussianMixture(
       new UpdatableWeights(weights),
       gaussians,
-      new GradientDescent())
+      new GradientAscent())
   }
 
 /**
@@ -410,7 +410,7 @@ object GradientGaussianMixture{
   */
   def fit(
     data: RDD[SV], 
-    optim: Optimizer = new GradientDescent(), 
+    optim: Optimizer = new GradientAscent(), 
     k: Int = 2,
     batchSize: Option[Int] = None,
     maxIter: Int = 100,
