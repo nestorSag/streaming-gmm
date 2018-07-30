@@ -12,10 +12,11 @@ import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 class LogBarrier extends Regularizer{ 
 
 
-	private var scale = 1e-2
+	private var scale = 1.0
 
 	def setScale(scale: Double): this.type = {
-		require(scale > 0, "scale must be positive")
+		require(scale > 0.5, "scale must be at least 0.5 to avoid covariance singularities")
+
 		this.scale = scale
 		this
 	}
