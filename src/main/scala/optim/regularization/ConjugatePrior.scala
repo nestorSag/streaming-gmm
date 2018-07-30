@@ -57,7 +57,8 @@ class ConjugatePrior(val dim: Int, var k: Int) extends Regularizer{
 
   */
 	def setDf(df: Double): this.type = {
-		require(df>sigmaPriorMean.cols-1,"degrees of freedom must me greater than dim(sigmaPriorMean)")
+		//require(df>sigmaPriorMean.cols-1,"degrees of freedom must me greater than dim(sigmaPriorMean)")
+		require(df>0,"degrees of freedom must me greater than zero")
 		this.df = df
 		this.regularizingMatrix = buildRegMatrix(df,muPriorMean,sigmaPriorMean)
 		this
