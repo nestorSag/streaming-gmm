@@ -114,8 +114,8 @@ class ConjugatePrior(val dim: Int, var k: Int) extends Regularizer{
 
 
 	def gaussianGradient(dist:UpdatableGaussianComponent): BDM[Double] = {
-		(this.regularizingMatrix - df*dist.paramMat)*0.5
-		//updateRegularizer(paramMat)
+		val kappa = df+dim+2
+		(this.regularizingMatrix - dist.paramMat * kappa)*0.5
 	}
 
 	def weightsGradient(weights: BDV[Double]): BDV[Double] = {
@@ -123,7 +123,8 @@ class ConjugatePrior(val dim: Int, var k: Int) extends Regularizer{
 	}
 
 	def evaluateDist(dist: UpdatableGaussianComponent): Double = {
-		- 0.5*(df*(dist.logDetSigma + math.log(dist.getS)) + symProdTrace(regularizingMatrix,dist.invParamMat))
+		val kappa = df + dim + 2
+		- 0.5*(kappa*(dist.logDetSigma + math.log(dist.getS)) + symProdTrace(regularizingMatrix,dist.invParamMat))
 	}
 
 	def evaluateWeights(weights: BDV[Double]): Double = {
@@ -136,11 +137,12 @@ class ConjugatePrior(val dim: Int, var k: Int) extends Regularizer{
   */
 	private def buildRegMatrix(df: Double, muPriorMean: BDV[Double], sigmaPriorMean: BDM[Double]): BDM[Double] = {
 
-		//       [sigmaPriorMean + df*muPriorMean*muPriorMean.t, df*muPriorMean
-		//        df*muPriorMean^T                     ,         df]
-		
-		val shrinkedMu = muPriorMean*df
-		val lastRow = new BDV[Double](shrinkedMu.toArray ++ Array(df))
+		//       [sigmaPriorMean + kappa*muPriorMean*muPriorMean.t, kappa*muPriorMean
+		//        kappa*muPriorMean^T                     ,         kappa]
+		val kappa = df + dim + 2
+
+		val shrinkedMu = muPriorMean*kappa
+		val lastRow = new BDV[Double](shrinkedMu.toArray ++ Array(kappa))
 
 		BDM.vertcat(BDM.horzcat(sigmaPriorMean + shrinkedMu*muPriorMean.t,shrinkedMu.toDenseMatrix.t),lastRow.asDenseMatrix)
 	}

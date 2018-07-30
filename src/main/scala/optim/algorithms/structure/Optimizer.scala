@@ -195,10 +195,10 @@ trait Optimizer extends Serializable{
   * @param n positive intger
   * @return this
   */
-  def halveStepEvery(n: Int): this.type = {
-    require(n>0, "n must be a positive integer")
+  def halveStepEvery(m: Int): this.type = {
+    require(m>0, "m must be a positive integer")
 
-    shrinkageRate = math.pow(2.0,-1.0/n)
+    shrinkageRate = math.pow(2.0,-1.0/m)
     this
 
   }

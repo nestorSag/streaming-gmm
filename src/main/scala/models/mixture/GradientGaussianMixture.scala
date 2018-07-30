@@ -139,7 +139,7 @@ class GradientGaussianMixture private[models] (
 
             val newPars = bcOptim.value.getUpdate(
                 dist.paramMat,
-                grad,
+                grad, //averaged gradient. see line 128
                 dist.optimUtils)
             
             dist.update(newPars)
@@ -162,7 +162,7 @@ class GradientGaussianMixture private[models] (
             dist.update(
               optim.getUpdate(
                 dist.paramMat,
-                grad,
+                grad, //averaged gradient. see line 128
                 dist.optimUtils))
             
             dist
@@ -175,11 +175,9 @@ class GradientGaussianMixture private[models] (
 
         gaussians = newDists
 
-        //logger.debug(s"weight gradient: ${sampleStats.weightsGradient / n.toDouble}")
-
         val newWeights = optim.getUpdate(
               fromSimplex(Utils.toBDV(weights.weights)),
-              sampleStats.weightsGradient / n.toDouble, //average gradients
+              sampleStats.weightsGradient / n.toDouble, //averaged gradients
               weights.optimUtils)
 
         weights.update(toSimplex(newWeights))

@@ -16,7 +16,7 @@ class LogBarrierTest extends FlatSpec {
 
   var r = scala.util.Random
 
-  var scale = r.nextFloat.toDouble
+  var scale = r.nextFloat.toDouble + 0.5
 
   var logbarrier = new LogBarrier().setScale(scale)
 
