@@ -42,7 +42,7 @@ class ConjugatePrior(val dim: Int, var k: Int) extends Regularizer{
   * Degrees of freedom for the covariance prior
 
   */
-	private var df: Double = dim + 1
+	private var df: Double = dim
 
 /**
   * Concentration parameter for the weight vector prior
@@ -58,7 +58,7 @@ class ConjugatePrior(val dim: Int, var k: Int) extends Regularizer{
   */
 	def setDf(df: Double): this.type = {
 		//require(df>sigmaPriorMean.cols-1,"degrees of freedom must me greater than dim(sigmaPriorMean)")
-		require(df>0,"degrees of freedom must me greater than zero")
+		require(df>dim-1,"degrees of freedom must me greater than dim-1")
 		this.df = df
 		this.regularizingMatrix = buildRegMatrix(df,muPriorMean,sigmaPriorMean)
 		this
