@@ -76,19 +76,19 @@ class ADAMAX extends Optimizer {
 			ops.ewAbs(grad),
 			ops.rescale(utils.adamInfo.get,beta2)))
 
-	grad
 
 	//  |g| + beta2*u 
-	// val aux2 = ops.sum(
-	// 	ops.ewAbs(grad),
-	// 	ops.rescale(utils.adamInfo.get,beta2))
+	val aux2 = ops.sum(
+		ops.ewAbs(grad),
+		ops.rescale(utils.adamInfo.get,beta2))
 
 	//max(beta2*u,|g|) = 0.5 * (|g| + beta2*u + |beta2*u - |g||) = 0.5*(aux1+aux2)
-	// utils.updateAdamInfo(
-	// 	ops.rescale(
-	// 		ops.sum(aux1,aux2),
-	// 		0.5))
+	utils.updateAdamInfo(
+		ops.rescale(
+			ops.sum(aux1,aux2),
+			0.5))
 
+	grad
 	// val alpha_t = 1.0/(1.0 - math.pow(beta1,t))
 
 	// ops.rescale(
