@@ -86,6 +86,7 @@ Now we can pass it to the model when initializing it by addind an ```optim``` pa
 val model = GradientGaussianMixture.fit(data,k,myOptim)
 ```
 
+* ADAM and ADAMAX are also available, but their use is discouraged because of instability and generally bad results.
 ### Regularization
 
 To avoid the problem of [covariance singularity](https://stats.stackexchange.com/a/219358/66574), two regularization terms can be used; they are added to the optimizer object.
