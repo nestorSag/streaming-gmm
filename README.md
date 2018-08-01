@@ -6,8 +6,6 @@ It is based on the results of [[1]](https://arxiv.org/pdf/1706.03267.pdf) and im
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine.
-
 ### Prerequisites
 
 The projectu uses ```scala 2.11.8```, ```spark 2.3.1``` and ```breeze 0.13.2```
