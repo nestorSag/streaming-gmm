@@ -67,7 +67,7 @@ model
 
 ### Optimization algorithms
 
-The default optimization algorithm when creating and updating the model is GradientAscent. Accelerated gradient ascent directions are also available (in fact they usually perform better, so we recommend using them) and we can create them as follows:
+The default optimization algorithm when creating and updating the model is ```GradientAscent```. Accelerated gradient ascent directions are also available (in fact they usually perform better, so we recommend using them) and we can create them as follows:
 
 ```
 import com.github.gradientgmm.optim.algorithms.{MomentumGradientAscent,NesterovGradientAscent}
