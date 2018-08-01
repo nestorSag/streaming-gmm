@@ -47,7 +47,7 @@ val model = GradientGaussianMixture.init(data,k)
 the above will use the result of a K-means model fitted with a small sample to set initial
 weights, means and covariances.
 
-We can initialize the model as above and then perform gradient ascent (actually, ascent) iterations in a single instruction with:
+We can initialize the model as above and then perform gradient ascent iterations in a single instruction with:
 
 ```
 val model = GradientGaussianMixture.fit(data,k)
