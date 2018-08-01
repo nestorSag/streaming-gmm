@@ -25,7 +25,7 @@ trait SparkTester extends FunSuite{
     val data = sc.textFile("src/test/resources/testdata.csv")// Trains Gaussian Mixture Model
     val parsedData = data.map(s => SVS.dense(s.trim.split(' ').map(_.toDouble))).cache()
 
-    val mygmm = GradientGaussianMixture.initialize(parsedData,new GradientAscent(),k,50,20,0)
+    val mygmm = GradientGaussianMixture.initialize(parsedData,k)
 
     val weights = mygmm.getWeights
     val gaussians = mygmm.getGaussians.map{

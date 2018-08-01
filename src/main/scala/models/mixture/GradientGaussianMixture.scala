@@ -280,38 +280,46 @@ class GradientGaussianMixture private[models] (
 }
 
 object GradientGaussianMixture{
+
 /**
-  * Creates a new GradientGaussianMixture instance
+  * Creates a new GradientGaussianMixture instance from arrays of weights, means and covariances
   * @param weights Array of weights
-  * @param gaussians Array of mixture components
-  * @param optim Optimizer object
+  * @param means Array of mean vectors
+  * @param covs Array of covariance matrices
+  * @param optim Optimization algorithm. Defaults to GradintAscent
  
   */
   def apply(
     weights: Array[Double],
-    gaussians: Array[UpdatableGaussianComponent]): GradientGaussianMixture = {
-
-    new GradientGaussianMixture(
-      new UpdatableWeights(weights),
-      gaussians,
-      new GradientAscent())
-  }
-
-/**
-  * Creates a new GradientGaussianMixture instance
-  * @param weights Array of weights
-  * @param gaussians Array of mixture components
-  * @param optim Optimizer object
- 
-  */
-  def apply(
-    weights: Array[Double],
-    gaussians: Array[UpdatableGaussianComponent],
+    means: Array[BDV[Double]],
+    covs: Array[BDM[Double]],
     optim: Optimizer): GradientGaussianMixture = {
 
     new GradientGaussianMixture(
       new UpdatableWeights(weights),
-      gaussians,
+      means.zip(covs).map{case(m,v) => UpdatableGaussianComponent(m,v)},
+      optim)
+  }
+
+/**
+  * Creates a new GradientGaussianMixture instance from arrays of weights, means and covariances
+  * @param weights Array of weights
+  * @param means Array of mean vectors
+  * @param covs Array of covariance matrices
+  * @param optim Optimization algorithm. Defaults to GradintAscent
+ 
+  */
+  def apply(
+    weights: Array[Double],
+    means: Array[SV],
+    covs: Array[SM],
+    optim: Optimizer = new GradientAscent()): GradientGaussianMixture = {
+
+    val covdim = covs(0).numCols
+
+    new GradientGaussianMixture(
+      new UpdatableWeights(weights),
+      means.zip(covs).map{case(m,v) => UpdatableGaussianComponent(Utils.toBDV(m.toArray),new BDM(covdim,covdim,v.toArray))},
       optim)
   }
 
@@ -319,7 +327,7 @@ object GradientGaussianMixture{
   * Creates a new GradientGaussianMixture instance initialized with the
   * results of a K-means model fitted with a sample of the data
   * @param data training data in the form of an RDD of Spark vectors
-  * @param optim Optimizer object
+  * @param optim Optimizer object. Defaults to simple gradient ascent
   * @param k Number of components in the mixture
   * @param pointsPerCl The K-Means model will be trained with k*pointsPerCl points
   * @param nIters Number of iterations allowed for the K-means model
@@ -327,8 +335,8 @@ object GradientGaussianMixture{
   */
   def initialize(
     data: RDD[SV],
-    optim: Optimizer,
     k: Int,
+    optim: Optimizer = new GradientAscent(),
     pointsPerCl: Int = 50,
     nIters: Int = 20,
     seed: Long = 0): GradientGaussianMixture = {
@@ -408,8 +416,8 @@ object GradientGaussianMixture{
   */
   def fit(
     data: RDD[SV], 
+    k: Int,
     optim: Optimizer = new GradientAscent(), 
-    k: Int = 2,
     batchSize: Option[Int] = None,
     maxIter: Int = 100,
     convTol: Double = 1e-6, 
@@ -419,8 +427,8 @@ object GradientGaussianMixture{
     
     val model = initialize(
                   data,
-                  optim,
                   k,
+                  optim,
                   pointsPerCl,
                   kMeansIters,
                   seed)

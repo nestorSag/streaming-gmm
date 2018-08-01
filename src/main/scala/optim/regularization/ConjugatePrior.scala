@@ -30,13 +30,13 @@ class ConjugatePrior(val dim: Int, var k: Int) extends Regularizer{
   * prior mean for components' mean vector
 
   */
-	private var muPriorMean: BDV[Double] = BDV.zeros[Double](dim)
+	private var normalMean: BDV[Double] = BDV.zeros[Double](dim)
 
 /**
   * prior mean for components' covariance matrix
 
   */
-	private var sigmaPriorMean: BDM[Double] = BDM.eye[Double](dim)
+	private var iwMean: BDM[Double] = BDM.eye[Double](dim)
 
 /**
   * Degrees of freedom for the covariance prior
@@ -48,7 +48,7 @@ class ConjugatePrior(val dim: Int, var k: Int) extends Regularizer{
   * Concentration parameter for the weight vector prior
 
   */
-	private var weightConcentrationPar: Double = 0.5 
+	private var dirichletParam: Double = 1.0/k
 
 /**
   * degrees of freedom for the Inverse-Wishart prior
@@ -57,48 +57,50 @@ class ConjugatePrior(val dim: Int, var k: Int) extends Regularizer{
 
   */
 	def setDf(df: Double): this.type = {
-		//require(df>sigmaPriorMean.cols-1,"degrees of freedom must me greater than dim(sigmaPriorMean)")
+		//require(df>iwMean.cols-1,"degrees of freedom must me greater than dim(iwMean)")
 		require(df>dim-1,"degrees of freedom must me greater than dim-1")
 		this.df = df
-		this.regularizingMatrix = buildRegMatrix(df,muPriorMean,sigmaPriorMean)
+		this.regularizingMatrix = buildRegMatrix(df,normalMean,iwMean)
 		this
 	}
 
 	def getDf = this.df
 
 /**
-  * Set mean and covariance parameters' prior means.
+  * Set mean and covariance parameters' prior means. 
   * The Gaussian parameter prior means must be set at the same time to check correctness, since their dimension must match
-
+  
+  * @param normalMean Expected value vector for the prior Normal distribution
+  * @param iwMean Expected value matrix for the prior Inverse-Wishart distribution
   */
-	def setGaussianPriorMeans(muPriorMean: BDV[Double], sigmaPriorMean: BDM[Double]): this.type = {
+	def setMeanAndCovExpVals(normalMean: BDV[Double], iwMean: BDM[Double]): this.type = {
 		val logger: Logger = Logger.getLogger("conjugatePrior")
 
-		require(sigmaPriorMean.cols == sigmaPriorMean.rows, "sigma prior mean is not a square matrix")
-		require(muPriorMean.length == sigmaPriorMean.cols, "parameters' dimensions does not match")
-		require(sigmaPriorMean == sigmaPriorMean.t,"sigmaPriorMean must be symmetric")
+		require(iwMean.cols == iwMean.rows, "sigma prior mean is not a square matrix")
+		require(normalMean.length == iwMean.cols, "parameters' dimensions does not match")
+		require(iwMean == iwMean.t,"iwMean must be symmetric")
 
-		if(df <= sigmaPriorMean.cols-1){
-			this.df = sigmaPriorMean.cols
-			logger.info(s"Setting df to ${this.df}. It must be larger than ${muPriorMean.length}")
+		if(df <= iwMean.cols-1){
+			this.df = iwMean.cols
+			logger.info(s"Setting df to ${this.df}. It must be larger than ${normalMean.length}")
 		}
-		this.muPriorMean = muPriorMean
-		this.sigmaPriorMean = sigmaPriorMean
-		this.regularizingMatrix = buildRegMatrix(df,muPriorMean,sigmaPriorMean)
+		this.normalMean = normalMean
+		this.iwMean = iwMean
+		this.regularizingMatrix = buildRegMatrix(df,normalMean,iwMean)
 		this
 	}
 
-	def getMuPriorMean = muPriorMean
+	def getNormalMean = normalMean
 
-	def getSigmaPriorMean = sigmaPriorMean
+	def getIwMean = iwMean
 
-	def setWeightConcentrationPar(alpha: Double): this.type = {
+	def setDirichletParam(alpha: Double): this.type = {
 		require(alpha>0,"Dirichlet prior concentration parameter must be positive")
-		this.weightConcentrationPar = alpha
+		this.dirichletParam = alpha
 		this
 	}
 
-	def getWeightConcentrationPar = weightConcentrationPar
+	def getDirichletParam = dirichletParam
 
 	def setK(k: Int): this.type = {
 		require(k>0,"number of clusters must be positive")
@@ -111,7 +113,7 @@ class ConjugatePrior(val dim: Int, var k: Int) extends Regularizer{
   * Get augmented parameter matrix. See ''Hosseini, Reshad & Sra, Suvrit. (2017). An Alternative to EM for Gaussian Mixture Models: Batch and Stochastic Riemannian Optimization''
 
   */
-	var regularizingMatrix = buildRegMatrix(df,muPriorMean,sigmaPriorMean)
+	var regularizingMatrix = buildRegMatrix(df,normalMean,iwMean)
 
 
 	def gaussianGradient(dist:UpdatableGaussianComponent): BDM[Double] = {
@@ -120,7 +122,7 @@ class ConjugatePrior(val dim: Int, var k: Int) extends Regularizer{
 	}
 
 	def weightsGradient(weights: BDV[Double]): BDV[Double] = {
-		(BDV.ones[Double](k) - weights*k.toDouble)*weightConcentrationPar
+		(BDV.ones[Double](k) - weights*k.toDouble)*dirichletParam
 	}
 
 	def evaluateDist(dist: UpdatableGaussianComponent): Double = {
@@ -129,23 +131,23 @@ class ConjugatePrior(val dim: Int, var k: Int) extends Regularizer{
 	}
 
 	def evaluateWeights(weights: BDV[Double]): Double = {
-		weightConcentrationPar*sum(log(weights))
+		dirichletParam*sum(log(weights))
 	}
 	
 /**
   * Build augmented parameter matrix
 
   */
-	private def buildRegMatrix(df: Double, muPriorMean: BDV[Double], sigmaPriorMean: BDM[Double]): BDM[Double] = {
+	private def buildRegMatrix(df: Double, normalMean: BDV[Double], iwMean: BDM[Double]): BDM[Double] = {
 
-		//       [sigmaPriorMean + kappa*muPriorMean*muPriorMean.t, kappa*muPriorMean
-		//        kappa*muPriorMean^T                     ,         kappa]
+		//       [iwMean + kappa*normalMean*normalMean.t, kappa*normalMean
+		//        kappa*normalMean^T                     ,         kappa]
 		val kappa = df + dim + 2
 
-		val shrinkedMu = muPriorMean*kappa
+		val shrinkedMu = normalMean*kappa
 		val lastRow = new BDV[Double](shrinkedMu.toArray ++ Array(kappa))
 
-		BDM.vertcat(BDM.horzcat(sigmaPriorMean + shrinkedMu*muPriorMean.t,shrinkedMu.toDenseMatrix.t),lastRow.asDenseMatrix)
+		BDM.vertcat(BDM.horzcat(iwMean + shrinkedMu*normalMean.t,shrinkedMu.toDenseMatrix.t),lastRow.asDenseMatrix)
 	}
 
 /**

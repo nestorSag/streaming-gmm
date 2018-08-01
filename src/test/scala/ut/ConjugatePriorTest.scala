@@ -39,8 +39,8 @@ class ConjugatePriorTest extends FlatSpec {
     
     var prior = new ConjugatePrior(dim,k)
       .setDf(df)
-      .setGaussianPriorMeans(mu,cov)
-      .setWeightConcentrationPar(1.0/k)
+      .setMeanAndCovExpVals(mu,cov)
+      .setDirichletParam(1.0/k)
 
     val lcv = BDV(Array.fill(dim)(0.0) ++ Array(1.0)) // last canonical vector e_d = (0,...,0,1)
 
@@ -75,8 +75,8 @@ class ConjugatePriorTest extends FlatSpec {
     // -df/2*log det paramMat - 0.5*trace(psi*sInv)
     var prior = new ConjugatePrior(dim,k)
       .setDf(df)
-      .setGaussianPriorMeans(mu,cov)
-      .setWeightConcentrationPar(1.0/k)
+      .setMeanAndCovExpVals(mu,cov)
+      .setDirichletParam(1.0/k)
 
     var testdist = UpdatableGaussianComponent(kappa,mu,cov) // when paramMat = regularizingMatrix
 
@@ -89,7 +89,7 @@ class ConjugatePriorTest extends FlatSpec {
     assert(math.pow(shouldBeZero,2) < errorTol)
 
     // try moving the weight 
-    shouldBe = (-0.5*(prior.getDf+dim+2)*logdet(testdist.paramMat) - 0.5*(dim+1) + prior.getWeightConcentrationPar*math.log(0.5))
+    shouldBe = (-0.5*(prior.getDf+dim+2)*logdet(testdist.paramMat) - 0.5*(dim+1) + prior.getDirichletParam*math.log(0.5))
 
     shouldBeZero = prior.evaluateDist(testdist) + prior.evaluateWeights(vectorWeight*0.5) - shouldBe
     
@@ -110,8 +110,8 @@ class ConjugatePriorTest extends FlatSpec {
     // if regularization is a true conjugate prior unless the problem's dimensionality is one)
     prior = new ConjugatePrior(dim,k)
       .setDf(dim)
-      .setGaussianPriorMeans(BDV.zeros[Double](dim),BDM.eye[Double](dim))
-      .setWeightConcentrationPar(1.0/k)
+      .setMeanAndCovExpVals(BDV.zeros[Double](dim),BDM.eye[Double](dim))
+      .setDirichletParam(1.0/k)
 
 
     shouldBe = (- 0.5*(dim+testdist.getS*kappa))
