@@ -44,10 +44,10 @@ or providing training data and the number of components (the data must be an ```
 val model = GradientGaussianMixture.init(data,k)
 ```
 
-the above will use the result of a K-means model fitted with a small sample to set initial
+the above line will use the result of a K-means model fitted with a small sample to set initial
 weights, means and covariances.
 
-We can initialize the model as above and then perform gradient ascent iterations in a single instruction with:
+YOu can initialize the model as above and then perform gradient ascent iterations in a single instruction with:
 
 ```
 val model = GradientGaussianMixture.fit(data,k)
@@ -55,7 +55,7 @@ val model = GradientGaussianMixture.fit(data,k)
 
 ### Optimization
 
-For an existing model, ```model.step(data)``` can be used to update it. The mini-batch size and number of iterations of every ```step()``` call can be specified beforehand:
+For an existing model, ```model.step(data)``` is used to update it. The mini-batch size and number of iterations of every ```step()``` call can be specified beforehand:
 
 ```
 model
@@ -66,7 +66,7 @@ model
 
 ### Optimization algorithms
 
-The default optimization algorithm when creating and updating the model is ```GradientAscent```. Accelerated gradient ascent directions are also available (in fact they usually perform better, so we recommend using them) and we can create them as follows:
+The default optimization algorithm when creating and updating the model is ```GradientAscent```. Accelerated gradient ascent directions are also available (in fact they usually perform better, so you should use them!) and they can be created as follows:
 
 ```
 import com.github.gradientgmm.optim.algorithms.{MomentumGradientAscent,NesterovGradientAscent}
@@ -78,13 +78,13 @@ val myOptim = new MomentumGradientAscent()
     .setMinLearningRate(0.01)
 
 ```
-Now we can pass it to the model when initializing it by addind an ```optim``` parameter ton any of the instructions above, for example:
+Now you can pass it to the model when initializing it by addind an ```optim``` parameter to any of the instructions above, for example:
 
 ```
 val model = GradientGaussianMixture.fit(data,k,myOptim)
 ```
 
-* ADAM and ADAMAX are also available, but their use is discouraged because of instability and generally bad results.
+* ADAM and ADAMAX are also available, but their use is discouraged because they are unstable and produce poor results
 ### Regularization
 
 To avoid the problem of [covariance singularity](https://stats.stackexchange.com/a/219358/66574), two regularization terms can be used; they are added to the optimizer object.
@@ -98,7 +98,7 @@ val lbReg = new LogBarrier()
 optim.setRegularizer(lbReg)
 model.setOptimizer(optim)
 ```
-We recommend using ```LogBarrier``` because it is cheaper computationally and memory-wise and has a smaller effect on the final model's quality.
+Its usually better to use ```LogBarrier``` because it is cheaper computationally and memory-wise and has a smaller effect on the final model's quality.
 
 ### Classifying Data
 
