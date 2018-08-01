@@ -74,8 +74,8 @@ trait Optimizable extends Serializable {
     def sumScalar(x: BDV[Double], z: Double): BDV[Double] = {x + z}
     def rescale(x: BDV[Double], z: Double): BDV[Double] = {x*z}
     def sub(x: BDV[Double], y: BDV[Double]): BDV[Double] = {x - y}
-    def abs(x:BDV[Double]): BDV[Double] = {abs(x)}
 
+    def ewAbs(x:BDV[Double]): BDV[Double] = {abs(x)}
     def ewProd(x: BDV[Double], y: BDV[Double]): BDV[Double] = {x *:* y}
     def ewDiv(x: BDV[Double], y: BDV[Double]): BDV[Double] = {x /:/ y}
     def ewSqrt(x:BDV[Double]): BDV[Double] = {sqrt(x)}
@@ -86,8 +86,8 @@ trait Optimizable extends Serializable {
     def sumScalar(x: BDM[Double], z: Double): BDM[Double] = {x + z}
     def rescale(x: BDM[Double], z: Double): BDM[Double] = {x*z}
     def sub(x: BDM[Double], y: BDM[Double]): BDM[Double] = {x - y}
-    def abs(x:BDM[Double]): BDM[Double] = {abs(x)}
-
+    
+    def ewAbs(x:BDM[Double]): BDM[Double] = {abs(x)}
     def ewProd(x: BDM[Double], y: BDM[Double]): BDM[Double] = {x *:* y}
     def ewDiv(x: BDM[Double], y: BDM[Double]): BDM[Double] = {x /:/ y}
     def ewSqrt(x:BDM[Double]): BDM[Double] = {sqrt(x)}
@@ -140,8 +140,8 @@ trait ParameterOperations[A] extends Serializable{
   def sumScalar(x:A,z:Double): A
   def rescale(x: A, d: Double): A
   def sub(x:A, y:A): A
-  def abs(x: A): A
 
+  def ewAbs(x: A): A
   def ewProd(x:A,y:A): A
   def ewDiv(x:A,y:A): A
   def ewSqrt(x:A): A

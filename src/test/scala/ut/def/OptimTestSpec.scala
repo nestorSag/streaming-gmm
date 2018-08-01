@@ -5,7 +5,7 @@ import com.github.gradientgmm.components.UpdatableWeights
 import com.github.gradientgmm.optim.algorithms.ParameterOperations
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, sum}
-import breeze.numerics.{sqrt, exp, log}
+import breeze.numerics.{sqrt, exp, log, abs => bAbs}
 
 
 
@@ -59,7 +59,7 @@ trait OptimTestSpec extends FlatSpec{
     def sumScalar(x: BDV[Double], z: Double): BDV[Double] = {x + z}
     def rescale(x: BDV[Double], z: Double): BDV[Double] = {x*z}
     def sub(x: BDV[Double], y: BDV[Double]): BDV[Double] = {x - y}
-    def abs(x:BDV[Double]): BDV[Double] = {abs(x)}
+    def ewAbs(x:BDV[Double]): BDV[Double] = {bAbs(x)}
 
     def ewProd(x: BDV[Double], y: BDV[Double]): BDV[Double] = {x *:* y}
     def ewDiv(x: BDV[Double], y: BDV[Double]): BDV[Double] = {x /:/ y}
@@ -71,7 +71,7 @@ trait OptimTestSpec extends FlatSpec{
     def sumScalar(x: BDM[Double], z: Double): BDM[Double] = {x + z}
     def rescale(x: BDM[Double], z: Double): BDM[Double] = {x*z}
     def sub(x: BDM[Double], y: BDM[Double]): BDM[Double] = {x - y}
-    def abs(x:BDM[Double]): BDM[Double] = {abs(x)}
+    def ewAbs(x:BDM[Double]): BDM[Double] = {bAbs(x)}
 
     def ewProd(x: BDM[Double], y: BDM[Double]): BDM[Double] = {x *:* y}
     def ewDiv(x: BDM[Double], y: BDM[Double]): BDM[Double] = {x /:/ y}

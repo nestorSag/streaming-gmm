@@ -2,8 +2,6 @@ package com.github.gradientgmm.optim.algorithms
 
 import com.github.gradientgmm.components.AcceleratedGradientUtils
 
-import breeze.numerics.sqrt
-
 /**
   * Optimizer that performs gradient ascent using the ADAMAX algorithm. See ''Adam: A Method for Stochastic Optimization. Kingma, Diederik P.; Ba, Jimmy, 2014''
   */
@@ -73,29 +71,31 @@ class ADAMAX extends Optimizer {
 	// because max() is not implementd for elementwise matrix comparison in breeze
 
 	// | |g| - beta2*u |
-	val aux1 = ops.abs(
+	val aux1 = ops.ewAbs(
 		ops.sub(
-			ops.abs(grad),
+			ops.ewAbs(grad),
 			ops.rescale(utils.adamInfo.get,beta2)))
 
+	grad
+
 	//  |g| + beta2*u 
-	val aux2 = ops.sum(
-		ops.abs(grad),
-		ops.rescale(utils.adamInfo.get,beta2))
+	// val aux2 = ops.sum(
+	// 	ops.ewAbs(grad),
+	// 	ops.rescale(utils.adamInfo.get,beta2))
 
 	//max(beta2*u,|g|) = 0.5 * (|g| + beta2*u + |beta2*u - |g||) = 0.5*(aux1+aux2)
-	utils.updateAdamInfo(
-		ops.rescale(
-			ops.sum(aux1,aux2),
-			0.5))
+	// utils.updateAdamInfo(
+	// 	ops.rescale(
+	// 		ops.sum(aux1,aux2),
+	// 		0.5))
 
-	val alpha_t = 1.0/(1.0 - math.pow(beta1,t))
+	// val alpha_t = 1.0/(1.0 - math.pow(beta1,t))
 
-	ops.rescale(
-		ops.ewDiv(
-			utils.momentum.get,
-			utils.adamInfo.get),
-		alpha_t)
+	// ops.rescale(
+	// 	ops.ewDiv(
+	// 		utils.momentum.get,
+	// 		utils.adamInfo.get),
+	// 	alpha_t)
 
 	}
 
