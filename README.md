@@ -62,7 +62,7 @@ For an existing model, ```model.step(data)``` can be used to update it. The mini
 model
 .maxIter(20)
 .batchSize(50)
-.step()
+.step(data)
 ```
 
 ### Optimization algorithms
@@ -74,7 +74,7 @@ import com.github.gradientgmm.optim.algorithms.{MomentumGradientAscent,NesterovG
 
 val myOptim = new MomentumGradientAscent()
     .setLearningRate(0.9)
-    .halveStepEvery(50)
+    .halveStepSizeEvery(50)
     .setBeta(0.6) //inertia parameter
     .setMinLearningRate(0.01)
 
