@@ -1,7 +1,7 @@
 # Gradient-based streamming Gaussian Mixtures in Spark
 
 This project forms part of an MSc dissertation at the University of Edinburgh. 
-It is based on the results from [1] about a stochastic gradient ascent algorithm for (possibly regularized) GMMs and extends these results by implementing accelerated descent (actually, ascent) directions as well. Since a gradient-based mixture model can be easily extended to process streaming data in an intuitive way, such an implementation is also available.
+It is based on the results from [1] about a stochastic gradient ascent algorithm for (possibly regularized) GMMs and extends these results by implementing accelerated descent (actually, ascent) directions as well. 
 
 ## Getting Started
 
@@ -21,7 +21,7 @@ lazy val projectIDependOn = RootProject(uri("git://github.com/nestorSag/streamin
 dependsOn(projectIDependOn)
 ```
 
-where ```latest_version``` is the latest release (as of now, ```1.4```)
+where ```latest_version``` is the latest release (as of now, ```1.3```)
 
 ## Using the program
 
