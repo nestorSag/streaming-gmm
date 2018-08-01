@@ -96,7 +96,6 @@ class ADAMAX extends Optimizer {
 			utils.adamInfo.get),
 		alpha_t)
 
-	grad
 
 	}
 
