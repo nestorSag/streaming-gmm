@@ -88,14 +88,15 @@ class ADAMAX extends Optimizer {
 			ops.sum(aux1,aux2),
 			0.5))
 
-	grad
-	// val alpha_t = 1.0/(1.0 - math.pow(beta1,t))
+	val alpha_t = 1.0/(1.0 - math.pow(beta1,t))
 
-	// ops.rescale(
-	// 	ops.ewDiv(
-	// 		utils.momentum.get,
-	// 		utils.adamInfo.get),
-	// 	alpha_t)
+	ops.rescale(
+		ops.ewDiv(
+			utils.momentum.get,
+			utils.adamInfo.get),
+		alpha_t)
+
+	grad
 
 	}
 
