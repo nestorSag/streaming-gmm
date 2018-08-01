@@ -54,28 +54,28 @@ trait OptimTestSpec extends FlatSpec{
         log(x/x(d-1))
     }
 
-	implicit val vectorOps = new ParameterOperations[BDV[Double]] {
+	protected implicit val vectorOps = new ParameterOperations[BDV[Double]] {
+    def sum(x: BDV[Double], y: BDV[Double]): BDV[Double] = {x + y}
+    def sumScalar(x: BDV[Double], z: Double): BDV[Double] = {x + z}
+    def rescale(x: BDV[Double], z: Double): BDV[Double] = {x*z}
+    def sub(x: BDV[Double], y: BDV[Double]): BDV[Double] = {x - y}
+    def abs(x:BDV[Double]): BDV[Double] = {abs(x)}
 
-      def sum(x: BDV[Double], y: BDV[Double]): BDV[Double] = {x + y}
-      def sumScalar(x: BDV[Double], z: Double): BDV[Double] = {x + z}
-      def rescale(x: BDV[Double], z: Double): BDV[Double] = {x*z}
-      def sub(x: BDV[Double], y: BDV[Double]): BDV[Double] = {x - y}
-
-      def ewProd(x: BDV[Double], y: BDV[Double]): BDV[Double] = {x *:* y}
-      def ewDiv(x: BDV[Double], y: BDV[Double]): BDV[Double] = {x /:/ y}
-      def ewSqrt(x:BDV[Double]): BDV[Double] = {sqrt(x)}
+    def ewProd(x: BDV[Double], y: BDV[Double]): BDV[Double] = {x *:* y}
+    def ewDiv(x: BDV[Double], y: BDV[Double]): BDV[Double] = {x /:/ y}
+    def ewSqrt(x:BDV[Double]): BDV[Double] = {sqrt(x)}
   }
 
-  implicit val matrixOps = new ParameterOperations[BDM[Double]] {
+  protected implicit val matrixOps = new ParameterOperations[BDM[Double]] {
+    def sum(x: BDM[Double], y: BDM[Double]): BDM[Double] = {x + y}
+    def sumScalar(x: BDM[Double], z: Double): BDM[Double] = {x + z}
+    def rescale(x: BDM[Double], z: Double): BDM[Double] = {x*z}
+    def sub(x: BDM[Double], y: BDM[Double]): BDM[Double] = {x - y}
+    def abs(x:BDM[Double]): BDM[Double] = {abs(x)}
 
-      def sum(x: BDM[Double], y: BDM[Double]): BDM[Double] = {x + y}
-      def sumScalar(x: BDM[Double], z: Double): BDM[Double] = {x + z}
-      def rescale(x: BDM[Double], z: Double): BDM[Double] = {x*z}
-      def sub(x: BDM[Double], y: BDM[Double]): BDM[Double] = {x - y}
-
-      def ewProd(x: BDM[Double], y: BDM[Double]): BDM[Double] = {x *:* y}
-      def ewDiv(x: BDM[Double], y: BDM[Double]): BDM[Double] = {x /:/ y}
-      def ewSqrt(x:BDM[Double]): BDM[Double] = {sqrt(x)}
+    def ewProd(x: BDM[Double], y: BDM[Double]): BDM[Double] = {x *:* y}
+    def ewDiv(x: BDM[Double], y: BDM[Double]): BDM[Double] = {x /:/ y}
+    def ewSqrt(x:BDM[Double]): BDM[Double] = {sqrt(x)}
   }
 
 

@@ -1,7 +1,7 @@
 package com.github.gradientgmm.optim.algorithms
 
 import breeze.linalg.{diag, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, sum}
-import breeze.numerics.sqrt
+import breeze.numerics.{sqrt,abs}
 
 import org.apache.spark.mllib.linalg.{Vector => SV}
 import org.apache.spark.api.java.JavaRDD
@@ -74,6 +74,7 @@ trait Optimizable extends Serializable {
     def sumScalar(x: BDV[Double], z: Double): BDV[Double] = {x + z}
     def rescale(x: BDV[Double], z: Double): BDV[Double] = {x*z}
     def sub(x: BDV[Double], y: BDV[Double]): BDV[Double] = {x - y}
+    def abs(x:BDV[Double]): BDV[Double] = {abs(x)}
 
     def ewProd(x: BDV[Double], y: BDV[Double]): BDV[Double] = {x *:* y}
     def ewDiv(x: BDV[Double], y: BDV[Double]): BDV[Double] = {x /:/ y}
@@ -85,6 +86,7 @@ trait Optimizable extends Serializable {
     def sumScalar(x: BDM[Double], z: Double): BDM[Double] = {x + z}
     def rescale(x: BDM[Double], z: Double): BDM[Double] = {x*z}
     def sub(x: BDM[Double], y: BDM[Double]): BDM[Double] = {x - y}
+    def abs(x:BDM[Double]): BDM[Double] = {abs(x)}
 
     def ewProd(x: BDM[Double], y: BDM[Double]): BDM[Double] = {x *:* y}
     def ewDiv(x: BDM[Double], y: BDM[Double]): BDM[Double] = {x /:/ y}
@@ -138,6 +140,7 @@ trait ParameterOperations[A] extends Serializable{
   def sumScalar(x:A,z:Double): A
   def rescale(x: A, d: Double): A
   def sub(x:A, y:A): A
+  def abs(x: A): A
 
   def ewProd(x:A,y:A): A
   def ewDiv(x:A,y:A): A
