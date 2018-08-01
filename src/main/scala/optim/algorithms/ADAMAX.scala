@@ -17,6 +17,8 @@ class ADAMAX extends Optimizer {
   */
 	var beta1 = 0.9
 
+	private var eps = 1e-8 //needed because last weight gradient is always zero
+
 /**
   * Exponential smoothing parameter for the second raw moment estimator 
   */
@@ -93,7 +95,7 @@ class ADAMAX extends Optimizer {
 	ops.rescale(
 		ops.ewDiv(
 			utils.momentum.get,
-			utils.adamInfo.get),
+			ops.sumScalar(utils.adamInfo.get,eps)),
 		alpha_t)
 
 

@@ -175,10 +175,10 @@ class GradientGaussianMixture private[models] (
 
         gaussians = newDists
 
-        if(d==2 && k == 3){
-        //send values formatted for R processing to logs
-          logger.debug(s"weights gradients: ${"c(" + (sampleStats.weightsGradient / n.toDouble).toArray.mkString(",") + ")"}")
-        }
+        // if(d==2 && k == 3){
+        // //send values formatted for R processing to logs
+        //   logger.debug(s"weights gradients: ${"c(" + (sampleStats.weightsGradient / n.toDouble).toArray.mkString(",") + ")"}")
+        // }
         
         val newWeights = optim.getUpdate(
               fromSimplex(Utils.toBDV(weights.weights)),
