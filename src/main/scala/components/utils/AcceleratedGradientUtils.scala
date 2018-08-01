@@ -4,10 +4,10 @@ import breeze.linalg.{DenseVector => BDV, DenseMatrix => BDM}
 
 
 /**
-  * A class that wraps necessary object for accelerated gradient descent methods.
+  * A class that wraps necessary object for accelerated gradient ascent methods.
   *
   * Intializes and stores the necessary numeric data structures to calculate ascent directions in
-  * Momentum gradient descent and the ADAM algorithm. It only initializes such objects when they
+  * Momentum gradient ascent and the ADAM algorithm. It only initializes such objects when they
   * are called, avoiding storing unecessary information.
 
   * @tparam T The structure data type, e.g., DenseVector or DenseMatrix

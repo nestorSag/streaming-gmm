@@ -20,7 +20,7 @@ class UpdatableGaussianComponent private(
   _sigma: BDM[Double]) extends GConcaveGaussian(_s,_mu,_sigma) with MatrixParamUpdate {
 
 /**
-  * accelerated gradient descent utilities. See [[AcceleratedGradientUtils]]
+  * accelerated gradient ascent utilities. See [[AcceleratedGradientUtils]]
  
   */
   val optimUtils = new MatrixGradientUtils(d+1)

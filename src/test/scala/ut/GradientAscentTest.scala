@@ -47,14 +47,14 @@ class GradientAscentTest extends OptimTestSpec{
 		// the formula from above cannot be applied to the weights because of the 
 		// nonlinearity induced by the softmax function
 
-		// below: deterministic calculation for gradient descent in expectation
-		// same as momentum gradient descent but with beta = 0
+		// below: deterministic calculation for gradient ascent in expectation
+		// same as momentum gradient ascent but with beta = 0
 
 		var x0 = toBDV(initialWeights)
 
 		var softx0 = fromSimplex(x0)
 
-		//calculate gradient descent in expectation
+		//calculate gradient ascent in expectation
 		// this will be checked against the program's results below
 		for(i <- 1 to niter){
 			var g = (targetWeights - x0) //gradient

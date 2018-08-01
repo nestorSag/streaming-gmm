@@ -23,7 +23,7 @@ class MomentumTest extends OptimTestSpec{
 
 		var m = BDM.zeros[Double](x0.rows,x0.cols) //momentum
 		
-		//calculate gradient descent with momentum in expectation
+		//calculate gradient ascent with momentum in expectation
 		// this will be checked against the program's results below
 		for(i <- 1 to niter){
 			var g = (targetParamMat - x0) * 0.5 //gradient
@@ -58,7 +58,7 @@ class MomentumTest extends OptimTestSpec{
 
 		var softx0 = toBDV(x0.toArray.map{case w => math.log(w/x0(k-1))})
 
-		//calculate gradient descent with momentum in expectation
+		//calculate gradient ascent with momentum in expectation
 		// this will be checked against the program's results below
 		for(i <- 1 to niter){
 			var g = (targetWeights - x0) //gradient

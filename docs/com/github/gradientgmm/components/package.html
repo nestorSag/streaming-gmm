@@ -1,0 +1,290 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>components - com.github.gradientgmm.components</title>
+          <meta name="description" content="components - com.github.gradientgmm.components" />
+          <meta name="keywords" content="components com.github.gradientgmm.components" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../../../lib/template.js"></script>
+      <script type="text/javascript" src="../../../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../../../index.html';
+            var hash = 'com.github.gradientgmm.components.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img alt="Package" src="../../../../lib/package_big.png" />
+        <p id="owner"><a href="../../../package.html" class="extype" name="com">com</a>.<a href="../../package.html" class="extype" name="com.github">github</a>.<a href="../package.html" class="extype" name="com.github.gradientgmm">gradientgmm</a></p>
+        <h1>components</h1><span class="permalink">
+      <a href="../../../../index.html#com.github.gradientgmm.components.package" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">components</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        
+        
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="com.github.gradientgmm.components.AcceleratedGradientUtils" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="AcceleratedGradientUtils[T]extendsSerializable"></a>
+      <a id="AcceleratedGradientUtils[T]:AcceleratedGradientUtils[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="AcceleratedGradientUtils.html"><span class="name">AcceleratedGradientUtils</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#com.github.gradientgmm.components.package@AcceleratedGradientUtils[T]extendsSerializable" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">A class that wraps necessary object for accelerated gradient ascent methods.</p><div class="fullcomment"><div class="comment cmt"><p>A class that wraps necessary object for accelerated gradient ascent methods.</p><p>Intializes and stores the necessary numeric data structures to calculate ascent directions in
+Momentum gradient ascent and the ADAM algorithm. It only initializes such objects when they
+are called, avoiding storing unecessary information.
+</p></div><dl class="paramcmts block"><dt class="tparam">T</dt><dd class="cmt"><p>The structure data type, e.g., DenseVector or DenseMatrix</p></dd></dl></div>
+    </li><li name="com.github.gradientgmm.components.GConcaveGaussian" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="GConcaveGaussianextendsMultivariateGaussian"></a>
+      <a id="GConcaveGaussian:GConcaveGaussian"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="GConcaveGaussian.html"><span class="name">GConcaveGaussian</span></a><span class="result"> extends <a href="MultivariateGaussian.html" class="extype" name="com.github.gradientgmm.components.MultivariateGaussian">MultivariateGaussian</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#com.github.gradientgmm.components.package@GConcaveGaussianextendsMultivariateGaussian" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Multivariate Gaussian Distribution reformulation that implies a g-concave loss function in
+<i>Hosseini, Reshad &amp; Sra, Suvrit. (2017). An Alternative to EM for Gaussian Mixture Models: Batch and Stochastic Riemannian Optimization</i></p><div class="fullcomment"><div class="comment cmt"><p>Multivariate Gaussian Distribution reformulation that implies a g-concave loss function in
+<i>Hosseini, Reshad &amp; Sra, Suvrit. (2017). An Alternative to EM for Gaussian Mixture Models: Batch and Stochastic Riemannian Optimization</i></p><p>For an arbitrary Gaussian distribution, its g-concave reformulation have zero mean and an
+augmented covariance matrix which is a function of the original mean, covariance matrix
+and an additional positive scalar s. Original data points x are mapped to
+y = [x 1] to be evaluated under the new distribution. When s = 1, the density
+of the original distirbution and the reformulation are equal for all points.
+</p></div></div>
+    </li><li name="com.github.gradientgmm.components.MatrixGradientUtils" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MatrixGradientUtilsextendsAcceleratedGradientUtils[breeze.linalg.DenseMatrix[Double]]"></a>
+      <a id="MatrixGradientUtils:MatrixGradientUtils"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="MatrixGradientUtils.html"><span class="name">MatrixGradientUtils</span></a><span class="result"> extends <a href="AcceleratedGradientUtils.html" class="extype" name="com.github.gradientgmm.components.AcceleratedGradientUtils">AcceleratedGradientUtils</a>[<span class="extype" name="breeze.linalg.DenseMatrix">DenseMatrix</span>[<span class="extype" name="scala.Double">Double</span>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#com.github.gradientgmm.components.package@MatrixGradientUtilsextendsAcceleratedGradientUtils[breeze.linalg.DenseMatrix[Double]]" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Implementation of <a href="AcceleratedGradientUtils.html" class="extype" name="com.github.gradientgmm.components.AcceleratedGradientUtils">AcceleratedGradientUtils</a> to allow matrix-like acceleration terms.</p><div class="fullcomment"><div class="comment cmt"><p>Implementation of <a href="AcceleratedGradientUtils.html" class="extype" name="com.github.gradientgmm.components.AcceleratedGradientUtils">AcceleratedGradientUtils</a> to allow matrix-like acceleration terms.</p><p>It uses Breeze's DenseMatrix as the data type</p></div></div>
+    </li><li name="com.github.gradientgmm.components.MatrixParamUpdate" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="MatrixParamUpdateextendsSerializable"></a>
+      <a id="MatrixParamUpdate:MatrixParamUpdate"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="MatrixParamUpdate.html"><span class="name">MatrixParamUpdate</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#com.github.gradientgmm.components.package@MatrixParamUpdateextendsSerializable" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Container of a <a href="MatrixGradientUtils.html" class="extype" name="com.github.gradientgmm.components.MatrixGradientUtils">MatrixGradientUtils</a> instance</p>
+    </li><li name="com.github.gradientgmm.components.MultivariateGaussian" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MultivariateGaussianextendsSerializable"></a>
+      <a id="MultivariateGaussian:MultivariateGaussian"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="MultivariateGaussian.html"><span class="name">MultivariateGaussian</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#com.github.gradientgmm.components.package@MultivariateGaussianextendsSerializable" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Multivariate Gaussian distribution class</p><div class="fullcomment"><div class="comment cmt"><p>Multivariate Gaussian distribution class</p><p>It is based on Spark's <a href="https://spark.apache.org/docs/2.1.1/api/scala/index.html#org.apache.spark.ml.stat.distribution.MultivariateGaussian" target="_blank">MultivariateGaussian</a> and it implements
+much of the same functionality, but more of its internal objects, such as the covariance matrix determinant
+and the covariance matrix inverse, are public; many of its parameters are mutable as well.
+</p></div></div>
+    </li><li name="com.github.gradientgmm.components.UpdatableGaussianComponent" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="UpdatableGaussianComponentextendsGConcaveGaussianwithMatrixParamUpdate"></a>
+      <a id="UpdatableGaussianComponent:UpdatableGaussianComponent"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="UpdatableGaussianComponent.html"><span class="name">UpdatableGaussianComponent</span></a><span class="result"> extends <a href="GConcaveGaussian.html" class="extype" name="com.github.gradientgmm.components.GConcaveGaussian">GConcaveGaussian</a> with <a href="MatrixParamUpdate.html" class="extype" name="com.github.gradientgmm.components.MatrixParamUpdate">MatrixParamUpdate</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#com.github.gradientgmm.components.package@UpdatableGaussianComponentextendsGConcaveGaussianwithMatrixParamUpdate" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Gaussian distribution that implements an updating routine based on its g-concave reformulation
+and contains gradient ascent utilities necessary for accelerated ascent algorithms.</p>
+    </li><li name="com.github.gradientgmm.components.UpdatableWeights" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="UpdatableWeightsextendsSerializablewithVectorParamUpdate"></a>
+      <a id="UpdatableWeights:UpdatableWeights"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="UpdatableWeights.html"><span class="name">UpdatableWeights</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span> with <a href="VectorParamUpdate.html" class="extype" name="com.github.gradientgmm.components.VectorParamUpdate">VectorParamUpdate</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#com.github.gradientgmm.components.package@UpdatableWeightsextendsSerializablewithVectorParamUpdate" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Wrapper class for the weights vector.</p><div class="fullcomment"><div class="comment cmt"><p>Wrapper class for the weights vector.</p><p>It includes functionality to check the simplex constraints and perofrm accelerated gradient ascent.
+see <a href="https://en.wikipedia.org/wiki/Simplex" target="_blank">https://en.wikipedia.org/wiki/Simplex</a>
+</p></div></div>
+    </li><li name="com.github.gradientgmm.components.VectorGradientUtils" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="VectorGradientUtilsextendsAcceleratedGradientUtils[breeze.linalg.DenseVector[Double]]"></a>
+      <a id="VectorGradientUtils:VectorGradientUtils"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="VectorGradientUtils.html"><span class="name">VectorGradientUtils</span></a><span class="result"> extends <a href="AcceleratedGradientUtils.html" class="extype" name="com.github.gradientgmm.components.AcceleratedGradientUtils">AcceleratedGradientUtils</a>[<span class="extype" name="breeze.linalg.DenseVector">DenseVector</span>[<span class="extype" name="scala.Double">Double</span>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#com.github.gradientgmm.components.package@VectorGradientUtilsextendsAcceleratedGradientUtils[breeze.linalg.DenseVector[Double]]" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Implementation of <a href="AcceleratedGradientUtils.html" class="extype" name="com.github.gradientgmm.components.AcceleratedGradientUtils">AcceleratedGradientUtils</a> to allow vector-like acceleration terms.</p><div class="fullcomment"><div class="comment cmt"><p>Implementation of <a href="AcceleratedGradientUtils.html" class="extype" name="com.github.gradientgmm.components.AcceleratedGradientUtils">AcceleratedGradientUtils</a> to allow vector-like acceleration terms.</p><p>It uses Breeze's DenseVector as the data type</p></div></div>
+    </li><li name="com.github.gradientgmm.components.VectorParamUpdate" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="VectorParamUpdateextendsSerializable"></a>
+      <a id="VectorParamUpdate:VectorParamUpdate"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="VectorParamUpdate.html"><span class="name">VectorParamUpdate</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#com.github.gradientgmm.components.package@VectorParamUpdateextendsSerializable" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Container of a <a href="VectorGradientUtils.html" class="extype" name="com.github.gradientgmm.components.VectorGradientUtils">VectorGradientUtils</a> instance</p>
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="com.github.gradientgmm.components.UpdatableGaussianComponent" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="UpdatableGaussianComponent"></a>
+      <a id="UpdatableGaussianComponent:UpdatableGaussianComponent"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="UpdatableGaussianComponent$.html"><span class="name">UpdatableGaussianComponent</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#com.github.gradientgmm.components.package@UpdatableGaussianComponent" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>
