@@ -331,14 +331,16 @@ object GradientGaussianMixture{
   * @param k Number of components in the mixture
   * @param pointsPerCl The K-Means model will be trained with k*pointsPerCl points
   * @param nIters Number of iterations allowed for the K-means model
+  * @param nTries Number of K-means models to try
   * @param seed random seed
   */
-  def initialize(
+  def init(
     data: RDD[SV],
     k: Int,
     optim: Optimizer = new GradientAscent(),
     pointsPerCl: Int = 50,
     nIters: Int = 20,
+    nTries: Int = 1,
     seed: Long = 0): GradientGaussianMixture = {
     
     val dataSize = data.count()
@@ -348,12 +350,32 @@ object GradientGaussianMixture{
     val n = math.min(dataSize,pointsPerCl*k).toInt //in case the data has too few points
     var samples = sc.parallelize(data.takeSample(withReplacement = false, n, seed))
 
-    //create kmeans model
-    val kmeansModel = new KMeans()
+    var kmeansModel = new KMeans()
       .setMaxIterations(nIters)
       .setK(k)
       .setSeed(seed)
       .run(samples)
+
+    // within-set-sum-of-squares-error
+    var WSSSE: Double = kmeansModel.computeCost(samples)/n
+
+    // select best model from many tries
+    for(i <- 2 to nTries){
+
+      val model = new KMeans()
+      .setMaxIterations(nIters)
+      .setK(k)
+      .setSeed(seed + i - 1)
+      .run(samples)
+
+      var cost = model.computeCost(samples)/n
+
+      if(cost < WSSSE){
+        WSSSE = cost
+        kmeansModel = model
+      }
+
+    }
     
     val means = kmeansModel.clusterCenters.map{case v => Utils.toBDV(v.toArray)}
 
@@ -411,6 +433,7 @@ object GradientGaussianMixture{
   * @param convTol log-likelihood change tolerance for stopping criteria
   * @param pointsPerCl The K-Means model will be trained with k*pointsPerCl points
   * @param kMeansIters Number of iterations allowed for the K-means algorithm
+  * @param nTries Number of K-means models to try
   * @param seed Random seed
   * @return Fitted model
   */
@@ -422,15 +445,17 @@ object GradientGaussianMixture{
     maxIter: Int = 100,
     convTol: Double = 1e-6, 
     pointsPerCl: Int = 50,
-    kMeansIters: Int = 20, 
+    kMeansIters: Int = 20,
+    kMeansTries: Int = 1,
     seed: Int = 0): GradientGaussianMixture = {
     
-    val model = initialize(
+    val model = init(
                   data,
                   k,
                   optim,
                   pointsPerCl,
                   kMeansIters,
+                  kMeansTries,
                   seed)
     
     if(batchSize.isDefined){
