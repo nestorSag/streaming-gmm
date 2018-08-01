@@ -1,7 +1,8 @@
 # Gradient-based streamming Gaussian Mixtures in Spark
 
 This project forms part of an MSc dissertation at the University of Edinburgh. 
-It is based on the results from [1] about a stochastic gradient ascent algorithm for (possibly regularized) GMMs and extends these results by implementing accelerated descent (actually, ascent) directions as well. 
+
+It is based on the results of [1] and implements stochastic gradient ascent and additional accelerated gradient ascent algorithms for GMM, which make it particularly fitting for large-scale or streaming mixture models.
 
 ## Getting Started
 
