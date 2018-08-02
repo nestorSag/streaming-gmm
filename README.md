@@ -84,10 +84,10 @@ Now you can pass it to the model when initializing it by addind an ```optim``` p
 val model = GradientGaussianMixture.fit(data,k,myOptim)
 ```
 
-* ADAM and ADAMAX are also available, but their use is discouraged because they are unstable and produce poor results
+It is recommended to use a big initial step size and shrink it until 1e-2 or 1e-3
 ### Regularization
 
-To avoid the problem of [covariance singularity](https://stats.stackexchange.com/a/219358/66574), two regularization terms can be used; they are added to the optimizer object.
+To avoid the problem of [covariance singularity](https://stats.stackexchange.com/a/219358/66574), you can add a logarithmic barrier or a conjugate prior regularizer to the optimizer object:
 
 ```
 import com.github.gradientgmm.optim.regularization.{LogBarrier,ConjugatePrior}
@@ -95,10 +95,10 @@ import com.github.gradientgmm.optim.regularization.{LogBarrier,ConjugatePrior}
 val cpReg = new ConjugatePrior(k,dim) //pass k and data dimensionality
 val lbReg = new LogBarrier()
 
-optim.setRegularizer(lbReg)
-model.setOptimizer(optim)
+myOptim.setRegularizer(lbReg)
+model.setOptimizer(myOptim)
 ```
-Its usually better to use ```LogBarrier``` because it is cheaper computationally and memory-wise and has a smaller effect on the final model's quality.
+It is usually better to use ```LogBarrier``` because it is cheaper computationally and memory-wise and has a smaller effect on the final model's quality.
 
 ### Classifying Data
 
