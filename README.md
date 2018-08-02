@@ -2,11 +2,9 @@
 
 This project forms part of an MSc dissertation at the University of Edinburgh. 
 
-It is based on the results of [[1]](https://arxiv.org/pdf/1706.03267.pdf) and implements stochastic gradient ascent and additional accelerated gradient ascent algorithms for GMMs, which makes it particularly useful for large-scale or streaming mixture models.
+It is based on the results of [[1]](https://arxiv.org/pdf/1706.03267.pdf) and implements stochastic gradient ascent and additional accelerated gradient ascent algorithms for GMMs, which makes it particularly useful for large-scale and streaming mixture models.
 
 ## Getting Started
-
-These instructions will get you a copy of the project up and running on your local machine.
 
 ### Prerequisites
 
@@ -40,35 +38,24 @@ val model = GradientGaussianMixture(weigths,means,covs)
 
 (here ```means``` and ```covs``` are Spark's ```DenseVector``` and ```DenseMatrix``` respectively)
 
-or providing training data and the number of components (the data must be an ```RDD``` of Spark's ```DenseVector```, just like Spark's [GaussianMixtureModel](https://spark.apache.org/docs/2.3.1/api/scala/index.html#org.apache.spark.mllib.clustering.GaussianMixtureModel)):
+or passing as arguments training data and the number of components to ```init``` (the data must be an ```RDD``` of Spark's ```DenseVector```, just like Spark's [GaussianMixtureModel](https://spark.apache.org/docs/2.3.1/api/scala/index.html#org.apache.spark.mllib.clustering.GaussianMixtureModel)):
 
 ```
 val model = GradientGaussianMixture.init(data,k)
 ```
 
-the above will use the result of a K-means model fitted with a small sample to set initial
+the above line will use the result of a K-means model fitted with a small sample to set initial
 weights, means and covariances.
 
-We can initialize the model as above and then perform gradient ascent (actually, ascent) iterations in a single instruction with:
+You can initialize the model as above and then perform gradient ascent iterations in a single instruction with:
 
 ```
 val model = GradientGaussianMixture.fit(data,k)
 ```
 
-### Optimization
-
-For an existing model, ```model.step(data)``` can be used to update it. The mini-batch size and number of iterations of every ```step()``` call can be specified beforehand:
-
-```
-model
-.maxIter(20)
-.batchSize(50)
-.step(data)
-```
-
 ### Optimization algorithms
 
-The default optimization algorithm when creating and updating the model is ```GradientAscent```. Accelerated gradient ascent directions are also available (in fact they usually perform better, so we recommend using them) and we can create them as follows:
+The default optimization algorithm when creating and updating the model is ```GradientAscent```. Accelerated gradient ascent directions are also available (in fact they usually perform better, so you should use them!) and they can be created as follows:
 
 ```
 import com.github.gradientgmm.optim.algorithms.{MomentumGradientAscent,NesterovGradientAscent}
@@ -80,15 +67,28 @@ val myOptim = new MomentumGradientAscent()
     .setMinLearningRate(0.01)
 
 ```
-Now we can pass it to the model when initializing it by addind an ```optim``` parameter ton any of the instructions above, for example:
+Now you can pass it to the model when initializing it by addind an ```optim``` parameter to any of the instructions above, for example:
 
 ```
 val model = GradientGaussianMixture.fit(data,k,myOptim)
 ```
 
+It is recommended to use a big initial step size and shrink it until ```1e-2``` or ```1e-3```
+
+### Optimization
+
+For an existing model, ```model.step(data)``` is used to update it. The mini-batch size and number of iterations of every ```step()``` call can be specified beforehand:
+
+```
+model
+.maxIter(20)
+.batchSize(50)
+.step(data)
+```
+
 ### Regularization
 
-To avoid the problem of [covariance singularity](https://stats.stackexchange.com/a/219358/66574), two regularization terms can be used; they are added to the optimizer object.
+To avoid the problem of [covariance singularity](https://stats.stackexchange.com/a/219358/66574), you can add a logarithmic barrier or a conjugate prior regularizer to the optimizer object:
 
 ```
 import com.github.gradientgmm.optim.regularization.{LogBarrier,ConjugatePrior}
@@ -96,10 +96,10 @@ import com.github.gradientgmm.optim.regularization.{LogBarrier,ConjugatePrior}
 val cpReg = new ConjugatePrior(k,dim) //pass k and data dimensionality
 val lbReg = new LogBarrier()
 
-optim.setRegularizer(lbReg)
-model.setOptimizer(optim)
+myOptim.setRegularizer(lbReg)
+model.setOptimizer(myOptim)
 ```
-We recommend using ```LogBarrier``` because it is cheaper computationally and memory-wise and has a smaller effect on the final model's quality.
+It is usually better to use ```LogBarrier``` because it is cheaper computationally and memory-wise and has a smaller effect on the final model's quality.
 
 ### Classifying Data
 
