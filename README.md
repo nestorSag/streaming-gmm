@@ -47,21 +47,10 @@ val model = GradientGaussianMixture.init(data,k)
 the above line will use the result of a K-means model fitted with a small sample to set initial
 weights, means and covariances.
 
-YOu can initialize the model as above and then perform gradient ascent iterations in a single instruction with:
+You can initialize the model as above and then perform gradient ascent iterations in a single instruction with:
 
 ```
 val model = GradientGaussianMixture.fit(data,k)
-```
-
-### Optimization
-
-For an existing model, ```model.step(data)``` is used to update it. The mini-batch size and number of iterations of every ```step()``` call can be specified beforehand:
-
-```
-model
-.maxIter(20)
-.batchSize(50)
-.step(data)
 ```
 
 ### Optimization algorithms
@@ -84,7 +73,19 @@ Now you can pass it to the model when initializing it by addind an ```optim``` p
 val model = GradientGaussianMixture.fit(data,k,myOptim)
 ```
 
-It is recommended to use a big initial step size and shrink it until 1e-2 or 1e-3
+It is recommended to use a big initial step size and shrink it until ```1e-2``` or ```1e-3```
+
+### Optimization
+
+For an existing model, ```model.step(data)``` is used to update it. The mini-batch size and number of iterations of every ```step()``` call can be specified beforehand:
+
+```
+model
+.maxIter(20)
+.batchSize(50)
+.step(data)
+```
+
 ### Regularization
 
 To avoid the problem of [covariance singularity](https://stats.stackexchange.com/a/219358/66574), you can add a logarithmic barrier or a conjugate prior regularizer to the optimizer object:
