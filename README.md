@@ -38,7 +38,7 @@ val model = GradientGaussianMixture(weigths,means,covs)
 
 (here ```means``` and ```covs``` are Spark's ```DenseVector``` and ```DenseMatrix``` respectively)
 
-or providing training data and the number of components (the data must be an ```RDD``` of Spark's ```DenseVector```, just like Spark's [GaussianMixtureModel](https://spark.apache.org/docs/2.3.1/api/scala/index.html#org.apache.spark.mllib.clustering.GaussianMixtureModel)):
+or passing as arguments training data and the number of components (the data must be an ```RDD``` of Spark's ```DenseVector```, just like Spark's [GaussianMixtureModel](https://spark.apache.org/docs/2.3.1/api/scala/index.html#org.apache.spark.mllib.clustering.GaussianMixtureModel)):
 
 ```
 val model = GradientGaussianMixture.init(data,k)
