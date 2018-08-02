@@ -53,7 +53,7 @@ class ADAMAX extends Optimizer {
 
 	def direction[A](grad:A, utils: AcceleratedGradientUtils[A])(ops: ParameterOperations[A]): A = {
 
-	t += 0.5
+	t += 1.0
 
 	if(!utils.momentum.isDefined){
 		utils.initializeMomentum
