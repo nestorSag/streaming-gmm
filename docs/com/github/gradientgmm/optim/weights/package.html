@@ -66,24 +66,7 @@
 
         <div id="types" class="types members">
               <h3>Type Members</h3>
-              <ol><li name="com.github.gradientgmm.optim.weights.RatioWeightTransformation" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="RatioWeightTransformationextendsWeightsTransformation"></a>
-      <a id="RatioWeightTransformation:RatioWeightTransformation"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">class</span>
-      </span>
-      <span class="symbol">
-        <a href="RatioWeightTransformation.html"><span class="name">RatioWeightTransformation</span></a><span class="result"> extends <a href="WeightsTransformation.html" class="extype" name="com.github.gradientgmm.optim.weights.WeightsTransformation">WeightsTransformation</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../../../index.html#com.github.gradientgmm.optim.weights.package@RatioWeightTransformationextendsWeightsTransformation" title="Permalink" target="_top">
-        <img src="../../../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">Implements a ratio mapping to optimize the weight vector</p><div class="fullcomment"><div class="comment cmt"><p>Implements a ratio mapping to optimize the weight vector</p><p>The precise mapping is w_i =&gt; w_i/w_last</p></div></div>
-    </li><li name="com.github.gradientgmm.optim.weights.SoftmaxWeightTransformation" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+              <ol><li name="com.github.gradientgmm.optim.weights.SoftmaxWeightTransformation" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="SoftmaxWeightTransformationextendsWeightsTransformation"></a>
       <a id="SoftmaxWeightTransformation:SoftmaxWeightTransformation"></a>
       <h4 class="signature">
@@ -100,8 +83,7 @@
       </a>
     </span>
       <p class="shortcomment cmt">Implements a Softmax mapping to optimize the weight vector</p><div class="fullcomment"><div class="comment cmt"><p>Implements a Softmax mapping to optimize the weight vector</p><p>The precise mapping is w_i =&gt; log(w_i/w_last) and is an implementation of the procedure
-described in <i>Hosseini, Reshad &amp; Sra, Suvrit. (2017). An Alternative to EM for Gaussian Mixture Models: Batch and Stochastic Riemannian Optimization</i>
-(see <a href="https://arxiv.org/abs/1706.03267" target="_blank">https://arxiv.org/abs/1706.03267</a>).</p></div></div>
+described in <a href="https://arxiv.org/abs/1706.03267" target="_blank">An Alternative to EM for Gaussian Mixture Models: Batch and Stochastic Riemannian Optimization<i>]]</i></a></p></div></div>
     </li><li name="com.github.gradientgmm.optim.weights.WeightsTransformation" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
       <a id="WeightsTransformationextendsSerializable"></a>
       <a id="WeightsTransformation:WeightsTransformation"></a>
@@ -120,6 +102,27 @@ described in <i>Hosseini, Reshad &amp; Sra, Suvrit. (2017). An Alternative to EM
     </span>
       <p class="shortcomment cmt">Contains the basic functionality for any mapping to be used to
 fit the weights of a mixture model</p>
+    </li><li name="com.github.gradientgmm.optim.weights.RatioWeightTransformation" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="RatioWeightTransformationextendsWeightsTransformation"></a>
+      <a id="RatioWeightTransformation:RatioWeightTransformation"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="RatioWeightTransformation.html"><span class="name deprecated" title="Deprecated: (Since version gradientgmm 1.4) This is an experimental, numerically unstable transformation and should not be used">RatioWeightTransformation</span></a><span class="result"> extends <a href="WeightsTransformation.html" class="extype" name="com.github.gradientgmm.optim.weights.WeightsTransformation">WeightsTransformation</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.github.gradientgmm.optim.weights.package@RatioWeightTransformationextendsWeightsTransformation" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Implements a ratio mapping to optimize the weight vector</p><div class="fullcomment"><div class="comment cmt"><p>Implements a ratio mapping to optimize the weight vector</p><p>The precise mapping is w_i =&gt; w_i/w_last</p><p>Using it is NOT recommended; use the default Softmax transformation instead.
+</p></div><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@deprecated</span>
+              
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version gradientgmm 1.4)</i> This is an experimental, numerically unstable transformation and should not be used</p></dd></dl></div>
     </li></ol>
             </div>
 

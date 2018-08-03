@@ -1,22 +1,22 @@
 <!DOCTYPE html >
 <html>
         <head>
-          <title>GradientAggregator - com.github.gradientgmm.models.GradientAggregator</title>
-          <meta name="description" content="GradientAggregator - com.github.gradientgmm.models.GradientAggregator" />
-          <meta name="keywords" content="GradientAggregator com.github.gradientgmm.models.GradientAggregator" />
+          <title>GradientAggregator - com.github.gradientgmm.GradientAggregator</title>
+          <meta name="description" content="GradientAggregator - com.github.gradientgmm.GradientAggregator" />
+          <meta name="keywords" content="GradientAggregator com.github.gradientgmm.GradientAggregator" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
-      <link href="../../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
-      <link href="../../../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
-      <script type="text/javascript" src="../../../../lib/jquery.js" id="jquery-js"></script>
-      <script type="text/javascript" src="../../../../lib/jquery-ui.js"></script>
-      <script type="text/javascript" src="../../../../lib/template.js"></script>
-      <script type="text/javascript" src="../../../../lib/tools.tooltip.js"></script>
+      <link href="../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../../lib/template.js"></script>
+      <script type="text/javascript" src="../../../lib/tools.tooltip.js"></script>
       
       <script type="text/javascript">
          if(top === self) {
-            var url = '../../../../index.html';
-            var hash = 'com.github.gradientgmm.models.GradientAggregator$';
+            var url = '../../../index.html';
+            var hash = 'com.github.gradientgmm.GradientAggregator';
             var anchor = window.location.hash;
             var anchor_opt = '';
             if (anchor.length >= 1)
@@ -26,17 +26,17 @@
    	  </script>
     
         </head>
-        <body class="value">
+        <body class="type">
       <div id="definition">
-        <a href="GradientAggregator.html" title="See companion class"><img alt="Object/Class" src="../../../../lib/object_to_class_big.png" /></a>
-        <p id="owner"><a href="../../../package.html" class="extype" name="com">com</a>.<a href="../../package.html" class="extype" name="com.github">github</a>.<a href="../package.html" class="extype" name="com.github.gradientgmm">gradientgmm</a>.<a href="package.html" class="extype" name="com.github.gradientgmm.models">models</a></p>
-        <h1><a href="GradientAggregator.html" title="See companion class">GradientAggregator</a></h1><h3><span class="morelinks"><div>
+        <a href="GradientAggregator$.html" title="See companion object"><img alt="Class/Object" src="../../../lib/class_to_object_big.png" /></a>
+        <p id="owner"><a href="../../package.html" class="extype" name="com">com</a>.<a href="../package.html" class="extype" name="com.github">github</a>.<a href="package.html" class="extype" name="com.github.gradientgmm">gradientgmm</a></p>
+        <h1><a href="GradientAggregator$.html" title="See companion object">GradientAggregator</a></h1><h3><span class="morelinks"><div>
             Related Docs:
-            <a href="GradientAggregator.html" title="See companion class">class GradientAggregator</a>
-            | <a href="package.html" class="extype" name="com.github.gradientgmm.models">package models</a>
+            <a href="GradientAggregator$.html" title="See companion object">object GradientAggregator</a>
+            | <a href="package.html" class="extype" name="com.github.gradientgmm">package gradientgmm</a>
           </div></span></h3><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.models.GradientAggregator$" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      <a href="../../../index.html#com.github.gradientgmm.GradientAggregator" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       </div>
@@ -44,14 +44,18 @@
       <h4 id="signature" class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">object</span>
+        <span class="kind">class</span>
       </span>
       <span class="symbol">
         <span class="name">GradientAggregator</span><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Distributed aggregator of relevant statistics</p><p>In each worker it computes and aggregates the current batch log-likelihood,
+the regularization values for the current parameters and the
+gaussianGradients for each data point. The class structure is based heavily on
+Spark's <a href="https://github.com/apache/spark/blob/master/mllib/src/main/scala/org/apache/spark/mllib/clustering/GaussianMixture.scala" target="_blank">ExpectationSum</a>
+</p></div><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
@@ -71,7 +75,7 @@
                 <span class="filtertype">Inherited<br />
                 </span>
                 <ol id="linearization">
-                  <li class="in" name="com.github.gradientgmm.models.GradientAggregator"><span>GradientAggregator</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                  <li class="in" name="com.github.gradientgmm.GradientAggregator"><span>GradientAggregator</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                 </ol>
               </div><div id="ancestors">
             <span class="filtertype"></span>
@@ -88,7 +92,27 @@
 
       <div id="template">
         <div id="allMembers">
-        
+        <div id="constructors" class="members">
+              <h3>Instance Constructors</h3>
+              <ol><li name="com.github.gradientgmm.GradientAggregator#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="&lt;init&gt;(loss:Double,weightsGradient:breeze.linalg.DenseVector[Double],gaussianGradients:Array[breeze.linalg.DenseMatrix[Double]],counter:Int):com.github.gradientgmm.GradientAggregator"></a>
+      <a id="&lt;init&gt;:GradientAggregator"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">new</span>
+      </span>
+      <span class="symbol">
+        <span class="name">GradientAggregator</span><span class="params">(<span name="loss">loss: <span class="extype" name="scala.Double">Double</span></span>, <span name="weightsGradient">weightsGradient: <span class="extype" name="breeze.linalg.DenseVector">DenseVector</span>[<span class="extype" name="scala.Double">Double</span>]</span>, <span name="gaussianGradients">gaussianGradients: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="breeze.linalg.DenseMatrix">DenseMatrix</span>[<span class="extype" name="scala.Double">Double</span>]]</span>, <span name="counter">counter: <span class="extype" name="scala.Int">Int</span></span>)</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.github.gradientgmm.GradientAggregator@&lt;init&gt;(loss:Double,weightsGradient:breeze.linalg.DenseVector[Double],gaussianGradients:Array[breeze.linalg.DenseMatrix[Double]],counter:Int):com.github.gradientgmm.GradientAggregator" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">loss</dt><dd class="cmt"><p>aggregate log-likelihood</p></dd><dt class="param">gaussianGradients</dt><dd class="cmt"><p>Aggregate point-wise gaussianGradients for each component</p></dd></dl></div>
+    </li></ol>
+            </div>
 
         
 
@@ -108,8 +132,8 @@
         <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.models.GradientAggregator$@!=(x$1:Any):Boolean" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      <a href="../../../index.html#com.github.gradientgmm.GradientAggregator@!=(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
@@ -125,11 +149,28 @@
         <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.models.GradientAggregator$@##():Int" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      <a href="../../../index.html#com.github.gradientgmm.GradientAggregator@##():Int" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.github.gradientgmm.GradientAggregator#+=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="+=(x:com.github.gradientgmm.GradientAggregator):com.github.gradientgmm.GradientAggregator"></a>
+      <a id="+=(GradientAggregator):GradientAggregator"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $plus$eq" class="name">+=</span><span class="params">(<span name="x">x: <a href="" class="extype" name="com.github.gradientgmm.GradientAggregator">GradientAggregator</a></span>)</span><span class="result">: <a href="" class="extype" name="com.github.gradientgmm.GradientAggregator">GradientAggregator</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.github.gradientgmm.GradientAggregator@+=(x:com.github.gradientgmm.GradientAggregator):com.github.gradientgmm.GradientAggregator" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Adder for other GradientAggregator instances</p><div class="fullcomment"><div class="comment cmt"><p>Adder for other GradientAggregator instances</p><p>Used for further aggregation between each worker's object</p></div></div>
     </li><li name="scala.AnyRef#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="==(x$1:Any):Boolean"></a>
       <a id="==(Any):Boolean"></a>
@@ -142,28 +183,11 @@
         <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.models.GradientAggregator$@==(x$1:Any):Boolean" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      <a href="../../../index.html#com.github.gradientgmm.GradientAggregator@==(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="com.github.gradientgmm.models.GradientAggregator#add" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="add(weights:Array[Double],dists:Array[com.github.gradientgmm.components.UpdatableGaussianComponent],optim:com.github.gradientgmm.optim.algorithms.Optimizer)(agg:com.github.gradientgmm.models.GradientAggregator,y:breeze.linalg.DenseVector[Double]):com.github.gradientgmm.models.GradientAggregator"></a>
-      <a id="add(Array[Double],Array[UpdatableGaussianComponent],Optimizer)(GradientAggregator,DenseVector[Double]):GradientAggregator"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">add</span><span class="params">(<span name="weights">weights: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Double">Double</span>]</span>, <span name="dists">dists: <span class="extype" name="scala.Array">Array</span>[<a href="../components/UpdatableGaussianComponent.html" class="extype" name="com.github.gradientgmm.components.UpdatableGaussianComponent">UpdatableGaussianComponent</a>]</span>, <span name="optim">optim: <a href="../optim/algorithms/Optimizer.html" class="extype" name="com.github.gradientgmm.optim.algorithms.Optimizer">Optimizer</a></span>)</span><span class="params">(<span name="agg">agg: <a href="GradientAggregator.html" class="extype" name="com.github.gradientgmm.models.GradientAggregator">GradientAggregator</a></span>, <span name="y">y: <span class="extype" name="breeze.linalg.DenseVector">DenseVector</span>[<span class="extype" name="scala.Double">Double</span>]</span>)</span><span class="result">: <a href="GradientAggregator.html" class="extype" name="com.github.gradientgmm.models.GradientAggregator">GradientAggregator</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.models.GradientAggregator$@add(weights:Array[Double],dists:Array[com.github.gradientgmm.components.UpdatableGaussianComponent],optim:com.github.gradientgmm.optim.algorithms.Optimizer)(agg:com.github.gradientgmm.models.GradientAggregator,y:breeze.linalg.DenseVector[Double]):com.github.gradientgmm.models.GradientAggregator" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">Adder for individual points</p><div class="fullcomment"><div class="comment cmt"><p>Adder for individual points</p><p>Used for reducing individual data points and aggregating the ir statistics</p></div><dl class="paramcmts block"><dt class="param">weights</dt><dd class="cmt"><p>Current weights vector</p></dd><dt class="param">dists</dt><dd class="cmt"><p>Current model components</p></dd><dt class="param">optim</dt><dd class="cmt"><p>Optimization algorithm</p></dd><dt>returns</dt><dd class="cmt"><p>Instance with updated statistics</p></dd></dl></div>
     </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <a id="asInstanceOf[T0]:T0"></a>
@@ -176,8 +200,8 @@
         <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.models.GradientAggregator$@asInstanceOf[T0]:T0" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      <a href="../../../index.html#com.github.gradientgmm.GradientAggregator@asInstanceOf[T0]:T0" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
@@ -193,17 +217,34 @@
         <span class="name">clone</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.models.GradientAggregator$@clone():Object" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      <a href="../../../index.html#com.github.gradientgmm.GradientAggregator@clone():Object" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
                 <span class="name">@throws</span><span class="args">(<span>
       
       <span class="defval" name="classOf[java.lang.CloneNotSupportedException]">...</span>
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="com.github.gradientgmm.GradientAggregator#counter" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="counter:Int"></a>
+      <a id="counter:Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">counter</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.github.gradientgmm.GradientAggregator@counter:Int" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
     </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a>
       <a id="eq(AnyRef):Boolean"></a>
@@ -216,8 +257,8 @@
         <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.models.GradientAggregator$@eq(x$1:AnyRef):Boolean" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      <a href="../../../index.html#com.github.gradientgmm.GradientAggregator@eq(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
@@ -233,8 +274,8 @@
         <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.models.GradientAggregator$@equals(x$1:Any):Boolean" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      <a href="../../../index.html#com.github.gradientgmm.GradientAggregator@equals(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
@@ -250,17 +291,34 @@
         <span class="name">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.models.GradientAggregator$@finalize():Unit" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      <a href="../../../index.html#com.github.gradientgmm.GradientAggregator@finalize():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
                 <span class="name">@throws</span><span class="args">(<span>
       
       <span class="symbol">classOf[java.lang.Throwable]</span>
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="com.github.gradientgmm.GradientAggregator#gaussianGradients" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="gaussianGradients:Array[breeze.linalg.DenseMatrix[Double]]"></a>
+      <a id="gaussianGradients:Array[DenseMatrix[Double]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">gaussianGradients</span><span class="result">: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="breeze.linalg.DenseMatrix">DenseMatrix</span>[<span class="extype" name="scala.Double">Double</span>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.github.gradientgmm.GradientAggregator@gaussianGradients:Array[breeze.linalg.DenseMatrix[Double]]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Aggregate point-wise gaussianGradients for each component</p>
     </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <a id="getClass():Class[_]"></a>
@@ -273,28 +331,11 @@
         <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.models.GradientAggregator$@getClass():Class[_]" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      <a href="../../../index.html#com.github.gradientgmm.GradientAggregator@getClass():Class[_]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="com.github.gradientgmm.models.GradientAggregator#getPosteriors" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="getPosteriors(point:breeze.linalg.DenseVector[Double],dists:Array[com.github.gradientgmm.components.UpdatableGaussianComponent],weights:Array[Double]):breeze.linalg.DenseVector[Double]"></a>
-      <a id="getPosteriors(DenseVector[Double],Array[UpdatableGaussianComponent],Array[Double]):DenseVector[Double]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">getPosteriors</span><span class="params">(<span name="point">point: <span class="extype" name="breeze.linalg.DenseVector">DenseVector</span>[<span class="extype" name="scala.Double">Double</span>]</span>, <span name="dists">dists: <span class="extype" name="scala.Array">Array</span>[<a href="../components/UpdatableGaussianComponent.html" class="extype" name="com.github.gradientgmm.components.UpdatableGaussianComponent">UpdatableGaussianComponent</a>]</span>, <span name="weights">weights: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Double">Double</span>]</span>)</span><span class="result">: <span class="extype" name="breeze.linalg.DenseVector">DenseVector</span>[<span class="extype" name="scala.Double">Double</span>]</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.models.GradientAggregator$@getPosteriors(point:breeze.linalg.DenseVector[Double],dists:Array[com.github.gradientgmm.components.UpdatableGaussianComponent],weights:Array[Double]):breeze.linalg.DenseVector[Double]" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">compute posterior membership probabilities for a data point</p><div class="fullcomment"><div class="comment cmt"><p>compute posterior membership probabilities for a data point</p><p>Used for reducing individual data points and aggregating the ir statistics</p></div><dl class="paramcmts block"><dt class="param">point</dt><dd class="cmt"><p>Data point</p></dd><dt class="param">dists</dt><dd class="cmt"><p>Current model components</p></dd><dt class="param">weights</dt><dd class="cmt"><p>current model's weights</p></dd><dt>returns</dt><dd class="cmt"><p>Vector of posterior membership probabilities</p></dd></dl></div>
     </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="hashCode():Int"></a>
       <a id="hashCode():Int"></a>
@@ -307,28 +348,11 @@
         <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.models.GradientAggregator$@hashCode():Int" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      <a href="../../../index.html#com.github.gradientgmm.GradientAggregator@hashCode():Int" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="com.github.gradientgmm.models.GradientAggregator#init" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="init(k:Int,d:Int):com.github.gradientgmm.models.GradientAggregator"></a>
-      <a id="init(Int,Int):GradientAggregator"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">init</span><span class="params">(<span name="k">k: <span class="extype" name="scala.Int">Int</span></span>, <span name="d">d: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <a href="GradientAggregator.html" class="extype" name="com.github.gradientgmm.models.GradientAggregator">GradientAggregator</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.models.GradientAggregator$@init(k:Int,d:Int):com.github.gradientgmm.models.GradientAggregator" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">GradientAggregator initializer</p><div class="fullcomment"><div class="comment cmt"><p>GradientAggregator initializer</p><p>Initializes an instance with initial statistics set as zero</p></div><dl class="paramcmts block"><dt class="param">k</dt><dd class="cmt"><p>Number of components in the model</p></dd><dt class="param">d</dt><dd class="cmt"><p>Dimensionality of the data</p></dd></dl></div>
     </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <a id="isInstanceOf[T0]:Boolean"></a>
@@ -341,11 +365,46 @@
         <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.models.GradientAggregator$@isInstanceOf[T0]:Boolean" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      <a href="../../../index.html#com.github.gradientgmm.GradientAggregator@isInstanceOf[T0]:Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="com.github.gradientgmm.GradientAggregator#k" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="k:Int"></a>
+      <a id="k:Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">k</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.github.gradientgmm.GradientAggregator@k:Int" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Number of components in the model
+</p>
+    </li><li name="com.github.gradientgmm.GradientAggregator#loss" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="loss:Double"></a>
+      <a id="loss:Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">loss</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.github.gradientgmm.GradientAggregator@loss:Double" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">aggregate log-likelihood</p>
     </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a>
       <a id="ne(AnyRef):Boolean"></a>
@@ -358,8 +417,8 @@
         <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.models.GradientAggregator$@ne(x$1:AnyRef):Boolean" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      <a href="../../../index.html#com.github.gradientgmm.GradientAggregator@ne(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
@@ -375,8 +434,8 @@
         <span class="name">notify</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.models.GradientAggregator$@notify():Unit" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      <a href="../../../index.html#com.github.gradientgmm.GradientAggregator@notify():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
@@ -392,8 +451,8 @@
         <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.models.GradientAggregator$@notifyAll():Unit" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      <a href="../../../index.html#com.github.gradientgmm.GradientAggregator@notifyAll():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
@@ -409,8 +468,8 @@
         <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.models.GradientAggregator$@synchronized[T0](x$1:=&gt;T0):T0" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      <a href="../../../index.html#com.github.gradientgmm.GradientAggregator@synchronized[T0](x$1:=&gt;T0):T0" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
@@ -426,8 +485,8 @@
         <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.models.GradientAggregator$@toString():String" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      <a href="../../../index.html#com.github.gradientgmm.GradientAggregator@toString():String" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
@@ -443,8 +502,8 @@
         <span class="name">wait</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.models.GradientAggregator$@wait():Unit" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      <a href="../../../index.html#com.github.gradientgmm.GradientAggregator@wait():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
@@ -466,8 +525,8 @@
         <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.models.GradientAggregator$@wait(x$1:Long,x$2:Int):Unit" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      <a href="../../../index.html#com.github.gradientgmm.GradientAggregator@wait(x$1:Long,x$2:Int):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
@@ -489,8 +548,8 @@
         <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.models.GradientAggregator$@wait(x$1:Long):Unit" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      <a href="../../../index.html#com.github.gradientgmm.GradientAggregator@wait(x$1:Long):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
@@ -500,6 +559,23 @@
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="com.github.gradientgmm.GradientAggregator#weightsGradient" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="weightsGradient:breeze.linalg.DenseVector[Double]"></a>
+      <a id="weightsGradient:DenseVector[Double]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">weightsGradient</span><span class="result">: <span class="extype" name="breeze.linalg.DenseVector">DenseVector</span>[<span class="extype" name="scala.Double">Double</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.github.gradientgmm.GradientAggregator@weightsGradient:breeze.linalg.DenseVector[Double]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
     </li></ol>
             </div>
 

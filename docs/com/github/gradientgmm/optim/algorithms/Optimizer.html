@@ -56,7 +56,7 @@ Optimization algorithms like Stochastic Gradient Ascent are implementations of t
           <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div><div class="toggleContainer block">
             <span class="toggle">Known Subclasses</span>
-            <div class="subClasses hiddenContent"><a href="ADAM.html" class="extype" name="com.github.gradientgmm.optim.algorithms.ADAM">ADAM</a>, <a href="GradientAscent.html" class="extype" name="com.github.gradientgmm.optim.algorithms.GradientAscent">GradientAscent</a>, <a href="MomentumGradientAscent.html" class="extype" name="com.github.gradientgmm.optim.algorithms.MomentumGradientAscent">MomentumGradientAscent</a>, <a href="NesterovGradientAscent.html" class="extype" name="com.github.gradientgmm.optim.algorithms.NesterovGradientAscent">NesterovGradientAscent</a></div>
+            <div class="subClasses hiddenContent"><a href="ADAM.html" class="extype" name="com.github.gradientgmm.optim.algorithms.ADAM">ADAM</a>, <a href="ADAMAX.html" class="extype" name="com.github.gradientgmm.optim.algorithms.ADAMAX">ADAMAX</a>, <a href="GradientAscent.html" class="extype" name="com.github.gradientgmm.optim.algorithms.GradientAscent">GradientAscent</a>, <a href="MomentumGradientAscent.html" class="extype" name="com.github.gradientgmm.optim.algorithms.MomentumGradientAscent">MomentumGradientAscent</a>, <a href="NesterovGradientAscent.html" class="extype" name="com.github.gradientgmm.optim.algorithms.NesterovGradientAscent">NesterovGradientAscent</a></div>
           </div></div>
         
 
@@ -361,8 +361,8 @@ Optimization algorithms like Stochastic Gradient Ascent are implementations of t
         <img src="../../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Use the {fromSimplex} method from <a href="../weights/WeightsTransformation.html" class="extype" name="com.github.gradientgmm.optim.weights.WeightsTransformation">com.github.gradientgmm.optim.weights.WeightsTransformation</a>
-</p><div class="fullcomment"><div class="comment cmt"><p>Use the {fromSimplex} method from <a href="../weights/WeightsTransformation.html" class="extype" name="com.github.gradientgmm.optim.weights.WeightsTransformation">com.github.gradientgmm.optim.weights.WeightsTransformation</a>
+      <p class="shortcomment cmt">Use fromSimplex method from <a href="../weights/WeightsTransformation.html" class="extype" name="com.github.gradientgmm.optim.weights.WeightsTransformation">WeightsTransformation</a>
+</p><div class="fullcomment"><div class="comment cmt"><p>Use fromSimplex method from <a href="../weights/WeightsTransformation.html" class="extype" name="com.github.gradientgmm.optim.weights.WeightsTransformation">WeightsTransformation</a>
 </p></div><dl class="paramcmts block"><dt class="param">weights</dt><dd class="cmt"><p>mixture weights</p></dd></dl></div>
     </li><li name="com.github.gradientgmm.optim.algorithms.Optimizer#gaussianGradient" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="gaussianGradient(dist:com.github.gradientgmm.components.UpdatableGaussianComponent,point:breeze.linalg.DenseMatrix[Double],w:Double):breeze.linalg.DenseMatrix[Double]"></a>
@@ -486,19 +486,19 @@ Optimization algorithms like Stochastic Gradient Ascent are implementations of t
 but it differs for some algorithms, e.g. Nesterov's gradient ascent.
 </p></div><dl class="paramcmts block"><dt class="param">current</dt><dd class="cmt"><p>Current parameter values</p></dd><dt class="param">grad</dt><dd class="cmt"><p>Current batch gradient</p></dd><dt class="param">utils</dt><dd class="cmt"><p>Wrapper for accelerated gradient ascent utilities</p></dd><dt class="param">ops</dt><dd class="cmt"><p>Deffinitions for algebraic operations for the apropiate data structure, e.g. vector or matrix.
 .</p></dd><dt>returns</dt><dd class="cmt"><p>updated parameter values</p></dd></dl></div>
-    </li><li name="com.github.gradientgmm.optim.algorithms.Optimizer#halveStepEvery" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="halveStepEvery(m:Int):Optimizer.this.type"></a>
-      <a id="halveStepEvery(Int):Optimizer.this.type"></a>
+    </li><li name="com.github.gradientgmm.optim.algorithms.Optimizer#halveStepSizeEvery" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="halveStepSizeEvery(m:Int):Optimizer.this.type"></a>
+      <a id="halveStepSizeEvery(Int):Optimizer.this.type"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">halveStepEvery</span><span class="params">(<span name="m">m: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <a href="" class="extype" name="com.github.gradientgmm.optim.algorithms.Optimizer">Optimizer</a>.this.type</span>
+        <span class="name">halveStepSizeEvery</span><span class="params">(<span name="m">m: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <a href="" class="extype" name="com.github.gradientgmm.optim.algorithms.Optimizer">Optimizer</a>.this.type</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../../index.html#com.github.gradientgmm.optim.algorithms.Optimizer@halveStepEvery(m:Int):Optimizer.this.type" title="Permalink" target="_top">
+      <a href="../../../../../index.html#com.github.gradientgmm.optim.algorithms.Optimizer@halveStepSizeEvery(m:Int):Optimizer.this.type" title="Permalink" target="_top">
         <img src="../../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -555,8 +555,8 @@ the step size by half every n iterations.
         <img src="../../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Ascent procedure's learning rate
-</p><div class="fullcomment"><div class="comment cmt"><p>Ascent procedure's learning rate
+      <p class="shortcomment cmt">Step size
+</p><div class="fullcomment"><div class="comment cmt"><p>Step size
 </p></div><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
     </li><li name="com.github.gradientgmm.optim.algorithms.Optimizer#minLearningRate" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="minLearningRate:Double"></a>
@@ -801,8 +801,8 @@ After t iterations the learning rate will be shrinkageRate^t * learningRate
         <img src="../../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Use the {toSimplex} method from <a href="../weights/WeightsTransformation.html" class="extype" name="com.github.gradientgmm.optim.weights.WeightsTransformation">com.github.gradientgmm.optim.weights.WeightsTransformation</a>
-</p><div class="fullcomment"><div class="comment cmt"><p>Use the {toSimplex} method from <a href="../weights/WeightsTransformation.html" class="extype" name="com.github.gradientgmm.optim.weights.WeightsTransformation">com.github.gradientgmm.optim.weights.WeightsTransformation</a>
+      <p class="shortcomment cmt">Use toSimplex method from <a href="../weights/WeightsTransformation.html" class="extype" name="com.github.gradientgmm.optim.weights.WeightsTransformation">WeightsTransformation</a>
+</p><div class="fullcomment"><div class="comment cmt"><p>Use toSimplex method from <a href="../weights/WeightsTransformation.html" class="extype" name="com.github.gradientgmm.optim.weights.WeightsTransformation">WeightsTransformation</a>
 </p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>valid mixture weight vector</p></dd></dl></div>
     </li><li name="com.github.gradientgmm.optim.algorithms.Optimizer#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="toString():String"></a>
@@ -837,7 +837,7 @@ After t iterations the learning rate will be shrinkageRate^t * learningRate
         <img src="../../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Shrink {learningRate} by {shrinkageRate}</p>
+      <p class="shortcomment cmt">Shrink learningRate by a factor of shrinkageRate</p>
     </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <a id="wait():Unit"></a>

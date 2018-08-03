@@ -66,25 +66,7 @@
 
         <div id="types" class="types members">
               <h3>Type Members</h3>
-              <ol><li name="com.github.gradientgmm.optim.algorithms.ADAM" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="ADAMextendsOptimizer"></a>
-      <a id="ADAM:ADAM"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">class</span>
-      </span>
-      <span class="symbol">
-        <a href="ADAM.html"><span class="name">ADAM</span></a><span class="result"> extends <a href="Optimizer.html" class="extype" name="com.github.gradientgmm.optim.algorithms.Optimizer">Optimizer</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../../../index.html#com.github.gradientgmm.optim.algorithms.package@ADAMextendsOptimizer" title="Permalink" target="_top">
-        <img src="../../../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">Optimizer that performs gradient ascent using the ADAM algorithm.</p><div class="fullcomment"><div class="comment cmt"><p>Optimizer that performs gradient ascent using the ADAM algorithm. See <i>Adam: A Method for Stochastic Optimization. Kingma, Diederik P.; Ba, Jimmy, 2014</i>
-</p></div></div>
-    </li><li name="com.github.gradientgmm.optim.algorithms.GradientAscent" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+              <ol><li name="com.github.gradientgmm.optim.algorithms.GradientAscent" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="GradientAscentextendsOptimizer"></a>
       <a id="GradientAscent:GradientAscent"></a>
       <h4 class="signature">
@@ -100,9 +82,9 @@
         <img src="../../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Optimizer that performs stochastic gradient ascent
+      <p class="shortcomment cmt">Optimizer that performs Stochastic Gradient Ascent
 </p>
-    </li><li name="com.github.gradientgmm.optim.algorithms.MomentumGradientAscent" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="com.github.gradientgmm.optim.algorithms.MomentumGradientAscent" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="MomentumGradientAscentextendsOptimizer"></a>
       <a id="MomentumGradientAscent:MomentumGradientAscent"></a>
       <h4 class="signature">
@@ -118,8 +100,8 @@
         <img src="../../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Optimizer that performs stochastic gradient ascent with momentum
-</p>
+      <p class="shortcomment cmt">Optimizer that performs stochastic gradient ascent with momentum</p><div class="fullcomment"><div class="comment cmt"><p>Optimizer that performs stochastic gradient ascent with momentum</p><p>As formulated in <i>Goh, &quot;Why Momentum Really Works&quot;, Distill, 2017. http://doi.org/10.23915/distill.00006</i>
+</p></div></div>
     </li><li name="com.github.gradientgmm.optim.algorithms.NesterovGradientAscent" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="NesterovGradientAscentextendsOptimizer"></a>
       <a id="NesterovGradientAscent:NesterovGradientAscent"></a>
@@ -193,6 +175,48 @@ Optimization algorithms like Stochastic Gradient Ascent are implementations of t
       <p class="shortcomment cmt">Contains common mathematical operations that can be performed in both matrices and vectors.</p><div class="fullcomment"><div class="comment cmt"><p>Contains common mathematical operations that can be performed in both matrices and vectors.
 Its purpose is avoid duplicating code in the optimization algorithms' classes
 </p></div></div>
+    </li><li name="com.github.gradientgmm.optim.algorithms.ADAM" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ADAMextendsOptimizer"></a>
+      <a id="ADAM:ADAM"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ADAM.html"><span class="name deprecated" title="Deprecated: (Since version gradientgmm 1.4) ADAM can be unstable for GMM problems and should not be used">ADAM</span></a><span class="result"> extends <a href="Optimizer.html" class="extype" name="com.github.gradientgmm.optim.algorithms.Optimizer">Optimizer</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.github.gradientgmm.optim.algorithms.package@ADAMextendsOptimizer" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Optimizer that performs gradient ascent using the ADAM algorithm.</p><div class="fullcomment"><div class="comment cmt"><p>Optimizer that performs gradient ascent using the ADAM algorithm. See <i>Adam: A Method for Stochastic Optimization. Kingma, Diederik P.; Ba, Jimmy, 2014</i></p><p>Using it is NOT recommended; you should use SGD or its accelerated versions instead.
+</p></div><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@deprecated</span>
+              
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version gradientgmm 1.4)</i> ADAM can be unstable for GMM problems and should not be used</p></dd></dl></div>
+    </li><li name="com.github.gradientgmm.optim.algorithms.ADAMAX" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ADAMAXextendsOptimizer"></a>
+      <a id="ADAMAX:ADAMAX"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ADAMAX.html"><span class="name deprecated" title="Deprecated: (Since version gradientgmm 1.4) ADAMAX can be unstable for GMM problems and should not be used">ADAMAX</span></a><span class="result"> extends <a href="Optimizer.html" class="extype" name="com.github.gradientgmm.optim.algorithms.Optimizer">Optimizer</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.github.gradientgmm.optim.algorithms.package@ADAMAXextendsOptimizer" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Optimizer that performs gradient ascent using the ADAMAX algorithm.</p><div class="fullcomment"><div class="comment cmt"><p>Optimizer that performs gradient ascent using the ADAMAX algorithm. See <i>Adam: A Method for Stochastic Optimization. Kingma, Diederik P.; Ba, Jimmy, 2014</i></p><p>Using it is NOT recommended; you should use SGD or its accelerated versions instead.
+</p></div><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@deprecated</span>
+              
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version gradientgmm 1.4)</i> ADAMAX can be unstable for GMM problems and should not be used</p></dd></dl></div>
     </li></ol>
             </div>
 

@@ -45,11 +45,15 @@
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <span class="name">RatioWeightTransformation</span><span class="result"> extends <a href="WeightsTransformation.html" class="extype" name="com.github.gradientgmm.optim.weights.WeightsTransformation">WeightsTransformation</a></span>
+        <span class="name deprecated" title="Deprecated: (Since version gradientgmm 1.4) This is an experimental, numerically unstable transformation and should not be used">RatioWeightTransformation</span><span class="result"> extends <a href="WeightsTransformation.html" class="extype" name="com.github.gradientgmm.optim.weights.WeightsTransformation">WeightsTransformation</a></span>
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Implements a ratio mapping to optimize the weight vector</p><p>The precise mapping is w_i =&gt; w_i/w_last</p></div><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Implements a ratio mapping to optimize the weight vector</p><p>The precise mapping is w_i =&gt; w_i/w_last</p><p>Using it is NOT recommended; use the default Softmax transformation instead.
+</p></div><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@deprecated</span>
+              
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version gradientgmm 1.4)</i> This is an experimental, numerically unstable transformation and should not be used</p></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><a href="WeightsTransformation.html" class="extype" name="com.github.gradientgmm.optim.weights.WeightsTransformation">WeightsTransformation</a>, <span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>

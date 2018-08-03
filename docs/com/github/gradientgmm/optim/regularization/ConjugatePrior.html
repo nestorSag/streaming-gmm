@@ -50,8 +50,8 @@
       </h4>
       
           <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Conjugate prior regularization for all the mixture's parameters; this means an
-Inverse-Wishart prior over the covariance matrices, a Normal prior over the means
-and a Dirchlet prior over the weights.</p><p>See <a href="https://en.wikipedia.org/wiki/Normal-inverse-Wishart_distribution" target="_blank">https://en.wikipedia.org/wiki/Normal-inverse-Wishart_distribution</a></p><p>See <a href="https://en.wikipedia.org/wiki/Dirichlet_distribution" target="_blank">https://en.wikipedia.org/wiki/Dirichlet_distribution</a>
+<a href="https://en.wikipedia.org/wiki/Normal-inverse-Wishart_distribution" target="_blank">Inverse-Wishart</a> prior over the covariance matrices, a Normal prior over the means
+and a <a href="https://en.wikipedia.org/wiki/Dirichlet_distribution" target="_blank">Dirichlet</a> distribution prior over the weights.
 </p></div><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><a href="Regularizer.html" class="extype" name="com.github.gradientgmm.optim.regularization.Regularizer">Regularizer</a>, <span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
@@ -559,7 +559,7 @@ and a Dirchlet prior over the weights.</p><p>See <a href="https://en.wikipedia.o
         <img src="../../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Get augmented parameter matrix.</p><div class="fullcomment"><div class="comment cmt"><p>Get augmented parameter matrix. See <i>Hosseini, Reshad &amp; Sra, Suvrit. (2017). An Alternative to EM for Gaussian Mixture Models: Batch and Stochastic Riemannian Optimization</i></p></div></div>
+      <p class="shortcomment cmt">Parameter block matrix [A B; C D].</p><div class="fullcomment"><div class="comment cmt"><p>Parameter block matrix [A B; C D]. The blocks are:</p><p>A = iwMean + kappa * normalMean * normalMean.t</p><p>B = kappa * normalMean</p><p>C = kappa * normalMean.t</p><p>D = kappa</p><p>kappa = degFrredom + dim + 2</p></div></div>
     </li><li name="com.github.gradientgmm.optim.regularization.ConjugatePrior#setDf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="setDf(df:Double):ConjugatePrior.this.type"></a>
       <a id="setDf(Double):ConjugatePrior.this.type"></a>
