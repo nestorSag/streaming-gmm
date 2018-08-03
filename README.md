@@ -31,7 +31,7 @@ Below is a summary of how the program works. To see the full documentation click
 The model is initialized using its factory object, either specifying the arrays of initial weights, mean vectors and covariance matrices:
 
 ```
-import com.github.gradientgmm.models.GradientGaussianMixture
+import com.github.gradientgmm.GradientGaussianMixture
 
 val model = GradientGaussianMixture(weigths,means,covs)
 ```
