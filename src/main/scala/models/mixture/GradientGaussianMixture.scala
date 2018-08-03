@@ -120,12 +120,12 @@ class GradientGaussianMixture private[models] (
 
       val sampleStats = batch(gConcaveData).treeAggregate(GradientAggregator.init(k, d))(adder.value, _ += _)
 
+      val n: Int = sampleStats.counter // number of actual data points in current batch
+
       if(d==2 && k == 3){
         //send values formatted for R processing to logs
-        logger.debug(s"grads: list(${sampleStats.gaussianGradients.map{case g => "c(" + g.toArray.mkString(",") + ")"}.mkString(",")})")
+        logger.debug(s"grads: list(${sampleStats.gaussianGradients.map{case g => "c(" + (g/n.toDouble).toArray.mkString(",") + ")"}.mkString(",")})")
       }
-
-      val n: Int = sampleStats.counter // number of actual data points in current batch
 
       if(n>0){
       // pair Gaussian components with their respective parameter gradients
