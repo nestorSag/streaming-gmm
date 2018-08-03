@@ -16,7 +16,7 @@ class NesterovGradientAscent extends Optimizer {
 	var gamma = 0.5
 	
 	def setGamma(gamma: Double): this.type = { 
-		require(gamma > 0 , "gamma must be positive")
+		require(gamma > 0 & gamma < 1, "gamma must be in (0,1)")
 		this.gamma = gamma
 		this
 	}

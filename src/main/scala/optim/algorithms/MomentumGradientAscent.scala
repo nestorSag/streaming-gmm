@@ -14,7 +14,7 @@ class MomentumGradientAscent extends Optimizer {
 	var beta = 0.5
 	
 	def setBeta(beta: Double): this.type = { 
-		require(beta > 0 , "beta must be positive")
+		require(beta > 0 & beta < 1, "beta must be in (0,1)")
 		this.beta = beta
 		this
 	}
