@@ -14,8 +14,7 @@ import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV,
   * Spark's [[https://github.com/apache/spark/blob/master/mllib/src/main/scala/org/apache/spark/mllib/clustering/GaussianMixture.scala ExpectationSum]]
 
   * @param loss aggregate log-likelihood
-  * @param weightsGradient: aggregate posterior responsability for each component. See ''Pattern Recognition
-  * And Machine Learning. Bishop, Chis.'', page 432
+  * @param weightsGradient: aggregate posterior responsability for each component
   * @param gaussianGradients Aggregate point-wise gaussianGradients for each component
  
   */
@@ -31,7 +30,7 @@ class GradientAggregator(
   val k = gaussianGradients.length
 
 /**
-  * Adder for different GradientAggregator
+  * Adder for other GradientAggregator instances
   *
   * Used for further aggregation between each worker's object
  

@@ -5,7 +5,7 @@ import org.apache.spark.mllib.linalg.{Matrices => SMS, Matrix => SM, DenseMatrix
 
 /**
   * Multivariate Gaussian Distribution reformulation that implies a g-concave loss function in 
-  * ''Hosseini, Reshad & Sra, Suvrit. (2017). An Alternative to EM for Gaussian Mixture Models: Batch and Stochastic Riemannian Optimization''
+  * [[https://arxiv.org/abs/1706.03267 An Alternative to EM for Gaussian Mixture Models: Batch and Stochastic Riemannian Optimization'']]
   *
   * For an arbitrary Gaussian distribution, its g-concave reformulation have zero mean and an
   * augmented covariance matrix which is a function of the original mean, covariance matrix

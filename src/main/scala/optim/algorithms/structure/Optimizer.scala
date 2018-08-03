@@ -22,7 +22,7 @@ trait Optimizer extends Serializable{
 	protected var regularizer: Option[Regularizer] = None
 
 /**
-  * Ascent procedure's learning rate
+  * Step size
   */
 	protected var learningRate: Double = 0.9
 
@@ -49,7 +49,7 @@ trait Optimizer extends Serializable{
   */
   private var n: Double = 1.0
  /**
-  * Shrink {learningRate} by {shrinkageRate}
+  * Shrink learningRate by a factor of shrinkageRate
   *
   */
 	def updateLearningRate: Unit = {
@@ -57,7 +57,7 @@ trait Optimizer extends Serializable{
 	}
 
 /**
-  * Use the {fromSimplex} method from [[com.github.gradientgmm.optim.weights.WeightsTransformation]]
+  * Use fromSimplex method from [[com.github.gradientgmm.optim.weights.WeightsTransformation WeightsTransformation]]
   *
   * @param weights mixture weights
   */
@@ -66,7 +66,7 @@ trait Optimizer extends Serializable{
 	}
 
 /**
-  * Use the {toSimplex} method from [[com.github.gradientgmm.optim.weights.WeightsTransformation]]
+  * Use toSimplex method from [[com.github.gradientgmm.optim.weights.WeightsTransformation WeightsTransformation]]
   *
   * @param real vector
   * @return valid mixture weight vector

@@ -10,8 +10,7 @@ import breeze.numerics.{exp, log}
   * Implements a Softmax mapping to optimize the weight vector
 
   *The precise mapping is w_i => log(w_i/w_last) and is an implementation of the procedure 
-  * described in ''Hosseini, Reshad & Sra, Suvrit. (2017). An Alternative to EM for Gaussian Mixture Models: Batch and Stochastic Riemannian Optimization''
-  * (see [[https://arxiv.org/abs/1706.03267]]).
+  * described in [[https://arxiv.org/abs/1706.03267 An Alternative to EM for Gaussian Mixture Models: Batch and Stochastic Riemannian Optimization'']]
 
   */
 

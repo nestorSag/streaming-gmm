@@ -11,12 +11,8 @@ import org.apache.log4j.Logger
 
 /**
   * Conjugate prior regularization for all the mixture's parameters; this means an 
-  * Inverse-Wishart prior over the covariance matrices, a Normal prior over the means
-  * and a Dirchlet prior over the weights.
-
-  * See [[https://en.wikipedia.org/wiki/Normal-inverse-Wishart_distribution]]
-
-  * See [[https://en.wikipedia.org/wiki/Dirichlet_distribution]]
+  * [[https://en.wikipedia.org/wiki/Normal-inverse-Wishart_distribution Inverse-Wishart]] prior over the covariance matrices, a Normal prior over the means
+  * and a [[https://en.wikipedia.org/wiki/Dirichlet_distribution Dirichlet]] distribution prior over the weights.
 
   * @param dim Data dimensionality
 
@@ -109,10 +105,22 @@ class ConjugatePrior(val dim: Int, var k: Int) extends Regularizer{
 	}
 
 	def getK = this.k
-/**
-  * Get augmented parameter matrix. See ''Hosseini, Reshad & Sra, Suvrit. (2017). An Alternative to EM for Gaussian Mixture Models: Batch and Stochastic Riemannian Optimization''
 
+/**
+  * Parameter block matrix [A B; C D]. The blocks are:
+
+  * A = iwMean + kappa * normalMean * normalMean.t
+
+  * B = kappa * normalMean
+
+  * C = kappa * normalMean.t
+
+  * D = kappa
+
+  * kappa = degFrredom + dim + 2
+ 
   */
+
 	var regularizingMatrix = buildRegMatrix(df,normalMean,iwMean)
 
 
@@ -135,8 +143,18 @@ class ConjugatePrior(val dim: Int, var k: Int) extends Regularizer{
 	}
 	
 /**
-  * Build augmented parameter matrix
+  * Build parameter block matrix [A B; C D]. The blocks are:
 
+  * A = iwMean + kappa * normalMean * normalMean.t
+
+  * B = kappa * normalMean
+
+  * C = kappa * normalMean.t
+
+  * D = kappa
+
+  * kappa = degFrredom + dim + 2
+ 
   */
 	private def buildRegMatrix(df: Double, normalMean: BDV[Double], iwMean: BDM[Double]): BDM[Double] = {
 
@@ -151,7 +169,7 @@ class ConjugatePrior(val dim: Int, var k: Int) extends Regularizer{
 	}
 
 /**
-  * Faster computation of Tr(X*Y) for symmetric matrices
+  * Fast computation of Tr(X*Y) for symmetric matrices
 
   */
 	private def symProdTrace(x: BDM[Double], y: BDM[Double]): Double = { 

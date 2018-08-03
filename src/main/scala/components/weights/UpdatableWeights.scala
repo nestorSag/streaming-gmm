@@ -7,6 +7,7 @@ import breeze.linalg.{DenseVector => BDV}
   * Wrapper class for the weights vector.
 
   * It includes functionality to check the simplex constraints and perofrm accelerated gradient ascent.
+  
   * see [[https://en.wikipedia.org/wiki/Simplex]]
   
   * @param weights weight vector

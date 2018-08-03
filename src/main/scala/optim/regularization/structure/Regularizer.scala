@@ -5,8 +5,8 @@ import com.github.gradientgmm.components.UpdatableGaussianComponent
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 
 /**
-  * Basic functionality for a regularization term.
-  * See [[https://en.wikipedia.org/wiki/Regularization_(mathematics)]]
+  * Basic functionality for a [[https://en.wikipedia.org/wiki/Regularization_(mathematics) regularization]] term.
+  * 
   *
   * 
 

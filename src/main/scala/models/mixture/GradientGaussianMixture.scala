@@ -19,7 +19,7 @@ import org.apache.log4j.Logger
 
 /**
   * Optimizable gradient-based Gaussian Mixture Model
-  * See ''Hosseini, Reshad & Sra, Suvrit. (2017). An Alternative to EM for Gaussian Mixture Models: Batch and Stochastic Riemannian Optimization''
+  * See [[https://arxiv.org/abs/1706.03267 An Alternative to EM for Gaussian Mixture Models: Batch and Stochastic Riemannian Optimization'']]
   * @param w Weight vector wrapper
   * @param g Array of mixture components (distributions)
   * @param optim Optimization object
@@ -228,7 +228,6 @@ class GradientGaussianMixture private (
 
 /**
   * Update model parameters using streaming data
-  * See ''Hosseini, Reshad & Sra, Suvrit. (2017). An Alternative to EM for Gaussian Mixture Models: Batch and Stochastic Riemannian Optimization''
   * @param data Streaming data
  
   */
@@ -240,7 +239,6 @@ class GradientGaussianMixture private (
 
 /**
   * Cluster membership prediction for streaming data
-  * See ''Hosseini, Reshad & Sra, Suvrit. (2017). An Alternative to EM for Gaussian Mixture Models: Batch and Stochastic Riemannian Optimization''
   * @param data Streaming data
  
   */
@@ -252,7 +250,6 @@ class GradientGaussianMixture private (
 
 /**
   * Soft cluster membership prediction for streaming data
-  * See ''Hosseini, Reshad & Sra, Suvrit. (2017). An Alternative to EM for Gaussian Mixture Models: Batch and Stochastic Riemannian Optimization''
   * @param data Streaming data
  
   */

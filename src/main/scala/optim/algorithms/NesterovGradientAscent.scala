@@ -11,7 +11,7 @@ import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 class NesterovGradientAscent extends Optimizer {
 
 /**
-  * correction parameter
+  * Inertia parameter
   */
 	var gamma = 0.5
 	

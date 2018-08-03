@@ -4,12 +4,14 @@ import com.github.gradientgmm.components.AcceleratedGradientUtils
 
 /**
   * Optimizer that performs stochastic gradient ascent with momentum
+
+  * As formulated in ''Goh, "Why Momentum Really Works", Distill, 2017. http://doi.org/10.23915/distill.00006''
   */
 
 class MomentumGradientAscent extends Optimizer {
 
 /**
-  * exponential smoothing parameter. See ''Goh, "Why Momentum Really Works", Distill, 2017. http://doi.org/10.23915/distill.00006''
+  * Inertia parameter
   */
 	var beta = 0.5
 	
