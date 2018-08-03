@@ -1,4 +1,4 @@
-package com.github.gradientgmm.models
+package com.github.gradientgmm
 
 import com.github.gradientgmm.components.{UpdatableGaussianComponent, Utils}
 import com.github.gradientgmm.optim.algorithms.Optimizer 

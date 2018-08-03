@@ -14,6 +14,7 @@ import breeze.numerics.{exp, log}
   * (see [[https://arxiv.org/abs/1706.03267]]).
 
   */
+
 class SoftmaxWeightTransformation extends WeightsTransformation {
 	
 	/**
