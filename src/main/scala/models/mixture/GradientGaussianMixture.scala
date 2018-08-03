@@ -1,4 +1,4 @@
-package com.github.gradientgmm.models
+package com.github.gradientgmm
 
 import com.github.gradientgmm.components.{UpdatableGaussianComponent, UpdatableWeights, Utils}
 import com.github.gradientgmm.optim.algorithms.{Optimizable, Optimizer, GradientAscent}
@@ -25,7 +25,7 @@ import org.apache.log4j.Logger
   * @param optim Optimization object
  
   */
-class GradientGaussianMixture private[models] (
+class GradientGaussianMixture private (
   w:  UpdatableWeights,
   g: Array[UpdatableGaussianComponent],
   var optim: Optimizer) extends UpdatableGaussianMixture(w,g) with Optimizable {
@@ -99,12 +99,12 @@ class GradientGaussianMixture private[models] (
 
     while (iter < maxIter && math.abs(newLL-oldLL) > convergenceTol) {
 
-      batchSeed += 1
+      batchSeed += 1 //this is to avoid taking the same sample each iteration
 
-      val t0 = System.nanoTime
+      val t0 = System.nanoTime //this is to time program
 
       // if model parameters can be plotted (specific d and k)
-      // and logger is set to debug, send parameters' trajectory to logs
+      // and logger is set to debug, send trajectory of estimators to logs
       if(d==2 && k == 3){
         //send values formatted for R processing to logs
         logger.debug(s"means: list(${gaussians.map{case g => "c(" + g.getMu.toArray.mkString(",") + ")"}.mkString(",")})")
@@ -113,8 +113,6 @@ class GradientGaussianMixture private[models] (
       }
 
       // initialize curried adder that will aggregate the necessary statistics in the workers
-      // dataSize*batchFraction is the expected current batch size
-      // but it is not exact due to how spark takes samples from RDDs
       val adder = sc.broadcast(
         GradientAggregator.add(weights.weights, gaussians, optim)_)
 
@@ -122,10 +120,15 @@ class GradientGaussianMixture private[models] (
 
       val n: Int = sampleStats.counter // number of actual data points in current batch
 
+
+      // if model parameters can be plotted (specific d and k)
+      // and logger is set to debug, send gradients to logs
       if(d==2 && k == 3){
         //send values formatted for R processing to logs
         logger.debug(s"grads: list(${sampleStats.gaussianGradients.map{case g => "c(" + (g/n.toDouble).toArray.mkString(",") + ")"}.mkString(",")})")
       }
+
+
 
       if(n>0){
       // pair Gaussian components with their respective parameter gradients
@@ -138,7 +141,7 @@ class GradientGaussianMixture private[models] (
           // compute new gaussian parameters and regularization values in
           // parallel
 
-          val numPartitions = math.min(k, 1024)
+          val numPartitions = math.min(k, 1024) // same as GaussianMixture (MLlib)
 
           val newDists = sc.parallelize(tuples, numPartitions).map { case (grad,dist) =>
 
@@ -148,8 +151,6 @@ class GradientGaussianMixture private[models] (
                 dist.optimUtils)
             
             dist.update(newPars)
-
-            //dist.update(dist.paramMat + bcOptim.value.direction(grad,dist.optimUtils) * bcOptim.value.learningRate)
 
             bcOptim.value.updateLearningRate //update learning rate in workers
 
@@ -167,7 +168,7 @@ class GradientGaussianMixture private[models] (
             dist.update(
               optim.getUpdate(
                 dist.paramMat,
-                grad, //averaged gradient. see line 128
+                grad, //averaged gradient. see line 136
                 dist.optimUtils))
             
             dist
@@ -179,11 +180,6 @@ class GradientGaussianMixture private[models] (
         }
 
         gaussians = newDists
-
-        // if(d==2 && k == 3){
-        // //send values formatted for R processing to logs
-        //   logger.debug(s"weights gradients: ${"c(" + (sampleStats.weightsGradient / n.toDouble).toArray.mkString(",") + ")"}")
-        // }
         
         val newWeights = optim.getUpdate(
               fromSimplex(Utils.toBDV(weights.weights)),
@@ -191,7 +187,6 @@ class GradientGaussianMixture private[models] (
               weights.optimUtils)
 
         weights.update(toSimplex(newWeights))
-
 
         oldLL = newLL // current becomes previous
         newLL = sampleStats.loss / ebs //average loss

@@ -6,7 +6,11 @@ import breeze.numerics.sqrt
 
 /**
   * Optimizer that performs gradient ascent using the ADAM algorithm. See ''Adam: A Method for Stochastic Optimization. Kingma, Diederik P.; Ba, Jimmy, 2014''
+  
+  * Using it is NOT recommended; you should use SGD or its accelerated versions instead.
   */
+
+@deprecated("ADAM can be unstable for GMM problems and should not be used", "gradientgmm 1.4")
 class ADAM extends Optimizer {
 
 /**
@@ -30,7 +34,7 @@ class ADAM extends Optimizer {
 	var beta2 = 0.1
 	
 	def setBeta1(beta1: Double): this.type = { 
-		require(beta1 > 0 & beta1 < 1, "beta1 must be in (0,1)")
+		require(beta1 >= 0 & beta1 < 1, "beta1 must be in [0,1)")
 		this.beta1 = beta1
 		this
 	}
@@ -40,7 +44,7 @@ class ADAM extends Optimizer {
 	}
 
 	def setBeta2(beta2: Double): this.type = { 
-		require(beta2 > 0 & beta2 < 1 , "beta2 must be in (0,1)")
+		require(beta2 >= 0 & beta2 < 1 , "beta2 must be in [0,1)")
 		this.beta2 = beta2
 		this
 	}
@@ -66,50 +70,35 @@ class ADAM extends Optimizer {
 
 	def direction[A](grad:A, utils: AcceleratedGradientUtils[A])(ops: ParameterOperations[A]): A = {
 
-	t += 1.0
+		t += 1.0
 
-	if(!utils.momentum.isDefined){
-		utils.initializeMomentum
-	}
+		if(!utils.momentum.isDefined){
+			utils.initializeMomentum
+		}
 
-	if(!utils.adamInfo.isDefined){
-		utils.initializeAdamInfo
-	}
-	
-	// utils.updateMomentum(
-	// 	ops.sum(
-	// 		ops.rescale(utils.momentum.get,beta1), 
-	// 		ops.rescale(grad,1.0-beta1)))
+		if(!utils.adamInfo.isDefined){
+			utils.initializeAdamInfo
+		}
+		
+		utils.updateMomentum(
+			ops.sum(
+				ops.rescale(utils.momentum.get,beta1), 
+				ops.rescale(grad,1.0-beta1)))
 
-	// utils.updateAdamInfo(
-	// 	ops.sum(
-	// 		ops.rescale(utils.adamInfo.get,beta2), 
-	// 		ops.rescale(ops.ewProd(grad,grad),1.0-beta2)))
+		utils.updateAdamInfo(
+			ops.sum(
+				ops.rescale(utils.adamInfo.get,beta2), 
+				ops.rescale(ops.ewProd(grad,grad),1.0-beta2)))
 
-	utils.updateMomentum(
-		ops.sum(
-			ops.rescale(utils.momentum.get,beta1), 
-			grad))
+		val alpha_t = math.sqrt(1.0 - math.pow(beta2,t))/(1.0 - math.pow(beta1,t))
+		val epsHat = eps * math.sqrt(1.0 - math.pow(beta2,t))
 
-	utils.updateAdamInfo(
-		ops.sum(
-			ops.rescale(utils.adamInfo.get,beta2), 
-			ops.ewProd(grad,grad)))
+		ops.rescale(
+			ops.ewDiv(
+				utils.momentum.get,
+				ops.sumScalar(ops.ewSqrt(utils.adamInfo.get),epsHat)),
+			alpha_t)
 
-
-	val alpha_t = math.sqrt(1.0 - math.pow(beta2,t))/(1.0 - math.pow(beta1,t))
-	val epsHat = eps * math.sqrt(1.0 - math.pow(beta2,t))
-
-	// ops.rescale(
-	// 	ops.ewDiv(
-	// 		utils.momentum.get,
-	// 		ops.sumScalar(ops.ewSqrt(utils.adamInfo.get),epsHat)),
-	// 	alpha_t)
-
-	ops.ewDiv(
-		utils.momentum.get,
-		ops.sumScalar(ops.ewSqrt(utils.adamInfo.get),epsHat))
-	
 	}
 
 }
