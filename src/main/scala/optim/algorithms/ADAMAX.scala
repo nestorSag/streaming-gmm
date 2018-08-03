@@ -25,7 +25,7 @@ class ADAMAX extends Optimizer {
 	var beta2 = 0.999
 	
 	def setBeta1(beta1: Double): this.type = { 
-		require(beta1 > 0 , "beta1 must be positive")
+		require(beta1 > 0 & beta1 < 1, "beta1 must be in (0,1)")
 		this.beta1 = beta1
 		this
 	}
@@ -35,7 +35,7 @@ class ADAMAX extends Optimizer {
 	}
 
 	def setBeta2(beta2: Double): this.type = { 
-		require(beta2 > 0 , "beta2 must be positive")
+		require(beta2 > 0 & beta2 < 1 , "beta2 must be in (0,1)")
 		this.beta2 = beta2
 		this
 	}
@@ -66,7 +66,7 @@ class ADAMAX extends Optimizer {
 	utils.updateMomentum(
 		ops.sum(
 			ops.rescale(utils.momentum.get,beta1), 
-			ops.rescale(grad,1.0-beta1)))
+			grad))
 
 	//the following lines compute a maximum through absolute values
 	// max(a,b) = a + b + |b-a|

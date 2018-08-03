@@ -30,7 +30,7 @@ class ADAM extends Optimizer {
 	var beta2 = 0.1
 	
 	def setBeta1(beta1: Double): this.type = { 
-		require(beta1 > 0 , "beta1 must be positive")
+		require(beta1 > 0 & beta1 < 1, "beta1 must be in (0,1)")
 		this.beta1 = beta1
 		this
 	}
@@ -40,7 +40,7 @@ class ADAM extends Optimizer {
 	}
 
 	def setBeta2(beta2: Double): this.type = { 
-		require(beta2 > 0 , "beta2 must be positive")
+		require(beta2 > 0 & beta2 < 1 , "beta2 must be in (0,1)")
 		this.beta2 = beta2
 		this
 	}
@@ -76,15 +76,26 @@ class ADAM extends Optimizer {
 		utils.initializeAdamInfo
 	}
 	
+	// utils.updateMomentum(
+	// 	ops.sum(
+	// 		ops.rescale(utils.momentum.get,beta1), 
+	// 		ops.rescale(grad,1.0-beta1)))
+
+	// utils.updateAdamInfo(
+	// 	ops.sum(
+	// 		ops.rescale(utils.adamInfo.get,beta2), 
+	// 		ops.rescale(ops.ewProd(grad,grad),1.0-beta2)))
+
 	utils.updateMomentum(
 		ops.sum(
 			ops.rescale(utils.momentum.get,beta1), 
-			ops.rescale(grad,1.0-beta1)))
+			grad))
 
 	utils.updateAdamInfo(
 		ops.sum(
 			ops.rescale(utils.adamInfo.get,beta2), 
-			ops.rescale(ops.ewProd(grad,grad),1.0-beta2)))
+			ops.ewProd(grad,grad)))
+
 
 	val alpha_t = math.sqrt(1.0 - math.pow(beta2,t))/(1.0 - math.pow(beta1,t))
 	val epsHat = eps * math.sqrt(1.0 - math.pow(beta2,t))
