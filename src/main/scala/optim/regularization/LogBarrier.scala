@@ -13,7 +13,6 @@ class LogBarrier extends Regularizer{
 
 
 	private var scale = 1.0
-	private var shift: Double = 0.0
 
 	def setScale(scale: Double): this.type = {
 		require(scale >= 1.0, "scale must be at least 1.0 to avoid covariance singularities")
