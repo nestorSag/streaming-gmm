@@ -189,13 +189,12 @@ class GradientGaussianMixture private (
 
         oldLL = newLL // current becomes previous
         newLL = sampleStats.loss / ebs //average loss
-        logger.trace(s"newLL: ${newLL}")
 
         optim.updateLearningRate //update learning rate in driver
         iter += 1
 
         val elapsed = (System.nanoTime - t0)/1e9d
-        logger.info(s"iteration ${iter} took ${elapsed} seconds for ${n} samples")
+        logger.info(s"iteration ${iter} took ${elapsed} seconds for ${n} samples. new LL: ${newLL}")
         
       }else{
         logger.info("No points in sample. Skipping iteration")
