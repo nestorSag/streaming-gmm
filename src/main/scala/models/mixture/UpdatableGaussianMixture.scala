@@ -125,8 +125,13 @@ private[gradientgmm] class UpdatableGaussianMixture(
       weights: Array[Double],
       k: Int): Array[Double] = {
     val p = weights.zip(dists).map {
-      case (weight, dist) => EPS + weight * dist.pdf(pt) //ml eps
+      case (weight, dist) =>  weight * dist.pdf(pt) //ml eps
     }
+
+    for(i <- 0 to p.length-1){
+      p(i) = math.min(math.max(p(i),Double.MinPositiveValue),Double.MaxValue/p.length)
+    }
+    
     val pSum = p.sum
     for (i <- 0 until k) {
       p(i) /= pSum

@@ -44,7 +44,7 @@ class GradientGaussianMixture private (
   * @param data Training data as an RDD of Spark vectors 
  
   */
-  def step(data: RDD[SV]): Unit = {
+  def step(data: RDD[SV]): this.type = {
 
     // initialize logger. It logs the parameters' paths to solution
     // the messages' leve; lis set to DEBUG, so be sure to set the log level to DEBUG 
@@ -95,11 +95,10 @@ class GradientGaussianMixture private (
     def fromSimplex: BDV[Double] => BDV[Double] = optim.weightsOptimizer.fromSimplex
 
     //sampling seed
-    implicit var batchSeed: Long = this.seed
 
     while (iter < maxIter && math.abs(newLL-oldLL) > convergenceTol) {
 
-      batchSeed += 1 //this is to avoid taking the same sample each iteration
+      globalIterCounter += 1 //this is to avoid taking the same sample each iteration
 
       val t0 = System.nanoTime //this is to time program
 
@@ -194,19 +193,23 @@ class GradientGaussianMixture private (
 
         optim.updateLearningRate //update learning rate in driver
         iter += 1
-        }else{
-          logger.debug("No points in sample. Skipping iteration")
-        }
+
+        val elapsed = (System.nanoTime - t0)/1e9d
+        logger.info(s"iteration ${iter} took ${elapsed} seconds for ${n} samples")
+        
+      }else{
+        logger.info("No points in sample. Skipping iteration")
+      }
 
       adder.destroy()
-      val elapsed = (System.nanoTime - t0)/1e9d
-      logger.info(s"iteration ${iter} took ${elapsed} seconds for ${n} samples")
     }
 
     bcOptim.destroy()
 
     //set learning rate to original value in case it was shrunk
     optim.setLearningRate(initialRate)
+
+    this
 
   }
 
@@ -271,9 +274,9 @@ class GradientGaussianMixture private (
   * take sample for the current mini-batch, or pass the whole dataset if optim.batchSize = None
  
   */
-  private def batch(data: RDD[BDV[Double]])(implicit batchSeed: Long): RDD[BDV[Double]] = {
+  private def batch(data: RDD[BDV[Double]])(implicit globalIterCounter: Long): RDD[BDV[Double]] = {
     if(batchFraction < 1.0){
-      data.sample(false,batchFraction,batchSeed)
+      data.sample(false,batchFraction,seed + globalIterCounter)
     }else{
       data
     }

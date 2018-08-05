@@ -116,7 +116,7 @@ object GradientAggregator {
 /**
   * compute posterior membership probabilities for a data point
   *
-  * Used for reducing individual data points and aggregating the ir statistics
+  * Used for reducing individual data points and aggregating their statistics
   * @param point Data point
   * @param dists Current model components
   * @param weights current model's weights
@@ -124,10 +124,19 @@ object GradientAggregator {
  
   */
   def getPosteriors(point: BDV[Double], dists: Array[UpdatableGaussianComponent], weights: Array[Double]): BDV[Double] = {
+    
     val q = weights.zip(dists).map {
       case (weight, dist) =>  weight * dist.gConcavePdf(point) // <--q-logLikelihood
     }
-    Utils.toBDV(q)
+
+    var p = Utils.toBDV(q)
+
+    for(i <- 0 to p.length-1){
+      p(i) = math.min(math.max(p(i),Double.MinPositiveValue),Double.MaxValue/p.length)
+    }
+
+    p
+
   }
 
 }

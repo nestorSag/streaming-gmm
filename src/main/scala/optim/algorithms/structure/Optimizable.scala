@@ -41,6 +41,13 @@ trait Optimizable extends Serializable {
   */
   protected var seed: Long = 0
 
+/**
+  * this prevents the seed from repeating every time step() is called
+  * which would cause the same samples being taken
+
+  */
+  protected implicit var globalIterCounter: Long = 0
+
   def setOptim(optim: Optimizer): this.type = {
     this.optim = optim
     this
@@ -52,7 +59,7 @@ trait Optimizable extends Serializable {
   * Perform a gradient-based optimization step
   * @param data Data to fit the model
   */
-  def step(data: RDD[SV]): Unit
+  def step(data: RDD[SV]): this.type
 
 /**
   * Perform a gradient-based optimization step
