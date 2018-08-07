@@ -419,7 +419,7 @@ object GradientGaussianMixture{
       .map{case (k,m) => m}
 
     new GradientGaussianMixture(
-      new UpdatableWeights(proportions.map{case p => p/(n+k)}), 
+      new UpdatableWeights(proportions.map{case p => p/proportions.sum}), 
       (0 to k-1).map{case i => UpdatableGaussianComponent(means(i),pseudoCov(i))}.toArray,
       optim)
 

@@ -16,7 +16,7 @@ import breeze.linalg.{DenseVector => BDV, sum}
 class UpdatableWeights(var weights: Array[Double]) extends Serializable with VectorParamUpdate{
 
   require(isPositive(weights), "some weights are negative or equal to zero")
-  require(isInSimplex(weights),s"new weights don't sum 1: ${weights.mkString(",")}")
+  require(isInSimplex(weights),s"new weights don't sum 1: ${weights.mkString(",")}, error: ${(weights.sum-1.0)*(weights.sum-1.0)}")
 
 /**
   * Allowed deviation from 1 of the weight vector's sum
@@ -50,9 +50,10 @@ class UpdatableWeights(var weights: Array[Double]) extends Serializable with Vec
   def update(newParam: BDV[Double]): Unit = {
     // recenter soft weights to avoid under or overflow
     val newW = newParam.toArray
-    val berror = (sum(newParam) - 1.0)*(sum(newParam) - 1.0)
-    val aerror = (newW.sum-1.0)*(newW.sum-1.0)
-    require(isInSimplex(newW),s"new weights don't sum 1: ${newW.mkString(",")}, berror: ${berror}, aerror: ${aerror}")
+    require(isInSimplex(newW),s"new weights don't sum 1: ${newW.mkString(",")}")
+    //val berror = (sum(newParam) - 1.0)*(sum(newParam) - 1.0)
+    //val aerror = (newW.sum-1.0)*(newW.sum-1.0)
+    //require(isInSimplex(newW),s"new weights don't sum 1: ${newW.mkString(",")}, berror: ${berror}, aerror: ${aerror}")
     weights = newW
 
   }
