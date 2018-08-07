@@ -15,14 +15,15 @@ import breeze.linalg.{DenseVector => BDV, sum}
 
 class UpdatableWeights(var weights: Array[Double]) extends Serializable with VectorParamUpdate{
 
+  var simplexErrorTol = 1e-8
+
   require(isPositive(weights), "some weights are negative or equal to zero")
-  require(isInSimplex(weights),s"new weights don't sum 1: ${weights.mkString(",")}, error: ${(weights.sum-1.0)*(weights.sum-1.0)}")
+  require(isInSimplex(weights) ,s"new weights don't sum 1: ${weights.mkString(",")}")
 
 /**
   * Allowed deviation from 1 of the weight vector's sum
  
   */
-  var simplexErrorTol = 1e-8
 
 /**
   * weight vector dimensionality
