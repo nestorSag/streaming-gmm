@@ -1,6 +1,6 @@
 package com.github.gradientgmm.components
 
-import breeze.linalg.{DenseVector => BDV}
+import breeze.linalg.{DenseVector => BDV, sum}
 
 
 /**
@@ -50,7 +50,9 @@ class UpdatableWeights(var weights: Array[Double]) extends Serializable with Vec
   def update(newParam: BDV[Double]): Unit = {
     // recenter soft weights to avoid under or overflow
     val newW = newParam.toArray
-    require(isInSimplex(newW),s"new weights don't sum 1: ${newW.mkString(",")}")
+    val berror = (sum(newParam) - 1.0)*(sum(newParam) - 1.0)
+    val aerror = (newW.sum-1.0)*(newW.sum-1.0)
+    require(isInSimplex(newW),s"new weights don't sum 1: ${newW.mkString(",")}, berror: ${berror}, aerror: ${aerror}")
     weights = newW
 
   }
