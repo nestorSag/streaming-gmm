@@ -20,7 +20,7 @@ lazy val projectIDependOn = RootProject(uri("git://github.com/nestorSag/streamin
 dependsOn(projectIDependOn)
 ```
 
-where ```latest_version``` is the latest release (as of now, ```1.3```)
+where ```latest_version``` is the latest release (as of now, ```1.4```)
 
 ## Using the program
 
