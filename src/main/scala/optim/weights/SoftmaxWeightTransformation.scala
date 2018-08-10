@@ -1,4 +1,4 @@
-package com.github.gradientgmm.optim.weights
+package com.github.gradientgmm.optim
 
 import com.github.gradientgmm.components.Utils
 
@@ -10,7 +10,7 @@ import breeze.numerics.{exp, log}
   * Implements a Softmax mapping to optimize the weight vector
 
   *The precise mapping is w_i => log(w_i/w_last) and is an implementation of the procedure 
-  * described in [[https://arxiv.org/abs/1706.03267 An Alternative to EM for Gaussian Mixture Models: Batch and Stochastic Riemannian Optimization'']]
+  * described [[https://arxiv.org/abs/1706.03267 here]]
 
   */
 

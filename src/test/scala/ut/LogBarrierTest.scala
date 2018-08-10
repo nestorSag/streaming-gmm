@@ -1,7 +1,7 @@
 import org.scalatest.FlatSpec
 
 import com.github.gradientgmm.components.UpdatableGaussianComponent
-import com.github.gradientgmm.optim.regularizers.LogBarrier
+import com.github.gradientgmm.optim.LogBarrier
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, det, trace}
 

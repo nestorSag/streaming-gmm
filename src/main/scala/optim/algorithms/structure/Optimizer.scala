@@ -1,6 +1,5 @@
-package com.github.gradientgmm.optim.algorithms
+package com.github.gradientgmm.optim
 
-import com.github.gradientgmm.optim.weights.{WeightsTransformation,SoftmaxWeightTransformation}
 import com.github.gradientgmm.components.{UpdatableGaussianComponent, AcceleratedGradientUtils}
 
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV, sum}
@@ -138,5 +137,10 @@ trait Optimizer extends Serializable{
 	def getShrinkageRate: Double = { 
 		shrinkageRate
 	}
+
+  def setWeightsOptimizer(wo: WeightsTransformation): this.type = {
+    weightsOptimizer = wo
+    this
+  }
 
 }

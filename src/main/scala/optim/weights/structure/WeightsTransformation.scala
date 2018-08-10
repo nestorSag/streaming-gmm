@@ -1,4 +1,4 @@
-package com.github.gradientgmm.optim.weights
+package com.github.gradientgmm.optim
 
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 

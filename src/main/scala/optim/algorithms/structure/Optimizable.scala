@@ -1,6 +1,4 @@
-package com.github.gradientgmm.optim.algorithms
-
-import com.github.gradientgmm.optim.regularizers.Regularizer
+package com.github.gradientgmm.optim
 
 import breeze.linalg.{diag, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, sum}
 import breeze.numerics.{sqrt,abs}

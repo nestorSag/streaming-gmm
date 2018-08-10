@@ -3,7 +3,7 @@ import org.scalatest.{FunSuite}
 
 import com.github.gradientgmm.components.UpdatableGaussianComponent
 import com.github.gradientgmm.GradientGaussianMixture
-import com.github.gradientgmm.optim.algorithms.GradientAscent
+import com.github.gradientgmm.optim.GradientAscent
 
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.mllib.clustering.{GaussianMixture, GaussianMixtureModel}

@@ -1,4 +1,4 @@
-package com.github.gradientgmm.optim.weights
+package com.github.gradientgmm.optim
 
 import com.github.gradientgmm.components.Utils
 

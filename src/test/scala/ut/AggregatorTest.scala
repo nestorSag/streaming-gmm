@@ -1,7 +1,7 @@
 import org.scalatest.FlatSpec
 
 
-import com.github.gradientgmm.optim.algorithms.GradientAscent
+import com.github.gradientgmm.optim.GradientAscent
 import com.github.gradientgmm.MetricAggregator
 import com.github.gradientgmm.components.UpdatableGaussianComponent
 
@@ -20,7 +20,7 @@ class AggregatorTest extends FlatSpec{
 	var dim = 2
 	var nPoints = 5
 	var errorTol = 1e-8
-	
+	var k = 2
 	val clusterMeans = Array(new BDV(Array(-1.0,0.0)), new BDV(Array(1.0,0.0)))
 	val clusterWeights = Array(0.5,0.5)
 	val clusterVars = Array.fill(2)(BDM.eye[Double](dim))
@@ -31,8 +31,6 @@ class AggregatorTest extends FlatSpec{
 	val targetPoint = new BDV(Array(0.0,1.0))
 	// do y = [x 1]
 	val points = Array.fill(nPoints)(targetPoint).map{case v => new BDV(v.toArray ++ Array(1.0))}
-
-	optim.setN(nPoints)
 
 	val adder = MetricAggregator.add(clusterWeights, clusterDists)_
 	
@@ -52,21 +50,46 @@ class AggregatorTest extends FlatSpec{
 	}
 
 	"the posterior membership probabilities" should "be correclty calculated" in {
+		//we use weightsGradient to test this
 		//weightsGradient should be zero
 		val avgWeightGrad = agg.weightsGradient/nPoints.toDouble
 		assert(norm(avgWeightGrad) < errorTol)
 	}
 
-	"the descent direction" should "be correclty calculated" in {
+	"posterior probabilitiy aggregates" should "be correclty calculated" in {
 		val correctValue = {
-			val v = new BDV(targetPoint.toArray ++ Array(1.0))
-
-			clusterDists.map{ case d => (v*v.t - d.paramMat) * 0.25}
+			BDV.ones[Double](k) * 0.5 * nPoints.toDouble //posteriors should be of the form (0.5,...,0.5)
 		}
 
-		val avgGrads = agg.gaussianGradients.map{case g => g/nPoints.toDouble}
+		var error = (agg.posteriorsAgg - correctValue).t * (agg.posteriorsAgg - correctValue)
 
-		var error = correctValue.zip(avgGrads).map{case (a,b) => {trace((a-b).t*(a-b))}}.sum
 		assert(error < errorTol)
 	}
+
+	"outer product sum" should "be correclty calculated" in {
+		val correctValue = points.map{case x => x * x.t * 0.5}.reduce(_ + _)
+
+		val diff = agg.outerProductsAgg.map{case x => x - correctValue}.reduce(_ + _)
+		
+		println(correctValue)
+		println(agg.outerProductsAgg(0))
+		println(agg.outerProductsAgg(1))
+
+		assert(trace(diff*diff.t) < errorTol)
+	}
+
+	"gradient formula" should "return correct value" in {
+
+		val correctValues = agg.outerProductsAgg.zip(clusterDists).map{
+			case (o,dist) =>  0.5/nPoints.toDouble * (points(0) * points(0).t * 0.5 - dist.paramMat * 0.5 * nPoints.toDouble )}
+
+		val testValues = agg.outerProductsAgg.zip(clusterDists.zip(agg.posteriorsAgg.toArray)).map{
+			case (o,(dist,p)) =>  0.5/nPoints.toDouble * (o - p*dist.paramMat)}
+
+		val totalError = correctValues.zip(testValues).map{case (x,y) => trace((x - y)*(x-y).t)}.sum
+
+		assert(totalError < errorTol)
+
+	}
+
 }

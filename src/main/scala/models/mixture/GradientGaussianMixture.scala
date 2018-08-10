@@ -1,7 +1,7 @@
 package com.github.gradientgmm
 
 import com.github.gradientgmm.components.{UpdatableGaussianComponent, UpdatableWeights, Utils}
-import com.github.gradientgmm.optim.algorithms.{Optimizable, Optimizer, GradientAscent}
+import com.github.gradientgmm.optim.{Optimizable, Optimizer, GradientAscent}
 
 import breeze.linalg.{diag, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, sum}
 import breeze.numerics.sqrt
@@ -124,7 +124,7 @@ class GradientGaussianMixture private (
       // pair Gaussian components with their respective parameter gradients
         val tuples =
             Seq.tabulate(k)(i => (
-              sampleStats.secondMoment(i),
+              sampleStats.outerProductsAgg(i),
               sampleStats.posteriorsAgg(i),
               gaussians(i),
               n.toDouble))
