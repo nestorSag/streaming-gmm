@@ -1,6 +1,6 @@
 import org.scalatest.FlatSpec
 
-
+import com.github.gradientgmm.components.Utils
 import com.github.gradientgmm.optim.GradientAscent
 import com.github.gradientgmm.MetricAggregator
 import com.github.gradientgmm.components.UpdatableGaussianComponent
@@ -36,6 +36,8 @@ class AggregatorTest extends FlatSpec{
 	
 	val agg = points.foldLeft(MetricAggregator.init(2,dim)){case (agg,point) => adder(agg,point)}
 
+	val outerProductsMats = agg.outerProductsAgg.map(Utils.completeMatrix(_))
+
 	"the counter" should "be equal to nPoints" in {
 		//weightsGradient should be zero
 		assert(agg.counter == nPoints)
@@ -68,27 +70,32 @@ class AggregatorTest extends FlatSpec{
 
 	"outer product sum" should "be correclty calculated" in {
 		val correctValue = points.map{case x => x * x.t * 0.5}.reduce(_ + _)
-
-		val diff = agg.outerProductsAgg.map{case x => x - correctValue}.reduce(_ + _)
 		
-		println(correctValue)
-		println(agg.outerProductsAgg(0))
-		println(agg.outerProductsAgg(1))
-
+		val diff = outerProductsMats.map{case x => x - correctValue}.reduce(_ + _)
+		
 		assert(trace(diff*diff.t) < errorTol)
+
 	}
 
 	"gradient formula" should "return correct value" in {
 
-		val correctValues = agg.outerProductsAgg.zip(clusterDists).map{
-			case (o,dist) =>  0.5/nPoints.toDouble * (points(0) * points(0).t * 0.5 - dist.paramMat * 0.5 * nPoints.toDouble )}
+		val correctValues = clusterDists.map{
+			case dist =>  {
+				//print(points(0) * points(0).t * 0.5 * nPoints.toDouble)
+				0.5/nPoints.toDouble * (points(0) * points(0).t * 0.5 * nPoints.toDouble - dist.paramMat * 0.5 * nPoints.toDouble )
+			}
+		}
 
-		val testValues = agg.outerProductsAgg.zip(clusterDists.zip(agg.posteriorsAgg.toArray)).map{
-			case (o,(dist,p)) =>  0.5/nPoints.toDouble * (o - p*dist.paramMat)}
+		val testValues = outerProductsMats.zip(clusterDists.zip(agg.posteriorsAgg.toArray)).map{
+			case (o,(dist,p)) =>  {
+				//print(o)
+				0.5/nPoints.toDouble * (o - p*dist.paramMat)
+			}
+		}
 
-		val totalError = correctValues.zip(testValues).map{case (x,y) => trace((x - y)*(x-y).t)}.sum
-
-		assert(totalError < errorTol)
+		val totalError = correctValues.zip(testValues).map{case (x,y) => trace((x - y)*(x-y).t)}
+		
+		assert(totalError.sum < errorTol)
 
 	}
 

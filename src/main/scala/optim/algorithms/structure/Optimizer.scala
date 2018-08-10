@@ -45,7 +45,7 @@ trait Optimizer extends Serializable{
 	}
 
 /**
-  * Use fromSimplex method from [[com.github.gradientgmm.optim.weights.WeightsTransformation WeightsTransformation]]
+  * Use fromSimplex method from [[com.github.gradientgmm.optim.WeightsTransformation WeightsTransformation]]
   *
   * @param weights mixture weights
   */
@@ -54,7 +54,7 @@ trait Optimizer extends Serializable{
 	}
 
 /**
-  * Use toSimplex method from [[com.github.gradientgmm.optim.weights.WeightsTransformation WeightsTransformation]]
+  * Use toSimplex method from [[com.github.gradientgmm.optim.WeightsTransformation WeightsTransformation]]
   *
   * @param real vector
   * @return valid mixture weight vector

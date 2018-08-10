@@ -15,18 +15,17 @@ import com.github.fommil.netlib.BLAS.{getInstance => NativeBLAS}
   * and the terms that will later be used to compte the gradient. The class structure is based on
   * Spark's [[https://github.com/apache/spark/blob/master/mllib/src/main/scala/org/apache/spark/mllib/clustering/GaussianMixture.scala ExpectationSum]]
 
-  * @param loss aggregated log-likelihood
-  * @param weightsGradient: aggregate posterior responsability for each component
-  * @param posteriorsAgg Posterior responsabilities sum
-  * @param outerProductsAgg sum of weighted outer products
-  * @param loss aggregated log-likelihood
-  * @param counter batch size counter
+  * @param weightsGradient Aggregated posterior responsability for each component
+  * @param posteriorsAgg Sum of posterior cluster responsibilities
+  * @param outerProductsAgg Sum of weighted outer products
+  * @param loss Aggregated log-likelihood
+  * @param counter Batch size counter
  
   */
 class MetricAggregator(
   val weightsGradient: BDV[Double],
   val posteriorsAgg: BDV[Double],
-  val outerProductsAgg: Array[BDM[Double]],
+  val outerProductsAgg: Array[Array[Double]], //treat matrices as arrays for BLAS routines
   var loss: Double,
   var counter: Int) extends Serializable{
 
@@ -41,10 +40,19 @@ class MetricAggregator(
   * Used for further aggregation between each worker's object
  
   */
+  val m = outerProductsAgg(0).length
+
   def +=(x: MetricAggregator): MetricAggregator = {
+
     var i = 0
     while (i < k) {
-      outerProductsAgg(i) += x.outerProductsAgg(i)
+
+      var j = 0
+      var xcurrent = x.outerProductsAgg(i)
+      while(j < m){
+        outerProductsAgg(i)(j) += xcurrent(j)
+      }
+
       i += 1
     }
     posteriorsAgg += x.posteriorsAgg
@@ -70,7 +78,7 @@ object MetricAggregator {
     new MetricAggregator(
       BDV.zeros[Double](k),
       BDV.zeros[Double](k),
-      Array.fill(k)(BDM.zeros[Double](d+1, d+1)),
+      Array.fill(k)(Array.fill((d+1)*(d+1))(0.0)),
       0.0,
       0)
   }
@@ -90,6 +98,8 @@ object MetricAggregator {
       weights: Array[Double],
       dists: Array[UpdatableGaussianComponent])
       (agg: MetricAggregator, y: BDV[Double]): MetricAggregator = {
+
+    val d = dists(0).getMu.length // data dimensionality
 
     agg.counter += 1
 
@@ -114,7 +124,8 @@ object MetricAggregator {
     var i = 0
     while (i < agg.k) {
 
-      BLASsyr(posteriors(i),y,agg.outerProductsAgg(i))
+      //add only upper traingle
+      nativeBLAS.dsyr("U", y.length, posteriors(i), y.toArray, 1, agg.outerProductsAgg(i), d+1)
 
       i = i + 1
     }
@@ -156,27 +167,6 @@ object MetricAggregator {
       _nativeBLAS = NativeBLAS
     }
     _nativeBLAS
-  }
-
-  // BLAS syr routine performs a rank-1 symmetric update: A =  alpha * x * x.t + A
-  private def BLASsyr(alpha: Double, x: BDV[Double], mat: BDM[Double]) {
-    val nA = mat.rows
-    val mA = mat.cols
-
-    nativeBLAS.dsyr("U", x.length, alpha, x.toArray, 1, mat.toArray, nA)
-    //println("here")
-    //println(mat.toArray.getClass)
-    println(mat.toArray.mkString(","))
-    // Fill lower triangular part of A
-    var i = 0
-    while (i < mA) {
-      var j = i + 1
-      while (j < nA) {
-        mat(j,i) = mat(i,j)
-        j += 1
-      }
-      i += 1
-    }
   }
 
 

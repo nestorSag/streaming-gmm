@@ -136,14 +136,16 @@ class GradientGaussianMixture private (
 
           val numPartitions = math.min(k, 1024) // same as GaussianMixture (MLlib)
 
-          val (newDists,regValue) = sc.parallelize(tuples, numPartitions).map { case (_Y,w,dist,n) =>
+          val (newDists,regValue) = sc.parallelize(tuples, numPartitions).map { case (outer,w,dist,n) =>
+
+            val Y = Utils.completeMatrix(outer)
 
             //gradient for Gaussian parameters
             val (grad, regValue) = if(bcReg.value.isDefined){
-              (((_Y - w * dist.paramMat) * 0.5 + bcReg.value.get.gaussianGradient(dist)) / n,
+              (((Y - w * dist.paramMat) * 0.5 + bcReg.value.get.gaussianGradient(dist)) / n,
                 bcReg.value.get.evaluateDist(dist)/n)
             }else{
-              (((_Y - w * dist.paramMat) * 0.5 ) / n, 0.0)
+              (((Y - w * dist.paramMat) * 0.5 ) / n, 0.0)
             }
 
             val newPars = bcOptim.value.getUpdate(
@@ -163,14 +165,16 @@ class GradientGaussianMixture private (
 
         } else {
 
-          val (newDists,regValue) = tuples.map { case (_Y,w,dist,n) =>
+          val (newDists,regValue) = tuples.map { case (outer,w,dist,n) =>
+
+            val Y = Utils.completeMatrix(outer)
 
             //gradient for Gaussian parameters
             val (grad, regValue) = if(regularizer.isDefined){
-              (((_Y - w * dist.paramMat) * 0.5 + regularizer.get.gaussianGradient(dist)) / n,
+              (((Y - w * dist.paramMat) * 0.5 + regularizer.get.gaussianGradient(dist)) / n,
                 regularizer.get.evaluateDist(dist)/n)
             }else{
-              (((_Y - w * dist.paramMat) * 0.5 ) / n, 0.0)
+              (((Y - w * dist.paramMat) * 0.5 ) / n, 0.0)
             }
 
             dist.update(

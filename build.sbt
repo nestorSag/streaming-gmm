@@ -12,7 +12,7 @@ scalaVersion := "2.11.8"
 
 // It's possible to define many kinds of settings, such as:
 
-name := "gradient based gaussian mixture model"
+name := "gradientgmm"
 organization := "com.github.nestorsag.gradientgmm"
 version := "1.0"
 
@@ -29,6 +29,8 @@ libraryDependencies += "org.typelevel" %% "cats-core" % "1.0.1"
 libraryDependencies += "org.scalatest" % "scalatest_2.11" % "3.0.5" % "test"
 
 libraryDependencies  ++= Seq(
+
+  "com.github.fommil.netlib" % "all" % "1.1.2",
 
   "org.typelevel" %% "cats-core" % "1.0.1",
   // other dependencies here
@@ -77,6 +79,11 @@ resolvers ++= Seq(
   "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases/"
 )
 
+
+assemblyMergeStrategy in assembly := {
+ case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+ case x => MergeStrategy.first
+}
 // Here, `libraryDependencies` is a set of dependencies, and by using `+=`,
 // we're adding the cats dependency to the set of dependencies that sbt will go
 // and fetch when it starts up.
