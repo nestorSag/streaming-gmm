@@ -1,5 +1,7 @@
 package com.github.gradientgmm.optim.algorithms
 
+import com.github.gradientgmm.optim.regularizers.Regularizer
+
 import breeze.linalg.{diag, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, sum}
 import breeze.numerics.{sqrt,abs}
 
@@ -12,6 +14,12 @@ import org.apache.spark.rdd.RDD
 
   */
 trait Optimizable extends Serializable {
+
+/**
+  * Optional regularization term
+  */
+  protected var regularizer: Option[Regularizer] = None
+
 
 /**
   * Minibatch size for each iteration in the ascent procedure. If None, it performs
@@ -134,6 +142,17 @@ trait Optimizable extends Serializable {
   }
 
   def getSeed: Long = seed
+
+  def setRegularizer(r: Regularizer): this.type = {
+    regularizer = Option(r)
+    this
+  }
+
+  def setRegularizer(r: Option[Regularizer]): this.type = {
+    regularizer = r
+    this
+  }
+
 
 }
 

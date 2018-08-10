@@ -88,7 +88,6 @@ class GradientGaussianMixture private (
     }
     logger.debug(s"expected batch size: ${ebs}, fraction: ${fraction}")
     batchFraction = math.min(fraction,1.0) //in case batches are larger than whole dataset
-    optim.setN(ebs)
     
     //a bit of syntactic sugar
     def toSimplex: BDV[Double] => BDV[Double] = optim.weightsOptimizer.toSimplex
@@ -113,7 +112,7 @@ class GradientGaussianMixture private (
 
       // initialize curried adder that will aggregate the necessary statistics in the workers
       val adder = sc.broadcast(
-        GradientAggregator.add(weights.weights, gaussians, optim)_)
+        GradientAggregator.add(weights.weights, gaussians, regularizer, ebs)_)
 
       val sampleStats = batch(gConcaveData).treeAggregate(GradientAggregator.init(k, d))(adder.value, _ += _)
 

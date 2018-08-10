@@ -30,15 +30,6 @@ trait WeightsTransformation extends Serializable {
 	def toSimplex(soft: BDV[Double]): BDV[Double]
 
 /**
-  * Calculate the gradient of the weigh vector's mapping
-
-  * @param posteriors posterior responsability for the corresponding mixture component
-  * @param weights vector fo current weights
-  * @return weight vector gradient
-  */
-	def gradient(posteriors: BDV[Double], weights: BDV[Double]): BDV[Double]
-
-/**
   * Prevents underflows and overflows when optimizing the weights
 
   * Because of the functions involved in mapping points from and to the weight simplex

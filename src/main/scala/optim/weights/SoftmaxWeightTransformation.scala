@@ -33,13 +33,6 @@ class SoftmaxWeightTransformation extends WeightsTransformation {
 		bounded/sum(bounded)
 	}
 
-	def gradient(posteriors: BDV[Double], weights: BDV[Double]): BDV[Double] = {
-
-		//val n = posteriors.sum
-
-		posteriors - weights
-	}
-
 	def fromSimplex(weights: BDV[Double]): BDV[Double] = {
 		val d = weights.length
 		log(weights/weights(d-1))

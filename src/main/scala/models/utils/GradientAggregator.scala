@@ -1,7 +1,7 @@
 package com.github.gradientgmm
 
 import com.github.gradientgmm.components.{UpdatableGaussianComponent, Utils}
-import com.github.gradientgmm.optim.algorithms.Optimizer 
+import com.github.gradientgmm.optim.regularizers.Regularizer
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, sum}
 
@@ -81,7 +81,8 @@ object GradientAggregator {
   def add(
       weights: Array[Double],
       dists: Array[UpdatableGaussianComponent],
-      optim: Optimizer)
+      reg: Option[Regularizer],
+      n: Double)
       (agg: GradientAggregator, y: BDV[Double]): GradientAggregator = {
 
     agg.counter += 1
@@ -93,20 +94,37 @@ object GradientAggregator {
     agg.loss += math.log(sum(posteriors))
 
     // add regularization value due to weights vector
-    agg.loss += optim.evaluateRegularizationTerm(vectorWeights)
+    if(reg.isDefined){
+      agg.loss += reg.get.evaluateWeights(vectorWeights)/n
+    }
 
-    // update aggregated weight gradient
     posteriors /= sum(posteriors)
-    agg.weightsGradient += optim.weightsGradient(posteriors,vectorWeights)
+    // update aggregated weight gradient
+
+    agg.weightsGradient += (posteriors - vectorWeights) //gradient
+
+    // evaluate weight regularization gradient
+    if(reg.isDefined){
+      agg.weightsGradient += reg.get.weightsGradient(vectorWeights)/n
+    }
+
+    agg.weightsGradient(weights.length - 1) = 0.0 // last weight's auxiliar variable is fixed because of the simplex cosntraint
+
     // update gaussian parameters' gradients and log-likelihood
     var i = 0
     val outer = y*y.t
     while (i < agg.k) {
 
-      agg.gaussianGradients(i) += optim.gaussianGradient( dists(i), outer , posteriors(i))
+      agg.gaussianGradients(i) += (outer - dists(i).paramMat) * 0.5 * posteriors(i) //gradient
+
+      if(reg.isDefined){
+        agg.gaussianGradients(i) += reg.get.gaussianGradient(dists(i))/n
+      }
 
       // add regularization value due to Gaussian components
-      agg.loss += optim.evaluateRegularizationTerm(dists(i))
+      if(reg.isDefined){
+        agg.loss += reg.get.evaluateDist(dists(i))/n
+      }
 
       i = i + 1
     }
@@ -138,5 +156,6 @@ object GradientAggregator {
     p
 
   }
+
 
 }

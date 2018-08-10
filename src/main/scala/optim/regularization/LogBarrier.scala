@@ -1,4 +1,4 @@
-package com.github.gradientgmm.optim.regularization
+package com.github.gradientgmm.optim.regularizers
 
 import com.github.gradientgmm.components.UpdatableGaussianComponent
 
