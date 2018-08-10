@@ -5,40 +5,47 @@ import com.github.gradientgmm.optim.regularizers.Regularizer
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, sum}
 
+import com.github.fommil.netlib.{BLAS => NetlibBLAS, F2jBLAS}
+import com.github.fommil.netlib.BLAS.{getInstance => NativeBLAS}
+
 /**
   * Distributed aggregator of relevant statistics
   *
   * In each worker it computes and aggregates the current batch log-likelihood,
-  * the regularization values for the current parameters and the 
-  * gaussianGradients for each data point. The class structure is based heavily on
+  * and the terms that will later be used to compte the gradient. The class structure is based on
   * Spark's [[https://github.com/apache/spark/blob/master/mllib/src/main/scala/org/apache/spark/mllib/clustering/GaussianMixture.scala ExpectationSum]]
 
-  * @param loss aggregate log-likelihood
+  * @param loss aggregated log-likelihood
   * @param weightsGradient: aggregate posterior responsability for each component
-  * @param gaussianGradients Aggregate point-wise gaussianGradients for each component
+  * @param posteriorsAgg Posterior responsabilities sum
+  * @param secondMoment sum of weighted outer products
+  * @param loss aggregated log-likelihood
+  * @param counter batch size counter
  
   */
-class GradientAggregator(
-  var loss: Double,
+class MetricAggregator(
   val weightsGradient: BDV[Double],
-  val gaussianGradients: Array[BDM[Double]],
+  val posteriorsAgg: BDV[Double],
+  val secondMoment: Array[BDM[Double]],
+  var loss: Double,
   var counter: Int) extends Serializable{
 
 /**
   * Number of components in the model
   */
-  val k = gaussianGradients.length
+  val k = weightsGradient.length
 
 /**
-  * Adder for other GradientAggregator instances
+  * Adder for other MetricAggregator instances
   *
   * Used for further aggregation between each worker's object
  
   */
-  def +=(x: GradientAggregator): GradientAggregator = {
+  def +=(x: MetricAggregator): MetricAggregator = {
     var i = 0
     while (i < k) {
-      gaussianGradients(i) += x.gaussianGradients(i)
+      secondMoment(i) += x.secondMoment(i)
+      posteriorsAgg(i) += x.posteriorsAgg(i)
       i += 1
     }
     weightsGradient += x.weightsGradient
@@ -49,21 +56,22 @@ class GradientAggregator(
 
 }
 
-object GradientAggregator {
+object MetricAggregator {
 
 /**
-  * GradientAggregator initializer
+  * MetricAggregator initializer
   *
   * Initializes an instance with initial statistics set as zero
   * @param k Number of components in the model
   * @param d Dimensionality of the data
  
   */
-  def init(k: Int, d: Int): GradientAggregator = {
-    new GradientAggregator(
-      0.0,
+  def init(k: Int, d: Int): MetricAggregator = {
+    new MetricAggregator(
       BDV.zeros[Double](k),
+      BDV.zeros[Double](d+1),
       Array.fill(k)(BDM.zeros[Double](d+1, d+1)),
+      0.0,
       0)
   }
 
@@ -80,10 +88,8 @@ object GradientAggregator {
   */
   def add(
       weights: Array[Double],
-      dists: Array[UpdatableGaussianComponent],
-      reg: Option[Regularizer],
-      n: Double)
-      (agg: GradientAggregator, y: BDV[Double]): GradientAggregator = {
+      dists: Array[UpdatableGaussianComponent])
+      (agg: MetricAggregator, y: BDV[Double]): MetricAggregator = {
 
     agg.counter += 1
 
@@ -93,38 +99,22 @@ object GradientAggregator {
     
     agg.loss += math.log(sum(posteriors))
 
-    // add regularization value due to weights vector
-    if(reg.isDefined){
-      agg.loss += reg.get.evaluateWeights(vectorWeights)/n
-    }
 
     posteriors /= sum(posteriors)
+
+    agg.posteriorsAgg += posteriors
     // update aggregated weight gradient
 
     agg.weightsGradient += (posteriors - vectorWeights) //gradient
 
-    // evaluate weight regularization gradient
-    if(reg.isDefined){
-      agg.weightsGradient += reg.get.weightsGradient(vectorWeights)/n
-    }
 
     agg.weightsGradient(weights.length - 1) = 0.0 // last weight's auxiliar variable is fixed because of the simplex cosntraint
 
-    // update gaussian parameters' gradients and log-likelihood
+    // aggregate outer products
     var i = 0
-    val outer = y*y.t
     while (i < agg.k) {
 
-      agg.gaussianGradients(i) += (outer - dists(i).paramMat) * 0.5 * posteriors(i) //gradient
-
-      if(reg.isDefined){
-        agg.gaussianGradients(i) += reg.get.gaussianGradient(dists(i))/n
-      }
-
-      // add regularization value due to Gaussian components
-      if(reg.isDefined){
-        agg.loss += reg.get.evaluateDist(dists(i))/n
-      }
+      BLASsyr(posteriors(i),y,agg.secondMoment(i))
 
       i = i + 1
     }
@@ -155,6 +145,35 @@ object GradientAggregator {
 
     p
 
+  }
+
+  // the following code was taken from Spark's [[https://github.com/apache/spark/blob/master/mllib/src/main/scala/org/apache/spark/mllib/linalg/BLAS.scala BLAS]]
+  @transient private var _nativeBLAS: NetlibBLAS = _
+  
+  private def nativeBLAS: NetlibBLAS = {
+    if (_nativeBLAS == null) {
+      _nativeBLAS = NativeBLAS
+    }
+    _nativeBLAS
+  }
+
+  // BLAS syr routine performs a rank-1 symmetric update: A =  alpha * x * x.t + A
+  private def BLASsyr(alpha: Double, x: BDV[Double], A: BDM[Double]) {
+    val nA = A.rows
+    val mA = A.cols
+
+    nativeBLAS.dsyr("U", x.length, alpha, x.toArray, 1, A.toArray, nA)
+
+    // Fill lower triangular part of A
+    var i = 0
+    while (i < mA) {
+      var j = i + 1
+      while (j < nA) {
+        A(j, i) = A(i, j)
+        j += 1
+      }
+      i += 1
+    }
   }
 
 

@@ -2,7 +2,7 @@ import org.scalatest.FlatSpec
 
 
 import com.github.gradientgmm.optim.algorithms.GradientAscent
-import com.github.gradientgmm.GradientAggregator
+import com.github.gradientgmm.MetricAggregator
 import com.github.gradientgmm.components.UpdatableGaussianComponent
 
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, norm}
@@ -28,19 +28,15 @@ class AggregatorTest extends FlatSpec{
 	//val mixture = GradientGaussianMixture(clusterWeights,clusterDists)
 	val clusterDists = clusterMeans.zip(clusterVars).map{ case(m,v) => UpdatableGaussianComponent(m,v)}
 
-	val optim = new GradientAscent()
-		.setLearningRate(0.5)
-		.setShrinkageRate(1.0)
-
 	val targetPoint = new BDV(Array(0.0,1.0))
 	// do y = [x 1]
 	val points = Array.fill(nPoints)(targetPoint).map{case v => new BDV(v.toArray ++ Array(1.0))}
 
 	optim.setN(nPoints)
 
-	val adder = GradientAggregator.add(clusterWeights, clusterDists, optim)_
+	val adder = MetricAggregator.add(clusterWeights, clusterDists)_
 	
-	val agg = points.foldLeft(GradientAggregator.init(2,dim)){case (agg,point) => adder(agg,point)}
+	val agg = points.foldLeft(MetricAggregator.init(2,dim)){case (agg,point) => adder(agg,point)}
 
 	"the counter" should "be equal to nPoints" in {
 		//weightsGradient should be zero
