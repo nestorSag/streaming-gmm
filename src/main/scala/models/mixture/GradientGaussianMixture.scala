@@ -230,10 +230,10 @@ class GradientGaussianMixture private (
         logger.info("No points in sample. Skipping iteration")
       }
 
-      adder.destroy()
+      adder.unpersist()
     }
 
-    bcOptim.destroy()
+    //bcOptim.destroy()
 
     //set learning rate to original value in case it was shrunk
     optim.setLearningRate(initialRate)
