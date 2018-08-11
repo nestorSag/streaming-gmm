@@ -127,9 +127,11 @@ class GradientGaussianMixture private (
         val adder = sc.broadcast(
           MetricAggregator.add(weights.weights, gaussians)_)
 
+        val t0_ = System.nanoTime
         val sampleStats = intermediateSample
           .sample(false,1.0/itersPerSample,seed + globalIterCounter)
           .treeAggregate(MetricAggregator.init(k, d))(adder.value, _ += _)
+        logger.info(s"subsample took ${(System.nanoTime - t0_)/1e9d} seconds")
 
         val n: Int = sampleStats.counter // number of actual data points in current batch
 
