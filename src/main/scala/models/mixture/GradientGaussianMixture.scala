@@ -105,18 +105,24 @@ class GradientGaussianMixture private (
 
       // if model parameters can be plotted (specific d and k)
       // and logger is set to debug, send trajectory of estimators to logs
-      if(d==2 && k == 3){
-        //send values formatted for R processing to logs
-        logger.debug(s"means: list(${gaussians.map{case g => "c(" + g.getMu.toArray.mkString(",") + ")"}.mkString(",")})")
-        logger.debug(s"weights: ${"c(" + weights.weights.mkString(",") + ")"}")
-        logger.debug(s"covs: list(${gaussians.map{case g => "c(" + g.getSigma.toArray.mkString(",") + ")"}.mkString(",")})")
-      }
+      // if(d==2 && k == 3){
+      //   //send values formatted for R processing to logs
+      //   logger.debug(s"means: list(${gaussians.map{case g => "c(" + g.getMu.toArray.mkString(",") + ")"}.mkString(",")})")
+      //   logger.debug(s"weights: ${"c(" + weights.weights.mkString(",") + ")"}")
+      //   logger.debug(s"covs: list(${gaussians.map{case g => "c(" + g.getSigma.toArray.mkString(",") + ")"}.mkString(",")})")
+      // }
 
       // initialize curried adder that will aggregate the necessary statistics in the workers
       val adder = sc.broadcast(
         MetricAggregator.add(weights.weights, gaussians)_)
 
-      val sampleStats = batch(gConcaveData).treeAggregate(MetricAggregator.init(k, d))(adder.value, _ += _)
+      //val sampleStats = batch(gConcaveData).treeAggregate(MetricAggregator.init(k, d))(adder.value, _ += _)
+      var t0_ = System.nanoTime
+      val sampleStats1 = batch(gConcaveData)
+      logger.info(s"taking sample took ${(System.nanoTime - t0_)/1e9d} seconds")
+      t0_ = System.nanoTime
+      val sampleStats = sampleStats1.treeAggregate(MetricAggregator.init(k, d))(adder.value, _ += _)
+      logger.info(s"treeAggregate took ${(System.nanoTime - t0_)/1e9d} seconds")
 
       val n: Int = sampleStats.counter // number of actual data points in current batch
 
@@ -224,10 +230,7 @@ class GradientGaussianMixture private (
         iter += 1
 
         val elapsed = (System.nanoTime - t0)/1e9d
-        logger.info(s"iteration ${iter} took ${elapsed} seconds for ${n} samples. new LL: ${newLL}")
         
-      }else{
-        logger.info("No points in sample. Skipping iteration")
       }
 
       //adder.unpersist()
