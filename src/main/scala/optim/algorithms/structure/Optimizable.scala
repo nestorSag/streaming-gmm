@@ -14,6 +14,11 @@ import org.apache.spark.rdd.RDD
 trait Optimizable extends Serializable {
 
 /**
+  * Number of iterations between intermediate batch sampling
+  */
+
+  protected var itersPerSample: Int = 10
+/**
   * Optional regularization term
   */
   protected var regularizer: Option[Regularizer] = None
@@ -150,6 +155,14 @@ trait Optimizable extends Serializable {
     regularizer = r
     this
   }
+
+  def setItersPerSample(n: Int): this.type = {
+    require(n > 0,"n must be positive")
+    itersPerSample = n
+    this
+  }
+
+  def getItersPerSample = itersPerSample
 
 
 }

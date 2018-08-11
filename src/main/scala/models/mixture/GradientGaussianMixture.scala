@@ -64,7 +64,7 @@ class GradientGaussianMixture private (
     var newLL = 1.0   // current log-likelihood
     var oldLL = 0.0  // previous log-likelihood
     var iter = 0
-    
+
     // broadcast optim and reg to workers
     val bcOptim = sc.broadcast(this.optim)
     // broadcast optim and reg to workers
@@ -99,138 +99,146 @@ class GradientGaussianMixture private (
 
     while (iter < maxIter && math.abs(newLL-oldLL) > convergenceTol) {
 
-      globalIterCounter += 1 //this is to avoid taking the same sample each iteration
+      // take small intermediate sample to avoid taking a sample over the whole RDD at each iteration
+      val intermediateSample = if(batchFraction*itersPerSample<1){
+        gConcaveData.sample(false,batchFraction*itersPerSample,seed + globalIterCounter)
+      }else{
+        gConcaveData
+      }
 
-      val t0 = System.nanoTime //this is to time program
+      intermediateSample.cache()
+      var subiter = 0
+      while(subiter < math.min(itersPerSample,maxIter - iter) && math.abs(newLL-oldLL) > convergenceTol){
+      
+        globalIterCounter += 1 //this is to avoid taking the same sample each iteration
 
-      // if model parameters can be plotted (specific d and k)
-      // and logger is set to debug, send trajectory of estimators to logs
-      // if(d==2 && k == 3){
-      //   //send values formatted for R processing to logs
-      //   logger.debug(s"means: list(${gaussians.map{case g => "c(" + g.getMu.toArray.mkString(",") + ")"}.mkString(",")})")
-      //   logger.debug(s"weights: ${"c(" + weights.weights.mkString(",") + ")"}")
-      //   logger.debug(s"covs: list(${gaussians.map{case g => "c(" + g.getSigma.toArray.mkString(",") + ")"}.mkString(",")})")
-      // }
+        val t0 = System.nanoTime //this is to time program
 
-      // initialize curried adder that will aggregate the necessary statistics in the workers
-      val adder = sc.broadcast(
-        MetricAggregator.add(weights.weights, gaussians)_)
+        // if model parameters can be plotted (specific d and k)
+        // and logger is set to debug, send trajectory of estimators to logs
+        // if(d==2 && k == 3){
+        //   //send values formatted for R processing to logs
+        //   logger.debug(s"means: list(${gaussians.map{case g => "c(" + g.getMu.toArray.mkString(",") + ")"}.mkString(",")})")
+        //   logger.debug(s"weights: ${"c(" + weights.weights.mkString(",") + ")"}")
+        //   logger.debug(s"covs: list(${gaussians.map{case g => "c(" + g.getSigma.toArray.mkString(",") + ")"}.mkString(",")})")
+        // }
 
-      //val sampleStats = batch(gConcaveData).treeAggregate(MetricAggregator.init(k, d))(adder.value, _ += _)
-      var t0_ = System.nanoTime
-      val sampleStats1 = batch(gConcaveData)
-      logger.info(s"taking sample took ${(System.nanoTime - t0_)/1e9d} seconds")
-      t0_ = System.nanoTime
-      val sampleStats = sampleStats1.treeAggregate(MetricAggregator.init(k, d))(adder.value, _ += _)
-      logger.info(s"treeAggregate took ${(System.nanoTime - t0_)/1e9d} seconds")
+        // initialize curried adder that will aggregate the necessary statistics in the workers
+        val adder = sc.broadcast(
+          MetricAggregator.add(weights.weights, gaussians)_)
 
-      val n: Int = sampleStats.counter // number of actual data points in current batch
+        val sampleStats = intermediateSample
+          .sample(false,1.0/itersPerSample,seed + globalIterCounter)
+          .treeAggregate(MetricAggregator.init(k, d))(adder.value, _ += _)
 
-      if(n>0){
-      // pair Gaussian components with their respective parameter gradients
-        val tuples =
-            Seq.tabulate(k)(i => (
-              sampleStats.outerProductsAgg(i),
-              sampleStats.posteriorsAgg(i),
-              gaussians(i),
-              n.toDouble))
+        val n: Int = sampleStats.counter // number of actual data points in current batch
 
-        // update gaussians
-        val (newDists, regValues) = if (shouldDistribute) {
-          // compute new gaussian parameters and regularization values in
-          // parallel
+        if(n>0){
+        // pair Gaussian components with their respective parameter gradients
+          val tuples =
+              Seq.tabulate(k)(i => (
+                sampleStats.outerProductsAgg(i),
+                sampleStats.posteriorsAgg(i),
+                gaussians(i),
+                n.toDouble))
 
-          val numPartitions = math.min(k, 1024) // same as GaussianMixture (MLlib)
+          // update gaussians
+          val (newDists, regValues) = if (shouldDistribute) {
+            // compute new gaussian parameters and regularization values in
+            // parallel
 
-          val (newDists,regValue) = sc.parallelize(tuples, numPartitions).map { case (outer,w,dist,_n) =>
+            val numPartitions = math.min(k, 1024) // same as GaussianMixture (MLlib)
 
-            val _Y = completeMatrix(outer)
+            val (newDists,regValue) = sc.parallelize(tuples, numPartitions).map { case (outer,w,dist,_n) =>
 
-            //gradient for Gaussian parameters
-            val (grad, regValue) = if(bcReg.value.isDefined){
-              (((_Y - w * dist.paramMat) * 0.5 + bcReg.value.get.gaussianGradient(dist)) / _n,
-                bcReg.value.get.evaluateDist(dist)/_n)
-            }else{
-              (((_Y - w * dist.paramMat) * 0.5 ) / _n, 0.0)
-            }
+              val _Y = completeMatrix(outer)
 
-            val newPars = bcOptim.value.getUpdate(
-                dist.paramMat,
-                grad,
-                dist.optimUtils)
-            
-            dist.update(newPars)
+              //gradient for Gaussian parameters
+              val (grad, regValue) = if(bcReg.value.isDefined){
+                (((_Y - w * dist.paramMat) * 0.5 + bcReg.value.get.gaussianGradient(dist)) / _n,
+                  bcReg.value.get.evaluateDist(dist)/_n)
+              }else{
+                (((_Y - w * dist.paramMat) * 0.5 ) / _n, 0.0)
+              }
 
-            bcOptim.value.updateLearningRate //update learning rate in workers
+              val newPars = bcOptim.value.getUpdate(
+                  dist.paramMat,
+                  grad,
+                  dist.optimUtils)
+              
+              dist.update(newPars)
 
-            (dist, regValue)
+              bcOptim.value.updateLearningRate //update learning rate in workers
 
-          }.collect().unzip
+              (dist, regValue)
 
-          (newDists.toArray,regValue.toArray)
+            }.collect().unzip
 
-        } else {
+            (newDists.toArray,regValue.toArray)
 
-          val (newDists,regValue) = tuples.map { case (outer,w,dist,_n) =>
+          } else {
 
-            val _Y = completeMatrix(outer)
+            val (newDists,regValue) = tuples.map { case (outer,w,dist,_n) =>
 
-            //gradient for Gaussian parameters
-            val (grad, regValue) = if(regularizer.isDefined){
-              (((_Y - w * dist.paramMat) * 0.5 + regularizer.get.gaussianGradient(dist)) / _n,
-                regularizer.get.evaluateDist(dist)/_n)
-            }else{
-              (((_Y - w * dist.paramMat) * 0.5 ) / _n, 0.0)
-            }
+              val _Y = completeMatrix(outer)
 
-            dist.update(
-              optim.getUpdate(
-                dist.paramMat,
-                grad, //averaged gradient. see line 136
-                dist.optimUtils))
-            
-            (dist, regValue)
+              //gradient for Gaussian parameters
+              val (grad, regValue) = if(regularizer.isDefined){
+                (((_Y - w * dist.paramMat) * 0.5 + regularizer.get.gaussianGradient(dist)) / _n,
+                  regularizer.get.evaluateDist(dist)/_n)
+              }else{
+                (((_Y - w * dist.paramMat) * 0.5 ) / _n, 0.0)
+              }
 
-          }.unzip
+              dist.update(
+                optim.getUpdate(
+                  dist.paramMat,
+                  grad, //averaged gradient. see line 136
+                  dist.optimUtils))
+              
+              (dist, regValue)
 
-          (newDists.toArray,regValue.toArray)
+            }.unzip
 
+            (newDists.toArray,regValue.toArray)
+
+          }
+
+          gaussians = newDists
+          
+          val breezeWeights = Utils.toBDV(weights.weights)
+
+          val regWeightValue = if(regularizer.isDefined){
+            regularizer.get.evaluateWeights(breezeWeights)/n.toDouble
+          }else{
+            0.0
+          }
+
+          val weightsGrads = if(regularizer.isDefined){
+            (sampleStats.weightsGradient + regularizer.get.weightsGradient(breezeWeights)) / n.toDouble 
+          }else{
+            sampleStats.weightsGradient /n.toDouble
+          }
+
+         weightsGrads(weightsGrads.length - 1) = 0.0 // last weight's auxiliar variable is fixed because of the simplex cosntraint
+
+          val newWeights = optim.getUpdate(
+                fromSimplex(breezeWeights),
+                weightsGrads, 
+                weights.optimUtils)
+
+          weights.update(toSimplex(newWeights))
+
+          oldLL = newLL // current becomes previous
+
+          newLL = (sampleStats.loss + regValues.sum + regWeightValue) / n.toDouble //average loss
+
+          optim.updateLearningRate //update learning rate in driver
+          iter += 1
+          subiter += 1
+          val elapsed = (System.nanoTime - t0)/1e9d
         }
-
-        gaussians = newDists
-        
-        val breezeWeights = Utils.toBDV(weights.weights)
-
-        val regWeightValue = if(regularizer.isDefined){
-          regularizer.get.evaluateWeights(breezeWeights)/n.toDouble
-        }else{
-          0.0
-        }
-
-        val weightsGrads = if(regularizer.isDefined){
-          (sampleStats.weightsGradient + regularizer.get.weightsGradient(breezeWeights)) / n.toDouble 
-        }else{
-          sampleStats.weightsGradient /n.toDouble
-        }
-
-       weightsGrads(weightsGrads.length - 1) = 0.0 // last weight's auxiliar variable is fixed because of the simplex cosntraint
-
-        val newWeights = optim.getUpdate(
-              fromSimplex(breezeWeights),
-              weightsGrads, 
-              weights.optimUtils)
-
-        weights.update(toSimplex(newWeights))
-
-        oldLL = newLL // current becomes previous
-
-        newLL = (sampleStats.loss + regValues.sum + regWeightValue) / n.toDouble //average loss
-
-        optim.updateLearningRate //update learning rate in driver
-        iter += 1
-
-        val elapsed = (System.nanoTime - t0)/1e9d
-        
+          
       }
 
       //adder.unpersist()
