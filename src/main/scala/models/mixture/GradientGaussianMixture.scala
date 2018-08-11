@@ -230,7 +230,7 @@ class GradientGaussianMixture private (
         logger.info("No points in sample. Skipping iteration")
       }
 
-      adder.unpersist()
+      //adder.unpersist()
     }
 
     //bcOptim.destroy()
