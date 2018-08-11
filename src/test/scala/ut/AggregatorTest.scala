@@ -36,8 +36,29 @@ class AggregatorTest extends FlatSpec{
 	
 	val agg = points.foldLeft(MetricAggregator.init(2,dim)){case (agg,point) => adder(agg,point)}
 
-	val outerProductsMats = agg.outerProductsAgg.map(Utils.completeMatrix(_))
+	// copy of GradientGaussianMixture's completeMatrix method
+	def completeMatrix(x: Array[Double]): BDM[Double] = {
 
+	    // get size
+	    val d = math.sqrt(x.length).toInt
+
+	    //convert to matrix
+	    val mat = new BDM(d,d,x)
+	    //fill
+	    mat += mat.t
+	    //adjust diagonal elements
+	    var i = 0
+	    while(i < d){
+	      mat(i,i) /= 2
+	      i+=1
+	    }
+
+	    mat
+
+  	}
+
+  	val outerProductsMats = agg.outerProductsAgg.map(completeMatrix(_))
+  	
 	"the counter" should "be equal to nPoints" in {
 		//weightsGradient should be zero
 		assert(agg.counter == nPoints)
