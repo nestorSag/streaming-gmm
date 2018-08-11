@@ -136,21 +136,21 @@ class GradientGaussianMixture private (
 
           val numPartitions = math.min(k, 1024) // same as GaussianMixture (MLlib)
 
-          val (newDists,regValue) = sc.parallelize(tuples, numPartitions).map { case (outer,w,dist,n) =>
+          val (newDists,regValue) = sc.parallelize(tuples, numPartitions).map { case (outer,w,dist,_n) =>
 
-            val Y = Utils.completeMatrix(outer)
+            val _Y = completeMatrix(outer)
 
             //gradient for Gaussian parameters
             val (grad, regValue) = if(bcReg.value.isDefined){
-              (((Y - w * dist.paramMat) * 0.5 + bcReg.value.get.gaussianGradient(dist)) / n,
-                bcReg.value.get.evaluateDist(dist)/n)
+              (((_Y - w * dist.paramMat) * 0.5 + bcReg.value.get.gaussianGradient(dist)) / _n,
+                bcReg.value.get.evaluateDist(dist)/_n)
             }else{
-              (((Y - w * dist.paramMat) * 0.5 ) / n, 0.0)
+              (((_Y - w * dist.paramMat) * 0.5 ) / _n, 0.0)
             }
 
             val newPars = bcOptim.value.getUpdate(
                 dist.paramMat,
-                grad, //averaged gradient. see line 128
+                grad,
                 dist.optimUtils)
             
             dist.update(newPars)
@@ -165,16 +165,16 @@ class GradientGaussianMixture private (
 
         } else {
 
-          val (newDists,regValue) = tuples.map { case (outer,w,dist,n) =>
+          val (newDists,regValue) = tuples.map { case (outer,w,dist,_n) =>
 
-            val Y = Utils.completeMatrix(outer)
+            val _Y = completeMatrix(outer)
 
             //gradient for Gaussian parameters
             val (grad, regValue) = if(regularizer.isDefined){
-              (((Y - w * dist.paramMat) * 0.5 + regularizer.get.gaussianGradient(dist)) / n,
-                regularizer.get.evaluateDist(dist)/n)
+              (((_Y - w * dist.paramMat) * 0.5 + regularizer.get.gaussianGradient(dist)) / _n,
+                regularizer.get.evaluateDist(dist)/_n)
             }else{
-              (((Y - w * dist.paramMat) * 0.5 ) / n, 0.0)
+              (((_Y - w * dist.paramMat) * 0.5 ) / _n, 0.0)
             }
 
             dist.update(
@@ -207,6 +207,7 @@ class GradientGaussianMixture private (
           sampleStats.weightsGradient /n.toDouble
         }
 
+       weightsGrads(weightsGrads.length - 1) = 0.0 // last weight's auxiliar variable is fixed because of the simplex cosntraint
 
         val newWeights = optim.getUpdate(
               breezeWeights,
@@ -308,6 +309,33 @@ class GradientGaussianMixture private (
     }else{
       data
     }
+  }
+
+  /**
+  * Build a symmetric matrix from an array that represents an upper triangular matrix
+  *
+  * @param x upper triangular matrix array
+ 
+  */
+
+  private def completeMatrix(x: Array[Double]): BDM[Double] = {
+
+    // get size
+    val d = math.sqrt(x.length).toInt
+
+    //convert to matrix
+    val mat = new BDM(d,d,x)
+    //fill
+    mat += mat.t
+    //adjust diagonal elements
+    var i = 0
+    while(i < d){
+      mat(i,i) /= 2
+      i+=1
+    }
+
+    mat
+
   }
 
 }

@@ -28,31 +28,4 @@ object Utils extends Serializable{
     new BDV(x)
   }
 
-/**
-  * Build a symmetric matrix from an array that represents an upper triangular matrix
-  *
-  * @param x upper triangular matrix array
- 
-  */
-
-  def completeMatrix(x: Array[Double]): BDM[Double] = {
-
-    // get size
-    val d = math.sqrt(x.length).toInt
-
-    //convert to matrix
-    val mat = new BDM(d,d,x)
-    //fill
-    mat += mat.t
-    //adjust diagonal elements
-    var i = 0
-    while(i < d){
-      mat(i,i) /= 2
-      i+=1
-    }
-
-    mat
-
-  }
-
 }

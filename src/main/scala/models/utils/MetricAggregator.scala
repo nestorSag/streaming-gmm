@@ -51,6 +51,7 @@ class MetricAggregator(
       var xcurrent = x.outerProductsAgg(i)
       while(j < m){
         outerProductsAgg(i)(j) += xcurrent(j)
+        j += 1
       }
 
       i += 1
@@ -116,9 +117,6 @@ object MetricAggregator {
     // update aggregated weight gradient
 
     agg.weightsGradient += (posteriors - vectorWeights) //gradient
-
-
-    agg.weightsGradient(weights.length - 1) = 0.0 // last weight's auxiliar variable is fixed because of the simplex cosntraint
 
     // aggregate outer products
     var i = 0
