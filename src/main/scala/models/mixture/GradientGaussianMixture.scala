@@ -193,7 +193,7 @@ class GradientGaussianMixture private (
 
         gaussians = newDists
         
-        val breezeWeights = fromSimplex(Utils.toBDV(weights.weights))
+        val breezeWeights = Utils.toBDV(weights.weights)
 
         val regWeightValue = if(regularizer.isDefined){
           regularizer.get.evaluateWeights(breezeWeights)/n.toDouble
@@ -202,7 +202,7 @@ class GradientGaussianMixture private (
         }
 
         val weightsGrads = if(regularizer.isDefined){
-          (sampleStats.weightsGradient + regularizer.get.weightsGradient(Utils.toBDV(weights.weights))) / n.toDouble 
+          (sampleStats.weightsGradient + regularizer.get.weightsGradient(breezeWeights)) / n.toDouble 
         }else{
           sampleStats.weightsGradient /n.toDouble
         }
@@ -210,7 +210,7 @@ class GradientGaussianMixture private (
        weightsGrads(weightsGrads.length - 1) = 0.0 // last weight's auxiliar variable is fixed because of the simplex cosntraint
 
         val newWeights = optim.getUpdate(
-              breezeWeights,
+              fromSimplex(breezeWeights),
               weightsGrads, 
               weights.optimUtils)
 
