@@ -27,7 +27,8 @@ class MetricAggregator(
   val posteriorsAgg: BDV[Double],
   val outerProductsAgg: Array[Array[Double]], //treat matrices as arrays for BLAS routines
   var loss: Double,
-  var counter: Int) extends Serializable{
+  var counter: Int,
+  var currentBatch: Int) extends Serializable{
 
 /**
   * Number of components in the model
@@ -81,6 +82,7 @@ object MetricAggregator {
       BDV.zeros[Double](k),
       Array.fill(k)(Array.fill((d+1)*(d+1))(0.0)),
       0.0,
+      0,
       0)
   }
 
@@ -129,6 +131,21 @@ object MetricAggregator {
     }
     agg
   }
+
+  def batchSelector(
+      weights: Array[Double],
+      dists: Array[UpdatableGaussianComponent],
+      batchId: Int)(agg: MetricAggregator, batch: Array[BDV[Double]]): MetricAggregator = {
+
+    if(agg.currentBatch == batchId){
+
+      val adder = add(weights,dists)_
+      batch.foldLeft(agg){case (agg,point) => adder(agg,point)}
+    }
+    agg.currentBatch += 1
+    agg
+  }
+
 
 /**
   * compute posterior membership probabilities for a data point
