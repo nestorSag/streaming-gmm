@@ -282,10 +282,9 @@ class GradientGaussianMixture private (
 
     val batchesPerEpoch = math.floor(N.toDouble/batchLength)
 
-    val batchData = gConcaveData.sliding(batchLength)
-
     while (epoch < epoch) {
 
+      val batchData = gConcaveData.sliding(batchLength)
       var batches = math.floor((batchLength * maxIter.toDouble - epoch * N) / batchLength)
       var batch = 0
 
@@ -296,11 +295,16 @@ class GradientGaussianMixture private (
         // initialize curried adder that will aggregate the necessary statistics in the workers
         val discard = (batchesPerEpoch - batches).toInt
 
-        if(discard > 1){
-          batchData.drop(discard-1).foldLeft(this){case (model,batch) => model._step(batch)}
+        val (newWeights, newGaussians) = if(discard > 1){
+          val updated = batchData.drop(discard-1).foldLeft(this){case (model,batch) => model._step(batch)}
+          (updated.getWeights,updated.getGaussians)
         }else{
-          batchData.foldLeft(this){case (model,batch) => model._step(batch)}
+          val updated = batchData.foldLeft(this){case (model,batch) => model._step(batch)}
+          (updated.getWeights,updated.getGaussians)
         }
+
+        this.weights.update(Utils.toBDV(newWeights))
+        this.gaussians = newGaussians
 
         val elapsed = (System.nanoTime - t0)/1e9d
         logger.info(s"iteration took ${elapsed}}")
