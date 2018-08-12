@@ -326,6 +326,8 @@ class GradientGaussianMixture private (
     val k = weights.length
     val d = batch(0).length
 
+    println(s"processing batch of size ${batch.length}")
+    
      val adder = MetricAggregator.add(weights.weights, gaussians)_
 
     val sampleStats = batch
