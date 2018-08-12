@@ -242,6 +242,167 @@ class GradientGaussianMixture private (
 
   }
 
+
+/**
+  * Optimize the mixture parameters given some training data
+  * @param data Training data as an Array of Breeze vectors 
+ 
+  */
+  
+  def step(data: Array[BDV[Double]]): this.type = {
+
+    // initialize logger. It logs the parameters' paths to solution
+    // the messages' leve; lis set to DEBUG, so be sure to set the log level to DEBUG 
+    // if you want to see them
+    val logger: Logger = Logger.getLogger("modelPath")
+
+    val d = data(0).size
+
+    //map original vectors to points for the g-concave formulation
+    // y = [x 1]
+    val gConcaveData = data.map{x => new BDV[Double](x.toArray ++ Array[Double](1.0))}
+
+    var newLL = 1.0   // current log-likelihood
+    var oldLL = 0.0  // previous log-likelihood
+    var iter = 0
+
+    val initialRate = optim.getLearningRate
+    
+    //a bit of syntactic sugar
+    def toSimplex: BDV[Double] => BDV[Double] = optim.weightsOptimizer.toSimplex
+    def fromSimplex: BDV[Double] => BDV[Double] = optim.weightsOptimizer.fromSimplex
+
+    //shuddle data set 
+    var shuffle = false
+
+    val batchLength = if(batchSize.isDefined){
+      batchSize.get
+    }else{
+      gConcaveData.length
+    }
+
+    val N = gConcaveData.length
+
+    val batchLimit = math.floor(N.toDouble/batchLength)
+
+    while (iter < maxIter  && math.abs(newLL-oldLL) > convergenceTol) {
+
+      val dt = if(shuffle){
+        logger.info("shuffling")
+        scala.util.Random.shuffle(gConcaveData.toSeq).toArray
+      }else{
+        gConcaveData
+      }
+      var batchId = 0
+
+      while(batchId < math.min(batchLimit,maxIter - iter) && math.abs(newLL-oldLL) > convergenceTol){
+      
+        val t0 = System.nanoTime //this is to time program
+
+        if(batchSize.isDefined){
+          shuffle = true
+        }
+        // if model parameters can be plotted (specific d and k)
+        // and logger is set to debug, send trajectory of estimators to logs
+        if(d==2 && k == 3){
+          //send values formatted for R processing to logs
+          logger.debug(s"means: list(${gaussians.map{case g => "c(" + g.getMu.toArray.mkString(",") + ")"}.mkString(",")})")
+          logger.debug(s"weights: ${"c(" + weights.weights.mkString(",") + ")"}")
+          logger.debug(s"covs: list(${gaussians.map{case g => "c(" + g.getSigma.toArray.mkString(",") + ")"}.mkString(",")})")
+        }
+
+        // initialize curried adder that will aggregate the necessary statistics in the workers
+        val adder = MetricAggregator.add(weights.weights, gaussians)_
+
+        val sampleStats = dt
+          .slice(batchId*batchLength,math.min((batchId+1)*batchLength,N))
+          .foldLeft(MetricAggregator.init(k,d)){case (agg,point) => adder(agg,point)}
+        
+        val n = sampleStats.counter
+
+        val tuples =
+          Seq.tabulate(k)(i => (
+            sampleStats.outerProductsAgg(i),
+            sampleStats.posteriorsAgg(i),
+            gaussians(i),
+            n.toDouble))
+
+        val (newDists, regValues) = {
+
+          val (newDists,regValue) = tuples.map { case (outer,w,dist,_n) =>
+
+              val _Y = completeMatrix(outer)
+
+              //gradient for Gaussian parameters
+              val (grad, regValue) = if(regularizer.isDefined){
+                (((_Y - w * dist.paramMat) * 0.5 + regularizer.get.gaussianGradient(dist)) / _n,
+                  regularizer.get.evaluateDist(dist)/_n)
+              }else{
+                (((_Y - w * dist.paramMat) * 0.5 ) / _n, 0.0)
+              }
+
+              dist.update(
+                optim.getUpdate(
+                  dist.paramMat,
+                  grad, //averaged gradient. see line 136
+                  dist.optimUtils))
+              
+              (dist, regValue)
+
+            }.unzip
+
+            (newDists.toArray,regValue.toArray)
+        }
+
+        gaussians = newDists
+          
+        val breezeWeights = Utils.toBDV(weights.weights)
+
+        val regWeightValue = if(regularizer.isDefined){
+          regularizer.get.evaluateWeights(breezeWeights)/n.toDouble
+        }else{
+          0.0
+        }
+
+        val weightsGrads = if(regularizer.isDefined){
+          (sampleStats.weightsGradient + regularizer.get.weightsGradient(breezeWeights)) / n.toDouble 
+        }else{
+          sampleStats.weightsGradient /n.toDouble
+        }
+
+       weightsGrads(weightsGrads.length - 1) = 0.0 // last weight's auxiliar variable is fixed because of the simplex cosntraint
+
+        val newWeights = optim.getUpdate(
+              fromSimplex(breezeWeights),
+              weightsGrads, 
+              weights.optimUtils)
+
+        weights.update(toSimplex(newWeights))
+
+        oldLL = newLL // current becomes previous
+
+        newLL = (sampleStats.loss + regValues.sum + regWeightValue) / n.toDouble //average loss
+
+        optim.updateLearningRate //update learning rate in driver
+        
+        iter += 1
+        batchId += 1
+
+        val elapsed = (System.nanoTime - t0)/1e9d
+        logger.info(s"iteration ${iter} took ${elapsed} seconds for ${n} samples. new LL: ${newLL}")
+      }
+      //adder.unpersist()
+    }
+
+    //bcOptim.destroy()
+
+    //set learning rate to original value in case it was shrunk
+    optim.setLearningRate(initialRate)
+
+    this
+
+  }
+
 /**
   * Returns a Spark's Gaussian Mixture Model with the current parameters initialized with the current parameters
  
