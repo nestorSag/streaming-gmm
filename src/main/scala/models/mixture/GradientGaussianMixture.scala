@@ -248,7 +248,7 @@ class GradientGaussianMixture private (
   * @param data Training data as an Array of Breeze vectors 
  
   */
-  
+
   def step(data: Array[BDV[Double]]): this.type = {
 
     // initialize logger. It logs the parameters' paths to solution
