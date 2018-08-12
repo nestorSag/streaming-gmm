@@ -257,12 +257,10 @@ class GradientGaussianMixture private (
     // if you want to see them
     val logger: Logger = Logger.getLogger("modelPath")
 
-    val d = data(0).size
-
     //map original vectors to points for the g-concave formulation
     // y = [x 1]
-    val gConcaveData = data.map{x => new BDV[Double](x.toArray ++ Array[Double](1.0))}
-    val N = gConcaveData.length
+    //val gConcaveData = data.map{x => new BDV[Double](x.toArray ++ Array[Double](1.0))}
+    val N = data.length
 
     var newLL = 1.0   // current log-likelihood
     var oldLL = 0.0  // previous log-likelihood
@@ -273,44 +271,33 @@ class GradientGaussianMixture private (
     val batchLength = if(batchSize.isDefined){
       batchSize.get
     }else{
-      gConcaveData.length
+      data.length
     }
 
     val epochs = math.ceil(batchLength * maxIter.toDouble / N)
     var epoch = 0
 
+    val maxBatchesPerEpoch  = math.floor(N.toDouble/batchLength).toInt
 
-    val batchesPerEpoch = math.floor(N.toDouble/batchLength)
+    while (epoch < epochs) {
 
-    while (epoch < epoch) {
-
-      val batchData = gConcaveData.sliding(batchLength)
-      var batches = math.floor((batchLength * maxIter.toDouble - epoch * N) / batchLength)
-      var batch = 0
-
-      while(batch < batches){
+      val batchData = data.grouped(batchLength)
+      var batches = math.min(math.floor((batchLength * maxIter.toDouble - epoch * N) / batchLength), maxBatchesPerEpoch).toInt
       
-        val t0 = System.nanoTime //this is to time program
+      val t0 = System.nanoTime //this is to time program
 
-        // initialize curried adder that will aggregate the necessary statistics in the workers
-        val discard = (batchesPerEpoch - batches).toInt
+      // initialize curried adder that will aggregate the necessary statistics in the workers
+      val discard = maxBatchesPerEpoch  - batches
 
-        val (newWeights, newGaussians) = if(discard > 1){
-          val updated = batchData.drop(discard-1).foldLeft(this){case (model,batch) => model._step(batch)}
-          (updated.getWeights,updated.getGaussians)
-        }else{
-          val updated = batchData.foldLeft(this){case (model,batch) => model._step(batch)}
-          (updated.getWeights,updated.getGaussians)
-        }
+      if(discard > 1){
+        batchData.drop(discard).foldLeft(this){case (model,batch) => model._step(batch)}
 
-        this.weights.update(Utils.toBDV(newWeights))
-        this.gaussians = newGaussians
-
-        val elapsed = (System.nanoTime - t0)/1e9d
-        logger.info(s"iteration took ${elapsed}}")
-
-        batch += 1
+      }else{
+        batchData.foldLeft(this){case (model,batch) => model._step(batch)}
       }
+
+      val elapsed = (System.nanoTime - t0)/1e9d
+      logger.info(s"iteration took ${elapsed}}")
 
       epoch += 1
     }
@@ -330,11 +317,12 @@ class GradientGaussianMixture private (
     val k = weights.length
     val d = batch(0).length
 
-    println(s"processing batch of size ${batch.length}")
+    //println(s"processing batch of size ${batch.length}")
     
      val adder = MetricAggregator.add(weights.weights, gaussians)_
 
     val sampleStats = batch
+      .map{x => new BDV[Double](x.toArray ++ Array[Double](1.0))}
       .foldLeft(MetricAggregator.init(k,d)){case (agg,point) => adder(agg,point)}
     
     val n = sampleStats.counter
@@ -351,6 +339,7 @@ class GradientGaussianMixture private (
       val (newDists,regValue) = tuples.map { case (outer,w,dist,_n) =>
 
           val _Y = completeMatrix(outer)
+
 
           //gradient for Gaussian parameters
           val (grad, regValue) = if(regularizer.isDefined){
