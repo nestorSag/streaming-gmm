@@ -33,7 +33,7 @@ class GradientGaussianMixture private (
 
 
   def step(data: RDD[SV]): this.type = {
-
+    converged = false
     if(batchSize.isDefined){
       miniBatchStep(data)
     }else{
@@ -223,7 +223,9 @@ class GradientGaussianMixture private (
           oldLL = newLL // current becomes previous
 
           newLL = (sampleStats.loss + regValues.sum + regWeightValue) / n.toDouble //average loss
-
+          
+          lossValue = newLL
+          
           optim.updateLearningRate //update learning rate in driver
           subiter += 1
           val elapsed = (System.nanoTime - t0)/1e9d
@@ -238,6 +240,10 @@ class GradientGaussianMixture private (
 
     //set learning rate to original value in case it was shrunk
     optim.setLearningRate(initialRate)
+
+    if(math.abs(newLL-oldLL) < convergenceTol){
+      converged = true
+    }
 
     this
 
@@ -405,6 +411,7 @@ class GradientGaussianMixture private (
       oldLL = newLL // current becomes previous
 
       newLL = (sampleStats.loss + regValues.sum + regWeightValue) / n.toDouble //average loss
+      lossValue = newLL
 
       optim.updateLearningRate //update learning rate in driver
       iter += 1
@@ -419,6 +426,10 @@ class GradientGaussianMixture private (
 
     //set learning rate to original value in case it was shrunk
     optim.setLearningRate(initialRate)
+
+    if(math.abs(newLL-oldLL) < convergenceTol){
+      converged = true
+    }
 
     this
 
@@ -438,6 +449,7 @@ class GradientGaussianMixture private (
     // if you want to see them
 
     //map original vectors to points for the g-concave formulation
+    converged = false
     val N = data.length
 
     var newLL = 1.0   // current log-likelihood
@@ -447,9 +459,14 @@ class GradientGaussianMixture private (
     val initialRate = optim.getLearningRate
 
     val batchLength = if(batchSize.isDefined){
-      batchSize.get
+      if(batchSize.get > N){
+        println("batch size is bigger than dataset size. Performing full-batch optimisation.")
+        N
+      }else{
+        batchSize.get
+      }
     }else{
-      data.length
+      N
     }
 
     val epochs = math.ceil(batchLength * maxIter.toDouble / N)
@@ -463,7 +480,7 @@ class GradientGaussianMixture private (
 
     while (epoch < epochs) {
 
-      if(shuffle){
+      if(shuffle & batchLength < N){
         batchData = scala.util.Random.shuffle(data.toSeq).toArray.grouped(batchLength)
       }
 
@@ -496,85 +513,93 @@ class GradientGaussianMixture private (
 
     //val logger: Logger = Logger.getLogger("modelPath")
     //a bit of syntactic sugar
-    def toSimplex: BDV[Double] => BDV[Double] = optim.weightsOptimizer.toSimplex
-    def fromSimplex: BDV[Double] => BDV[Double] = optim.weightsOptimizer.fromSimplex
+    if(!converged){
+      def toSimplex: BDV[Double] => BDV[Double] = optim.weightsOptimizer.toSimplex
+      def fromSimplex: BDV[Double] => BDV[Double] = optim.weightsOptimizer.fromSimplex
 
-    val k = weights.length
-    val d = batch(0).length
+      val k = weights.length
+      val d = batch(0).length
 
-    //println(s"processing batch of size ${batch.length}")
-    
-     val adder = MetricAggregator.add(weights.weights, gaussians)_
-
-    val sampleStats = batch
-      .map{x => new BDV[Double](x.toArray ++ Array[Double](1.0))}
-      .foldLeft(MetricAggregator.init(k,d)){case (agg,point) => adder(agg,point)}
-    
-    val n = sampleStats.counter
-
-    val tuples =
-      Seq.tabulate(k)(i => (
-        sampleStats.outerProductsAgg(i),
-        sampleStats.posteriorsAgg(i),
-        gaussians(i),
-        n.toDouble))
-
-    val (newDists, regValues) = {
-
-      val (newDists,regValue) = tuples.map { case (outer,w,dist,_n) =>
-
-          val _Y = completeMatrix(outer)
-
-
-          //gradient for Gaussian parameters
-          val (grad, regValue) = if(regularizer.isDefined){
-            (((_Y - w * dist.paramMat) * 0.5 + regularizer.get.gaussianGradient(dist)) / _n,
-              regularizer.get.evaluateDist(dist)/_n)
-          }else{
-            (((_Y - w * dist.paramMat) * 0.5 ) / _n, 0.0)
-          }
-
-          dist.update(
-            optim.getUpdate(
-              dist.paramMat,
-              grad, //averaged gradient. see line 136
-              dist.optimUtils))
-          
-          (dist, regValue)
-
-        }.unzip
-
-        (newDists.toArray,regValue.toArray)
-    }
-
-    gaussians = newDists
+      //println(s"processing batch of size ${batch.length}")
       
-    val breezeWeights = Utils.toBDV(weights.weights)
+       val adder = MetricAggregator.add(weights.weights, gaussians)_
 
-    val regWeightValue = if(regularizer.isDefined){
-      regularizer.get.evaluateWeights(breezeWeights)/n.toDouble
-    }else{
-      0.0
+      val sampleStats = batch
+        .map{x => new BDV[Double](x.toArray ++ Array[Double](1.0))}
+        .foldLeft(MetricAggregator.init(k,d)){case (agg,point) => adder(agg,point)}
+      
+      val n = sampleStats.counter
+
+      val tuples =
+        Seq.tabulate(k)(i => (
+          sampleStats.outerProductsAgg(i),
+          sampleStats.posteriorsAgg(i),
+          gaussians(i),
+          n.toDouble))
+
+      val (newDists, regValues) = {
+
+        val (newDists,regValue) = tuples.map { case (outer,w,dist,_n) =>
+
+            val _Y = completeMatrix(outer)
+
+
+            //gradient for Gaussian parameters
+            val (grad, regValue) = if(regularizer.isDefined){
+              (((_Y - w * dist.paramMat) * 0.5 + regularizer.get.gaussianGradient(dist)) / _n,
+                regularizer.get.evaluateDist(dist)/_n)
+            }else{
+              (((_Y - w * dist.paramMat) * 0.5 ) / _n, 0.0)
+            }
+
+            dist.update(
+              optim.getUpdate(
+                dist.paramMat,
+                grad, //averaged gradient. see line 136
+                dist.optimUtils))
+            
+            (dist, regValue)
+
+          }.unzip
+
+          (newDists.toArray,regValue.toArray)
+      }
+
+      gaussians = newDists
+        
+      val breezeWeights = Utils.toBDV(weights.weights)
+
+      val regWeightValue = if(regularizer.isDefined){
+        regularizer.get.evaluateWeights(breezeWeights)/n.toDouble
+      }else{
+        0.0
+      }
+
+      val weightsGrads = if(regularizer.isDefined){
+        (sampleStats.weightsGradient + regularizer.get.weightsGradient(breezeWeights)) / n.toDouble 
+      }else{
+        sampleStats.weightsGradient /n.toDouble
+      }
+
+     weightsGrads(weightsGrads.length - 1) = 0.0 // last weight's auxiliar variable is fixed because of the simplex cosntraint
+
+      val newWeights = optim.getUpdate(
+            fromSimplex(breezeWeights),
+            weightsGrads, 
+            weights.optimUtils)
+
+      weights.update(toSimplex(newWeights))
+
+      // oldLL = newLL // current becomes previous
+
+      val newLL = (sampleStats.loss + regValues.sum + regWeightValue) / n.toDouble //average loss
+      
+      if(math.abs(newLL - lossValue) < convergenceTol){
+        converged = true
+      }
+
+      lossValue = newLL
     }
-
-    val weightsGrads = if(regularizer.isDefined){
-      (sampleStats.weightsGradient + regularizer.get.weightsGradient(breezeWeights)) / n.toDouble 
-    }else{
-      sampleStats.weightsGradient /n.toDouble
-    }
-
-   weightsGrads(weightsGrads.length - 1) = 0.0 // last weight's auxiliar variable is fixed because of the simplex cosntraint
-
-    val newWeights = optim.getUpdate(
-          fromSimplex(breezeWeights),
-          weightsGrads, 
-          weights.optimUtils)
-
-    weights.update(toSimplex(newWeights))
-
-    // oldLL = newLL // current becomes previous
-
-    val newLL = (sampleStats.loss + regValues.sum + regWeightValue) / n.toDouble //average loss
 
     this
 

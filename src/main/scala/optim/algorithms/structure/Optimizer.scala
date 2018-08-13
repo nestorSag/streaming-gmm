@@ -23,7 +23,7 @@ trait Optimizer extends Serializable{
   * Rate at which the learning rate is decreased as the number of iterations grow.
   * After t iterations the learning rate will be shrinkageRate^t * learningRate
   */
-  protected var shrinkageRate: Double = 0.95
+  protected var shrinkageRate: Double = math.pow(2.0,-1.0/20)
 
 /**
   * Minimum allowed learning rate. Once this lower bound is reached the learning rate will not

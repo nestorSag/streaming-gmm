@@ -14,6 +14,17 @@ import org.apache.spark.rdd.RDD
 trait Optimizable extends Serializable {
 
 /**
+  * Current loss value
+  */
+  protected var lossValue: Double = Double.MinValue
+
+/**
+  * convergence flag for local optimisation
+  */
+  protected var converged = false
+
+
+/**
   * Optional regularization term
   */
   protected var regularizer: Option[Regularizer] = None
@@ -134,6 +145,17 @@ trait Optimizable extends Serializable {
     this
   }
 
+  def setBatchSize(n: Option[Int]): this.type = {
+    if(n.isDefined){
+      require(n.get>0,"n must be a positive integer")
+      batchSize = n
+    }else{
+      batchSize = None
+    }
+
+    this
+  }
+
   def setSeed(s: Long): this.type = {
     seed = s
     this
@@ -150,6 +172,8 @@ trait Optimizable extends Serializable {
     regularizer = r
     this
   }
+
+  def getLoss = lossValue
 
 
 }
