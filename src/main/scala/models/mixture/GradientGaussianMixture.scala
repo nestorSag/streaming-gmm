@@ -54,6 +54,7 @@ class GradientGaussianMixture private (
     // if you want to see them
     require(batchSize.isDefined,"batchSize is not set")
 
+    var t0 = System.nanoTime
     val logger: Logger = Logger.getLogger("modelPath")
 
     val d = data.first().size
@@ -68,6 +69,7 @@ class GradientGaussianMixture private (
     val batchData = RDDFunctions.fromRDD(data
       .map{x => new BDV[Double](x.toArray ++ Array[Double](1.0))})
       .sliding(batchSize.get,batchSize.get).cache()
+    //batches are repeated if necessary to avoid expensive shuffling operation after each epoch
 
     val maxBatchesPerEpoch = batchData
       .mapPartitionsWithIndex{case (i,rows) => Iterator((i,rows.size))}
@@ -94,6 +96,7 @@ class GradientGaussianMixture private (
     def fromSimplex: BDV[Double] => BDV[Double] = optim.weightsOptimizer.fromSimplex
 
     //sampling seed
+    logger.info(s"optim setup stage took ${(System.nanoTime - t0)/1e9d}")
 
     while (iter < maxIter && math.abs(newLL-oldLL) > convergenceTol){
 
@@ -461,7 +464,7 @@ class GradientGaussianMixture private (
     while (epoch < epochs) {
 
       if(shuffle){
-        batchData = scala.util.Random.shuffle(batchData)
+        batchData = scala.util.Random.shuffle(data.toSeq).toArray.grouped(batchLength)
       }
 
       shuffle = true // always shuffle after first epoch
