@@ -118,7 +118,7 @@ class GradientGaussianMixture private (
           val adder = sc.broadcast(
             MetricAggregator.batchSelector(weights.weights, gaussians, subiter)_)
 
-          var t00 = System.nanoTime
+          //var t00 = System.nanoTime
           val sampleStats = batchData.treeAggregate(MetricAggregator.init(k, d))(adder.value, _ += _)
           //println(s"treeAggregate took ${(System.nanoTime - t00)/1e9d} seconds")
           val n: Int = sampleStats.counter // number of actual data points in current batch
@@ -430,14 +430,11 @@ class GradientGaussianMixture private (
 
   def step(data: Array[BDV[Double]]): this.type = {
 
-    require(batchSize.isDefined,"batch size is not set")
     // initialize logger. It logs the parameters' paths to solution
     // the messages' leve; lis set to DEBUG, so be sure to set the log level to DEBUG 
     // if you want to see them
 
     //map original vectors to points for the g-concave formulation
-    // y = [x 1]
-    //val gConcaveData = data.map{x => new BDV[Double](x.toArray ++ Array[Double](1.0))}
     val N = data.length
 
     var newLL = 1.0   // current log-likelihood
@@ -494,7 +491,7 @@ class GradientGaussianMixture private (
   
   private def updateParams(batch: Array[BDV[Double]]): this.type = {
 
-    val logger: Logger = Logger.getLogger("modelPath")
+    //val logger: Logger = Logger.getLogger("modelPath")
     //a bit of syntactic sugar
     def toSimplex: BDV[Double] => BDV[Double] = optim.weightsOptimizer.toSimplex
     def fromSimplex: BDV[Double] => BDV[Double] = optim.weightsOptimizer.fromSimplex
