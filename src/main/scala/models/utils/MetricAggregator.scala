@@ -132,20 +132,6 @@ object MetricAggregator {
     agg
   }
 
-  def batchSelector(
-      weights: Array[Double],
-      dists: Array[UpdatableGaussianComponent],
-      batchId: Int)(agg: MetricAggregator, batch: Array[BDV[Double]]): MetricAggregator = {
-
-    if(agg.currentBatch == batchId){
-
-      val adder = add(weights,dists)_
-      batch.foldLeft(agg){case (agg,point) => adder(agg,point)}
-    }
-    agg.currentBatch += 1
-    agg
-  }
-
 
 /**
   * compute posterior membership probabilities for a data point
