@@ -7,6 +7,9 @@ import org.apache.spark.mllib.linalg.{Vector => SV}
 import org.apache.spark.api.java.JavaRDD
 import org.apache.spark.rdd.RDD
 
+import org.apache.spark.streaming.api.java.JavaDStream
+import org.apache.spark.streaming.dstream.DStream
+
 /**
   * Contains the basic functionality for an object to be modified by Optimizer
 
@@ -84,6 +87,20 @@ trait Optimizable extends Serializable {
   */
   def step(data: JavaRDD[SV]): Unit = {
     step(data.rdd)
+  }
+
+//functionality for streaming data
+
+/**
+  * Update model parameters using streaming data
+  * @param data Streaming data
+ 
+  */
+  def step(data: DStream[SV]): this.type = {
+    data.foreachRDD { (rdd, time) =>
+      step(rdd)
+    }
+    this
   }
 
   /**

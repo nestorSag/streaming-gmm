@@ -314,7 +314,7 @@ class GradientGaussianMixture private (
   
   private def updateParams(batch: Array[BDV[Double]]): this.type = {
 
-    //val logger: Logger = Logger.getLogger("modelPath")
+    //val logger: Logger = Logger.getLogger(this.getClass)
     //a bit of syntactic sugar
     if(!converged){
       def toSimplex: BDV[Double] => BDV[Double] = optim.weightsOptimizer.toSimplex
@@ -397,6 +397,8 @@ class GradientGaussianMixture private (
 
       val newLL = (sampleStats.loss + regValues.sum + regWeightValue) / n.toDouble //average loss
       
+      //logger.info(s"iteration ${iter} took ${elapsed} seconds for ${n} samples. new LL: ${newLL}")
+
       if(math.abs(newLL - lossValue) < convergenceTol){
         converged = true
       }
@@ -423,40 +425,6 @@ class GradientGaussianMixture private (
           SVS.dense(g.getMu.toArray),
           SMS.dense(d,d,g.getSigma.toArray))})
   }
-
-/**
-  * Update model parameters using streaming data
-  * @param data Streaming data
- 
-  */
-  def step(data: DStream[SV]) {
-    data.foreachRDD { (rdd, time) =>
-      step(rdd)
-    }
-  }
-
-/**
-  * Cluster membership prediction for streaming data
-  * @param data Streaming data
- 
-  */
-  def predict(data: DStream[SV]) {
-    data.foreachRDD { (rdd, time) =>
-      predict(rdd)
-    }
-  }
-
-/**
-  * Soft cluster membership prediction for streaming data
-  * @param data Streaming data
- 
-  */
-  def predictSoft(data: DStream[SV]) {
-    data.foreachRDD { (rdd, time) =>
-      predictSoft(rdd)
-    }
-  }
-
 
 /**
   * Heuristic to decide when to distribute the computations. Taken from Spark's GaussianMixture class

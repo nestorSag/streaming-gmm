@@ -89,7 +89,7 @@ object MetricAggregator {
 /**
   * Adder for individual points
   *
-  * Used for reducing individual data points and aggregating the ir statistics
+  * Used for reducing individual data points and aggregating their statistics
   * @param weights Current weights vector
   * @param dists Current model components
   * @param optim Optimization algorithm

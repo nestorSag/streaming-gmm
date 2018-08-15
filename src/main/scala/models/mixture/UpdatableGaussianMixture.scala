@@ -6,8 +6,12 @@ import breeze.linalg.{diag, max, DenseMatrix => BDM, DenseVector => BDV, Vector 
 
 import org.apache.spark.SparkContext
 import org.apache.spark.api.java.JavaRDD
+
 import org.apache.spark.mllib.linalg.{Matrix => SM, Vector => SV}
 import org.apache.spark.rdd.RDD
+
+import org.apache.spark.streaming.api.java.JavaDStream
+import org.apache.spark.streaming.dstream.DStream
 
 /**
   * Implementation of a Gaussian Mixture Model with updatable components. 
@@ -74,6 +78,22 @@ private[gradientgmm] class UpdatableGaussianMixture(
   * @return RDD with arrays giving the membership probabilities for each cluster
  
   */
+  def predictSoft(points: JavaRDD[SV]): JavaRDD[Array[java.lang.Double]] = {
+    val sc = points.rdd.sparkContext
+    val bcDists = sc.broadcast(gaussians)
+    val bcWeights = sc.broadcast(weights.weights)
+    points.rdd.map { x =>
+      computeSoftAssignments(new BDV[Double](x.toArray), bcDists.value, bcWeights.value, k)
+    }.asInstanceOf[JavaRDD[Array[java.lang.Double]]]
+  }
+
+
+  /**
+  * Soft cluster membership prediction
+
+  * @return RDD with arrays giving the membership probabilities for each cluster
+ 
+  */
   def predictSoft(points: RDD[SV]): RDD[Array[Double]] = {
     val sc = points.sparkContext
     val bcDists = sc.broadcast(gaussians)
@@ -118,6 +138,24 @@ private[gradientgmm] class UpdatableGaussianMixture(
   * process individual points to compute soft cluster assignments
  
   */
+
+/**
+  * Cluster membership prediction for streaming data
+  * @param data Streaming data
+ 
+  */
+  def predict(data: DStream[SV]): DStream[Int] = {
+    data.map(this.predict)
+  }
+
+/**
+  * Soft cluster membership prediction for streaming data
+  * @param data Streaming data
+ 
+  */
+  def predictSoft(data: DStream[SV]): DStream[Array[Double]] = {
+    data.map(this.predictSoft)
+  }
 
   private def computeSoftAssignments(
       pt: BDV[Double],
