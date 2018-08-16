@@ -30,7 +30,7 @@ Below is a summary of how the program works. To see the full documentation click
 
 The model is initialized using its factory object, either specifying the arrays of initial weights, mean vectors and covariance matrices:
 
-```
+```scala
 import com.github.gradientgmm.GradientGaussianMixture
 
 val model = GradientGaussianMixture(weigths,means,covs)
@@ -40,7 +40,7 @@ val model = GradientGaussianMixture(weigths,means,covs)
 
 or passing as arguments training data and the number of components to ```init``` (the data must be an ```RDD``` of Spark's ```DenseVector```, just like Spark's [GaussianMixtureModel](https://spark.apache.org/docs/2.3.1/api/scala/index.html#org.apache.spark.mllib.clustering.GaussianMixtureModel)):
 
-```
+```scala
 val model = GradientGaussianMixture.init(data,k)
 ```
 
@@ -49,7 +49,7 @@ weights, means and covariances.
 
 You can initialize the model as above and then perform gradient ascent iterations in a single instruction with:
 
-```
+```scala
 val model = GradientGaussianMixture.fit(data,k)
 ```
 
@@ -57,7 +57,7 @@ val model = GradientGaussianMixture.fit(data,k)
 
 The default optimization algorithm when creating and updating the model is ```GradientAscent```. Accelerated gradient ascent directions are also available (in fact they usually perform better, so you should use them!) and they can be created as follows:
 
-```
+```scala
 import com.github.gradientgmm.optim.{MomentumGradientAscent,NesterovGradientAscent}
 
 val myOptim = new MomentumGradientAscent()
@@ -69,7 +69,7 @@ val myOptim = new MomentumGradientAscent()
 ```
 Now you can pass it to the model when initializing it by addind an ```optim``` parameter to any of the instructions above, for example:
 
-```
+```scala
 val model = GradientGaussianMixture.fit(data,k,myOptim)
 ```
 
@@ -79,7 +79,7 @@ It is recommended to use a big initial step size and shrink it until ```1e-2``` 
 
 For an existing model, ```model.step(data)``` is used to update it. The mini-batch size and number of iterations of every ```step()``` call can be specified beforehand:
 
-```
+```scala
 model
 .maxIter(20)
 .batchSize(50)
@@ -90,7 +90,7 @@ model
 
 To avoid the problem of [covariance singularity](https://stats.stackexchange.com/a/219358/66574), you can add a logarithmic barrier or a conjugate prior regularizer to the optimizer object:
 
-```
+```scala
 import com.github.gradientgmm.optim.{LogBarrier,ConjugatePrior}
 
 val cpReg = new ConjugatePrior(k,dim) //pass k and data dimensionality
