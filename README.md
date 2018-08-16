@@ -2,7 +2,7 @@
 
 This project forms part of an MSc dissertation at the University of Edinburgh. 
 
-It is based on the results of [[1]](https://arxiv.org/pdf/1706.03267.pdf) and implements stochastic gradient ascent and additional accelerated gradient ascent algorithms for GMMs, which makes it particularly useful for large-scale and streaming mixture models.
+It is based on the results of [[1]](https://arxiv.org/pdf/1706.03267.pdf) and implements stochastic gradient ascent and additional accelerated gradient ascent algorithms for GMMs, which makes it particularly useful for large-scale and streaming mixture models. It can work locally using Breeze's ```DenseVector``` as input or with distributed data using Spark's ```Vector```s
 
 ## Getting Started
 
