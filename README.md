@@ -20,7 +20,7 @@ lazy val projectIDependOn = RootProject(uri("git://github.com/nestorSag/streamin
 dependsOn(projectIDependOn)
 ```
 
-where ```latest_version``` is the latest release (as of now, ```1.4```)
+where ```latest_version``` is the latest release (as of now, ```1.5```)
 
 ## Using the program
 
@@ -58,7 +58,7 @@ val model = GradientGaussianMixture.fit(data,k)
 The default optimization algorithm when creating and updating the model is ```GradientAscent```. Accelerated gradient ascent directions are also available (in fact they usually perform better, so you should use them!) and they can be created as follows:
 
 ```
-import com.github.gradientgmm.optim.algorithms.{MomentumGradientAscent,NesterovGradientAscent}
+import com.github.gradientgmm.optim.{MomentumGradientAscent,NesterovGradientAscent}
 
 val myOptim = new MomentumGradientAscent()
     .setLearningRate(0.9)
@@ -91,7 +91,7 @@ model
 To avoid the problem of [covariance singularity](https://stats.stackexchange.com/a/219358/66574), you can add a logarithmic barrier or a conjugate prior regularizer to the optimizer object:
 
 ```
-import com.github.gradientgmm.optim.regularization.{LogBarrier,ConjugatePrior}
+import com.github.gradientgmm.optim.{LogBarrier,ConjugatePrior}
 
 val cpReg = new ConjugatePrior(k,dim) //pass k and data dimensionality
 val lbReg = new LogBarrier()
