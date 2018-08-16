@@ -17,7 +17,7 @@ import org.apache.log4j.Logger
   * @param dim Data dimensionality
 
   */
-class ConjugatePrior(val dim: Int, var k: Int) extends Regularizer{
+class ConjugatePrior(val dim: Int, val k: Int) extends Regularizer{
 
 	require(dim>0,"dimensionality must be a positive integer")
 	require(k>0,"number of clusters must be a positive integer")
@@ -98,13 +98,6 @@ class ConjugatePrior(val dim: Int, var k: Int) extends Regularizer{
 
 	def getDirichletParam = dirichletParam
 
-	def setK(k: Int): this.type = {
-		require(k>0,"number of clusters must be positive")
-		this.k = k
-		this
-	}
-
-	def getK = this.k
 
 /**
   * Parameter block matrix [A B; C D]. The blocks are:

@@ -47,14 +47,14 @@
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <span class="name">GradientGaussianMixture</span><span class="result"> extends <span class="extype" name="com.github.gradientgmm.UpdatableGaussianMixture">UpdatableGaussianMixture</span> with <a href="optim/algorithms/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.algorithms.Optimizable">Optimizable</a></span>
+        <span class="name">GradientGaussianMixture</span><span class="result"> extends <span class="extype" name="com.github.gradientgmm.UpdatableGaussianMixture">UpdatableGaussianMixture</span> with <a href="optim/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.Optimizable">Optimizable</a></span>
       </span>
       </h4>
       
           <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Optimizable gradient-based Gaussian Mixture Model
 See <a href="https://arxiv.org/abs/1706.03267" target="_blank">An Alternative to EM for Gaussian Mixture Models: Batch and Stochastic Riemannian Optimization<i>]]</i></a></p></div><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
-          <div class="superTypes hiddenContent"><a href="optim/algorithms/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.algorithms.Optimizable">Optimizable</a>, <span class="extype" name="com.github.gradientgmm.UpdatableGaussianMixture">UpdatableGaussianMixture</span>, <span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><a href="optim/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.Optimizable">Optimizable</a>, <span class="extype" name="com.github.gradientgmm.UpdatableGaussianMixture">UpdatableGaussianMixture</span>, <span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -72,7 +72,7 @@ See <a href="https://arxiv.org/abs/1706.03267" target="_blank">An Alternative to
                 <span class="filtertype">Inherited<br />
                 </span>
                 <ol id="linearization">
-                  <li class="in" name="com.github.gradientgmm.GradientGaussianMixture"><span>GradientGaussianMixture</span></li><li class="in" name="com.github.gradientgmm.optim.algorithms.Optimizable"><span>Optimizable</span></li><li class="in" name="com.github.gradientgmm.UpdatableGaussianMixture"><span>UpdatableGaussianMixture</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                  <li class="in" name="com.github.gradientgmm.GradientGaussianMixture"><span>GradientGaussianMixture</span></li><li class="in" name="com.github.gradientgmm.optim.Optimizable"><span>Optimizable</span></li><li class="in" name="com.github.gradientgmm.UpdatableGaussianMixture"><span>UpdatableGaussianMixture</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                 </ol>
               </div><div id="ancestors">
             <span class="filtertype"></span>
@@ -165,27 +165,7 @@ See <a href="https://arxiv.org/abs/1706.03267" target="_blank">An Alternative to
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="com.github.gradientgmm.GradientGaussianMixture#batchFraction" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="batchFraction:Double"></a>
-      <a id="batchFraction:Double"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">var</span>
-      </span>
-      <span class="symbol">
-        <span class="name">batchFraction</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#com.github.gradientgmm.GradientGaussianMixture@batchFraction:Double" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">mini-batch size as fraction of the complete training data
-Spark needs a double in [0,1] to take samples, so we need
-to translate a given batch size to a fraction of the data size
-</p>
-    </li><li name="com.github.gradientgmm.optim.algorithms.Optimizable#batchSize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+    </li><li name="com.github.gradientgmm.optim.Optimizable#batchSize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="batchSize:Option[Int]"></a>
       <a id="batchSize:Option[Int]"></a>
       <h4 class="signature">
@@ -203,7 +183,7 @@ to translate a given batch size to a fraction of the data size
     </span>
       <p class="shortcomment cmt">Minibatch size for each iteration in the ascent procedure.</p><div class="fullcomment"><div class="comment cmt"><p>Minibatch size for each iteration in the ascent procedure. If None, it performs
 full-batch optimization
-</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="optim/algorithms/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.algorithms.Optimizable">Optimizable</a></dd></dl></div>
+</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="optim/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.Optimizable">Optimizable</a></dd></dl></div>
     </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a>
       <a id="clone():AnyRef"></a>
@@ -227,7 +207,26 @@ full-batch optimization
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.github.gradientgmm.optim.algorithms.Optimizable#convergenceTol" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+    </li><li name="com.github.gradientgmm.optim.Optimizable#converged" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="converged:Boolean"></a>
+      <a id="converged:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">converged</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.github.gradientgmm.GradientGaussianMixture@converged:Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">convergence flag for local optimisation
+</p><div class="fullcomment"><div class="comment cmt"><p>convergence flag for local optimisation
+</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="optim/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.Optimizable">Optimizable</a></dd></dl></div>
+    </li><li name="com.github.gradientgmm.optim.Optimizable#convergenceTol" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="convergenceTol:Double"></a>
       <a id="convergenceTol:Double"></a>
       <h4 class="signature">
@@ -245,7 +244,7 @@ full-batch optimization
     </span>
       <p class="shortcomment cmt">Error tolerance in log-likelihood for the stopping criteria
 </p><div class="fullcomment"><div class="comment cmt"><p>Error tolerance in log-likelihood for the stopping criteria
-</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="optim/algorithms/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.algorithms.Optimizable">Optimizable</a></dd></dl></div>
+</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="optim/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.Optimizable">Optimizable</a></dd></dl></div>
     </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a>
       <a id="eq(AnyRef):Boolean"></a>
@@ -320,7 +319,7 @@ full-batch optimization
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>UpdatableGaussianMixture</dd></dl></div>
-    </li><li name="com.github.gradientgmm.optim.algorithms.Optimizable#getBatchSize" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+    </li><li name="com.github.gradientgmm.optim.Optimizable#getBatchSize" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getBatchSize:Option[Int]"></a>
       <a id="getBatchSize:Option[Int]"></a>
       <h4 class="signature">
@@ -336,7 +335,7 @@ full-batch optimization
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="optim/algorithms/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.algorithms.Optimizable">Optimizable</a></dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="optim/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.Optimizable">Optimizable</a></dd></dl></div>
     </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <a id="getClass():Class[_]"></a>
@@ -354,7 +353,7 @@ full-batch optimization
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="com.github.gradientgmm.optim.algorithms.Optimizable#getConvergenceTol" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+    </li><li name="com.github.gradientgmm.optim.Optimizable#getConvergenceTol" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getConvergenceTol:Double"></a>
       <a id="getConvergenceTol:Double"></a>
       <h4 class="signature">
@@ -370,7 +369,7 @@ full-batch optimization
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="optim/algorithms/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.algorithms.Optimizable">Optimizable</a></dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="optim/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.Optimizable">Optimizable</a></dd></dl></div>
     </li><li name="com.github.gradientgmm.UpdatableGaussianMixture#getGaussians" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getGaussians:Array[com.github.gradientgmm.components.UpdatableGaussianComponent]"></a>
       <a id="getGaussians:Array[UpdatableGaussianComponent]"></a>
@@ -388,7 +387,24 @@ full-batch optimization
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>UpdatableGaussianMixture</dd></dl></div>
-    </li><li name="com.github.gradientgmm.optim.algorithms.Optimizable#getMaxIter" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+    </li><li name="com.github.gradientgmm.optim.Optimizable#getLoss" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getLoss:Double"></a>
+      <a id="getLoss:Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getLoss</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.github.gradientgmm.GradientGaussianMixture@getLoss:Double" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="optim/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.Optimizable">Optimizable</a></dd></dl></div>
+    </li><li name="com.github.gradientgmm.optim.Optimizable#getMaxIter" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getMaxIter:Int"></a>
       <a id="getMaxIter:Int"></a>
       <h4 class="signature">
@@ -404,9 +420,9 @@ full-batch optimization
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="optim/algorithms/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.algorithms.Optimizable">Optimizable</a></dd></dl></div>
-    </li><li name="com.github.gradientgmm.optim.algorithms.Optimizable#getOptim" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="getOptim:com.github.gradientgmm.optim.algorithms.Optimizer"></a>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="optim/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.Optimizable">Optimizable</a></dd></dl></div>
+    </li><li name="com.github.gradientgmm.optim.Optimizable#getOptim" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getOptim:com.github.gradientgmm.optim.Optimizer"></a>
       <a id="getOptim:Optimizer"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -414,15 +430,15 @@ full-batch optimization
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">getOptim</span><span class="result">: <a href="optim/algorithms/Optimizer.html" class="extype" name="com.github.gradientgmm.optim.algorithms.Optimizer">Optimizer</a></span>
+        <span class="name">getOptim</span><span class="result">: <a href="optim/Optimizer.html" class="extype" name="com.github.gradientgmm.optim.Optimizer">Optimizer</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.github.gradientgmm.GradientGaussianMixture@getOptim:com.github.gradientgmm.optim.algorithms.Optimizer" title="Permalink" target="_top">
+      <a href="../../../index.html#com.github.gradientgmm.GradientGaussianMixture@getOptim:com.github.gradientgmm.optim.Optimizer" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="optim/algorithms/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.algorithms.Optimizable">Optimizable</a></dd></dl></div>
-    </li><li name="com.github.gradientgmm.optim.algorithms.Optimizable#getSeed" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="optim/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.Optimizable">Optimizable</a></dd></dl></div>
+    </li><li name="com.github.gradientgmm.optim.Optimizable#getSeed" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getSeed:Long"></a>
       <a id="getSeed:Long"></a>
       <h4 class="signature">
@@ -438,7 +454,7 @@ full-batch optimization
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="optim/algorithms/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.algorithms.Optimizable">Optimizable</a></dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="optim/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.Optimizable">Optimizable</a></dd></dl></div>
     </li><li name="com.github.gradientgmm.UpdatableGaussianMixture#getWeights" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getWeights:Array[Double]"></a>
       <a id="getWeights:Array[Double]"></a>
@@ -456,6 +472,25 @@ full-batch optimization
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>UpdatableGaussianMixture</dd></dl></div>
+    </li><li name="com.github.gradientgmm.optim.Optimizable#globalIterCounter" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="globalIterCounter:Long"></a>
+      <a id="globalIterCounter:Long"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">globalIterCounter</span><span class="result">: <span class="extype" name="scala.Long">Long</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.github.gradientgmm.GradientGaussianMixture@globalIterCounter:Long" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">this prevents the seed from repeating every time step() is called
+which would cause the same samples being taken</p><div class="fullcomment"><div class="comment cmt"><p>this prevents the seed from repeating every time step() is called
+which would cause the same samples being taken</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="optim/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.Optimizable">Optimizable</a></dd></dl></div>
     </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="hashCode():Int"></a>
       <a id="hashCode():Int"></a>
@@ -507,8 +542,27 @@ full-batch optimization
       </a>
     </span>
       <p class="shortcomment cmt">number of componenrs</p><div class="fullcomment"><div class="comment cmt"><p>number of componenrs</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd>UpdatableGaussianMixture</dd></dl></div>
-    </li><li name="com.github.gradientgmm.optim.algorithms.Optimizable#matrixOps" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="matrixOps:com.github.gradientgmm.optim.algorithms.ParameterOperations[breeze.linalg.DenseMatrix[Double]]"></a>
+    </li><li name="com.github.gradientgmm.optim.Optimizable#lossValue" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="lossValue:Double"></a>
+      <a id="lossValue:Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">lossValue</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.github.gradientgmm.GradientGaussianMixture@lossValue:Double" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Current loss value
+</p><div class="fullcomment"><div class="comment cmt"><p>Current loss value
+</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="optim/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.Optimizable">Optimizable</a></dd></dl></div>
+    </li><li name="com.github.gradientgmm.optim.Optimizable#matrixOps" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="matrixOps:com.github.gradientgmm.optim.ParameterOperations[breeze.linalg.DenseMatrix[Double]]"></a>
       <a id="matrixOps:ParameterOperations[DenseMatrix[Double]]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -516,15 +570,15 @@ full-batch optimization
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">matrixOps</span><span class="result">: <a href="optim/algorithms/ParameterOperations.html" class="extype" name="com.github.gradientgmm.optim.algorithms.ParameterOperations">ParameterOperations</a>[<span class="extype" name="breeze.linalg.DenseMatrix">DenseMatrix</span>[<span class="extype" name="scala.Double">Double</span>]]</span>
+        <span class="name">matrixOps</span><span class="result">: <a href="optim/ParameterOperations.html" class="extype" name="com.github.gradientgmm.optim.ParameterOperations">ParameterOperations</a>[<span class="extype" name="breeze.linalg.DenseMatrix">DenseMatrix</span>[<span class="extype" name="scala.Double">Double</span>]]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.github.gradientgmm.GradientGaussianMixture@matrixOps:com.github.gradientgmm.optim.algorithms.ParameterOperations[breeze.linalg.DenseMatrix[Double]]" title="Permalink" target="_top">
+      <a href="../../../index.html#com.github.gradientgmm.GradientGaussianMixture@matrixOps:com.github.gradientgmm.optim.ParameterOperations[breeze.linalg.DenseMatrix[Double]]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="optim/algorithms/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.algorithms.Optimizable">Optimizable</a></dd></dl></div>
-    </li><li name="com.github.gradientgmm.optim.algorithms.Optimizable#maxIter" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="optim/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.Optimizable">Optimizable</a></dd></dl></div>
+    </li><li name="com.github.gradientgmm.optim.Optimizable#maxIter" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="maxIter:Int"></a>
       <a id="maxIter:Int"></a>
       <h4 class="signature">
@@ -542,7 +596,7 @@ full-batch optimization
     </span>
       <p class="shortcomment cmt">Maximum number of iterations allowed
 </p><div class="fullcomment"><div class="comment cmt"><p>Maximum number of iterations allowed
-</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="optim/algorithms/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.algorithms.Optimizable">Optimizable</a></dd></dl></div>
+</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="optim/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.Optimizable">Optimizable</a></dd></dl></div>
     </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a>
       <a id="ne(AnyRef):Boolean"></a>
@@ -595,7 +649,7 @@ full-batch optimization
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
     </li><li name="com.github.gradientgmm.GradientGaussianMixture#optim" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="optim:com.github.gradientgmm.optim.algorithms.Optimizer"></a>
+      <a id="optim:com.github.gradientgmm.optim.Optimizer"></a>
       <a id="optim:Optimizer"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -603,31 +657,31 @@ full-batch optimization
         <span class="kind">var</span>
       </span>
       <span class="symbol">
-        <span class="name">optim</span><span class="result">: <a href="optim/algorithms/Optimizer.html" class="extype" name="com.github.gradientgmm.optim.algorithms.Optimizer">Optimizer</a></span>
+        <span class="name">optim</span><span class="result">: <a href="optim/Optimizer.html" class="extype" name="com.github.gradientgmm.optim.Optimizer">Optimizer</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.github.gradientgmm.GradientGaussianMixture@optim:com.github.gradientgmm.optim.algorithms.Optimizer" title="Permalink" target="_top">
+      <a href="../../../index.html#com.github.gradientgmm.GradientGaussianMixture@optim:com.github.gradientgmm.optim.Optimizer" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Optimization object</p><div class="fullcomment"><div class="comment cmt"><p>Optimization object</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.github.gradientgmm.GradientGaussianMixture">GradientGaussianMixture</a> → <a href="optim/algorithms/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.algorithms.Optimizable">Optimizable</a></dd></dl></div>
-    </li><li name="com.github.gradientgmm.GradientGaussianMixture#predict" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="predict(data:org.apache.spark.streaming.dstream.DStream[org.apache.spark.mllib.linalg.Vector]):Unit"></a>
-      <a id="predict(DStream[Vector]):Unit"></a>
+      <p class="shortcomment cmt">Optimization object</p><div class="fullcomment"><div class="comment cmt"><p>Optimization object</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.github.gradientgmm.GradientGaussianMixture">GradientGaussianMixture</a> → <a href="optim/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.Optimizable">Optimizable</a></dd></dl></div>
+    </li><li name="com.github.gradientgmm.UpdatableGaussianMixture#predict" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="predict(data:org.apache.spark.streaming.dstream.DStream[org.apache.spark.mllib.linalg.Vector]):org.apache.spark.streaming.dstream.DStream[Int]"></a>
+      <a id="predict(DStream[Vector]):DStream[Int]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">predict</span><span class="params">(<span name="data">data: <span class="extype" name="org.apache.spark.streaming.dstream.DStream">DStream</span>[<span class="extype" name="org.apache.spark.mllib.linalg.Vector">Vector</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="name">predict</span><span class="params">(<span name="data">data: <span class="extype" name="org.apache.spark.streaming.dstream.DStream">DStream</span>[<span class="extype" name="org.apache.spark.mllib.linalg.Vector">Vector</span>]</span>)</span><span class="result">: <span class="extype" name="org.apache.spark.streaming.dstream.DStream">DStream</span>[<span class="extype" name="scala.Int">Int</span>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.github.gradientgmm.GradientGaussianMixture@predict(data:org.apache.spark.streaming.dstream.DStream[org.apache.spark.mllib.linalg.Vector]):Unit" title="Permalink" target="_top">
+      <a href="../../../index.html#com.github.gradientgmm.GradientGaussianMixture@predict(data:org.apache.spark.streaming.dstream.DStream[org.apache.spark.mllib.linalg.Vector]):org.apache.spark.streaming.dstream.DStream[Int]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Cluster membership prediction for streaming data</p><div class="fullcomment"><div class="comment cmt"><p>Cluster membership prediction for streaming data</p></div><dl class="paramcmts block"><dt class="param">data</dt><dd class="cmt"><p>Streaming data</p></dd></dl></div>
+      <p class="shortcomment cmt">Cluster membership prediction for streaming data</p><div class="fullcomment"><div class="comment cmt"><p>Cluster membership prediction for streaming data</p></div><dl class="paramcmts block"><dt class="param">data</dt><dd class="cmt"><p>Streaming data</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd>UpdatableGaussianMixture</dd></dl></div>
     </li><li name="com.github.gradientgmm.UpdatableGaussianMixture#predict" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="predict(point:breeze.linalg.DenseVector[Double]):Int"></a>
       <a id="predict(DenseVector[Double]):Int"></a>
@@ -704,23 +758,23 @@ full-batch optimization
       <p class="shortcomment cmt">Cluster membership prediction
 </p><div class="fullcomment"><div class="comment cmt"><p>Cluster membership prediction
 </p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>RDD with the points' labels</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd>UpdatableGaussianMixture</dd></dl></div>
-    </li><li name="com.github.gradientgmm.GradientGaussianMixture#predictSoft" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="predictSoft(data:org.apache.spark.streaming.dstream.DStream[org.apache.spark.mllib.linalg.Vector]):Unit"></a>
-      <a id="predictSoft(DStream[Vector]):Unit"></a>
+    </li><li name="com.github.gradientgmm.UpdatableGaussianMixture#predictSoft" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="predictSoft(data:org.apache.spark.streaming.dstream.DStream[org.apache.spark.mllib.linalg.Vector]):org.apache.spark.streaming.dstream.DStream[Array[Double]]"></a>
+      <a id="predictSoft(DStream[Vector]):DStream[Array[Double]]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">predictSoft</span><span class="params">(<span name="data">data: <span class="extype" name="org.apache.spark.streaming.dstream.DStream">DStream</span>[<span class="extype" name="org.apache.spark.mllib.linalg.Vector">Vector</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="name">predictSoft</span><span class="params">(<span name="data">data: <span class="extype" name="org.apache.spark.streaming.dstream.DStream">DStream</span>[<span class="extype" name="org.apache.spark.mllib.linalg.Vector">Vector</span>]</span>)</span><span class="result">: <span class="extype" name="org.apache.spark.streaming.dstream.DStream">DStream</span>[<span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Double">Double</span>]]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.github.gradientgmm.GradientGaussianMixture@predictSoft(data:org.apache.spark.streaming.dstream.DStream[org.apache.spark.mllib.linalg.Vector]):Unit" title="Permalink" target="_top">
+      <a href="../../../index.html#com.github.gradientgmm.GradientGaussianMixture@predictSoft(data:org.apache.spark.streaming.dstream.DStream[org.apache.spark.mllib.linalg.Vector]):org.apache.spark.streaming.dstream.DStream[Array[Double]]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Soft cluster membership prediction for streaming data</p><div class="fullcomment"><div class="comment cmt"><p>Soft cluster membership prediction for streaming data</p></div><dl class="paramcmts block"><dt class="param">data</dt><dd class="cmt"><p>Streaming data</p></dd></dl></div>
+      <p class="shortcomment cmt">Soft cluster membership prediction for streaming data</p><div class="fullcomment"><div class="comment cmt"><p>Soft cluster membership prediction for streaming data</p></div><dl class="paramcmts block"><dt class="param">data</dt><dd class="cmt"><p>Streaming data</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd>UpdatableGaussianMixture</dd></dl></div>
     </li><li name="com.github.gradientgmm.UpdatableGaussianMixture#predictSoft" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="predictSoft(point:breeze.linalg.DenseVector[Double]):Array[Double]"></a>
       <a id="predictSoft(DenseVector[Double]):Array[Double]"></a>
@@ -778,7 +832,45 @@ full-batch optimization
       <p class="shortcomment cmt">Soft cluster membership prediction
 </p><div class="fullcomment"><div class="comment cmt"><p>Soft cluster membership prediction
 </p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>RDD with arrays giving the membership probabilities for each cluster</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd>UpdatableGaussianMixture</dd></dl></div>
-    </li><li name="com.github.gradientgmm.optim.algorithms.Optimizable#seed" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+    </li><li name="com.github.gradientgmm.UpdatableGaussianMixture#predictSoft" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="predictSoft(points:org.apache.spark.api.java.JavaRDD[org.apache.spark.mllib.linalg.Vector]):org.apache.spark.api.java.JavaRDD[Array[Double]]"></a>
+      <a id="predictSoft(JavaRDD[Vector]):JavaRDD[Array[Double]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">predictSoft</span><span class="params">(<span name="points">points: <span class="extype" name="org.apache.spark.api.java.JavaRDD">JavaRDD</span>[<span class="extype" name="org.apache.spark.mllib.linalg.Vector">Vector</span>]</span>)</span><span class="result">: <span class="extype" name="org.apache.spark.api.java.JavaRDD">JavaRDD</span>[<span class="extype" name="scala.Array">Array</span>[<span class="extype" name="java.lang.Double">Double</span>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.github.gradientgmm.GradientGaussianMixture@predictSoft(points:org.apache.spark.api.java.JavaRDD[org.apache.spark.mllib.linalg.Vector]):org.apache.spark.api.java.JavaRDD[Array[Double]]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Soft cluster membership prediction
+</p><div class="fullcomment"><div class="comment cmt"><p>Soft cluster membership prediction
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>RDD with arrays giving the membership probabilities for each cluster</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd>UpdatableGaussianMixture</dd></dl></div>
+    </li><li name="com.github.gradientgmm.optim.Optimizable#regularizer" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="regularizer:Option[com.github.gradientgmm.optim.Regularizer]"></a>
+      <a id="regularizer:Option[Regularizer]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">regularizer</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<a href="optim/Regularizer.html" class="extype" name="com.github.gradientgmm.optim.Regularizer">Regularizer</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.github.gradientgmm.GradientGaussianMixture@regularizer:Option[com.github.gradientgmm.optim.Regularizer]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Optional regularization term
+</p><div class="fullcomment"><div class="comment cmt"><p>Optional regularization term
+</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="optim/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.Optimizable">Optimizable</a></dd></dl></div>
+    </li><li name="com.github.gradientgmm.optim.Optimizable#seed" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="seed:Long"></a>
       <a id="seed:Long"></a>
       <h4 class="signature">
@@ -794,8 +886,25 @@ full-batch optimization
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">random seed for mini-batch sampling</p><div class="fullcomment"><div class="comment cmt"><p>random seed for mini-batch sampling</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="optim/algorithms/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.algorithms.Optimizable">Optimizable</a></dd></dl></div>
-    </li><li name="com.github.gradientgmm.optim.algorithms.Optimizable#setBatchSize" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <p class="shortcomment cmt">random seed for mini-batch sampling</p><div class="fullcomment"><div class="comment cmt"><p>random seed for mini-batch sampling</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="optim/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.Optimizable">Optimizable</a></dd></dl></div>
+    </li><li name="com.github.gradientgmm.optim.Optimizable#setBatchSize" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="setBatchSize(n:Option[Int]):Optimizable.this.type"></a>
+      <a id="setBatchSize(Option[Int]):GradientGaussianMixture.this.type"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">setBatchSize</span><span class="params">(<span name="n">n: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Int">Int</span>]</span>)</span><span class="result">: <a href="" class="extype" name="com.github.gradientgmm.GradientGaussianMixture">GradientGaussianMixture</a>.this.type</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.github.gradientgmm.GradientGaussianMixture@setBatchSize(n:Option[Int]):Optimizable.this.type" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="optim/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.Optimizable">Optimizable</a></dd></dl></div>
+    </li><li name="com.github.gradientgmm.optim.Optimizable#setBatchSize" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="setBatchSize(n:Int):Optimizable.this.type"></a>
       <a id="setBatchSize(Int):GradientGaussianMixture.this.type"></a>
       <h4 class="signature">
@@ -811,8 +920,8 @@ full-batch optimization
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="optim/algorithms/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.algorithms.Optimizable">Optimizable</a></dd></dl></div>
-    </li><li name="com.github.gradientgmm.optim.algorithms.Optimizable#setConvergenceTol" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="optim/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.Optimizable">Optimizable</a></dd></dl></div>
+    </li><li name="com.github.gradientgmm.optim.Optimizable#setConvergenceTol" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="setConvergenceTol(x:Double):Optimizable.this.type"></a>
       <a id="setConvergenceTol(Double):GradientGaussianMixture.this.type"></a>
       <h4 class="signature">
@@ -828,8 +937,8 @@ full-batch optimization
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="optim/algorithms/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.algorithms.Optimizable">Optimizable</a></dd></dl></div>
-    </li><li name="com.github.gradientgmm.optim.algorithms.Optimizable#setMaxIter" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="optim/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.Optimizable">Optimizable</a></dd></dl></div>
+    </li><li name="com.github.gradientgmm.optim.Optimizable#setMaxIter" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="setMaxIter(m:Int):Optimizable.this.type"></a>
       <a id="setMaxIter(Int):GradientGaussianMixture.this.type"></a>
       <h4 class="signature">
@@ -845,9 +954,9 @@ full-batch optimization
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="optim/algorithms/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.algorithms.Optimizable">Optimizable</a></dd></dl></div>
-    </li><li name="com.github.gradientgmm.optim.algorithms.Optimizable#setOptim" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="setOptim(optim:com.github.gradientgmm.optim.algorithms.Optimizer):Optimizable.this.type"></a>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="optim/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.Optimizable">Optimizable</a></dd></dl></div>
+    </li><li name="com.github.gradientgmm.optim.Optimizable#setOptim" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="setOptim(optim:com.github.gradientgmm.optim.Optimizer):Optimizable.this.type"></a>
       <a id="setOptim(Optimizer):GradientGaussianMixture.this.type"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -855,15 +964,49 @@ full-batch optimization
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">setOptim</span><span class="params">(<span name="optim">optim: <a href="optim/algorithms/Optimizer.html" class="extype" name="com.github.gradientgmm.optim.algorithms.Optimizer">Optimizer</a></span>)</span><span class="result">: <a href="" class="extype" name="com.github.gradientgmm.GradientGaussianMixture">GradientGaussianMixture</a>.this.type</span>
+        <span class="name">setOptim</span><span class="params">(<span name="optim">optim: <a href="optim/Optimizer.html" class="extype" name="com.github.gradientgmm.optim.Optimizer">Optimizer</a></span>)</span><span class="result">: <a href="" class="extype" name="com.github.gradientgmm.GradientGaussianMixture">GradientGaussianMixture</a>.this.type</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.github.gradientgmm.GradientGaussianMixture@setOptim(optim:com.github.gradientgmm.optim.algorithms.Optimizer):Optimizable.this.type" title="Permalink" target="_top">
+      <a href="../../../index.html#com.github.gradientgmm.GradientGaussianMixture@setOptim(optim:com.github.gradientgmm.optim.Optimizer):Optimizable.this.type" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="optim/algorithms/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.algorithms.Optimizable">Optimizable</a></dd></dl></div>
-    </li><li name="com.github.gradientgmm.optim.algorithms.Optimizable#setSeed" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="optim/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.Optimizable">Optimizable</a></dd></dl></div>
+    </li><li name="com.github.gradientgmm.optim.Optimizable#setRegularizer" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="setRegularizer(r:Option[com.github.gradientgmm.optim.Regularizer]):Optimizable.this.type"></a>
+      <a id="setRegularizer(Option[Regularizer]):GradientGaussianMixture.this.type"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">setRegularizer</span><span class="params">(<span name="r">r: <span class="extype" name="scala.Option">Option</span>[<a href="optim/Regularizer.html" class="extype" name="com.github.gradientgmm.optim.Regularizer">Regularizer</a>]</span>)</span><span class="result">: <a href="" class="extype" name="com.github.gradientgmm.GradientGaussianMixture">GradientGaussianMixture</a>.this.type</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.github.gradientgmm.GradientGaussianMixture@setRegularizer(r:Option[com.github.gradientgmm.optim.Regularizer]):Optimizable.this.type" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="optim/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.Optimizable">Optimizable</a></dd></dl></div>
+    </li><li name="com.github.gradientgmm.optim.Optimizable#setRegularizer" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="setRegularizer(r:com.github.gradientgmm.optim.Regularizer):Optimizable.this.type"></a>
+      <a id="setRegularizer(Regularizer):GradientGaussianMixture.this.type"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">setRegularizer</span><span class="params">(<span name="r">r: <a href="optim/Regularizer.html" class="extype" name="com.github.gradientgmm.optim.Regularizer">Regularizer</a></span>)</span><span class="result">: <a href="" class="extype" name="com.github.gradientgmm.GradientGaussianMixture">GradientGaussianMixture</a>.this.type</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.github.gradientgmm.GradientGaussianMixture@setRegularizer(r:com.github.gradientgmm.optim.Regularizer):Optimizable.this.type" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="optim/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.Optimizable">Optimizable</a></dd></dl></div>
+    </li><li name="com.github.gradientgmm.optim.Optimizable#setSeed" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="setSeed(s:Long):Optimizable.this.type"></a>
       <a id="setSeed(Long):GradientGaussianMixture.this.type"></a>
       <h4 class="signature">
@@ -879,42 +1022,59 @@ full-batch optimization
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="optim/algorithms/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.algorithms.Optimizable">Optimizable</a></dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="optim/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.Optimizable">Optimizable</a></dd></dl></div>
     </li><li name="com.github.gradientgmm.GradientGaussianMixture#step" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="step(data:org.apache.spark.streaming.dstream.DStream[org.apache.spark.mllib.linalg.Vector]):Unit"></a>
-      <a id="step(DStream[Vector]):Unit"></a>
+      <a id="step(data:Array[breeze.linalg.DenseVector[Double]]):GradientGaussianMixture.this.type"></a>
+      <a id="step(Array[DenseVector[Double]]):GradientGaussianMixture.this.type"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">step</span><span class="params">(<span name="data">data: <span class="extype" name="org.apache.spark.streaming.dstream.DStream">DStream</span>[<span class="extype" name="org.apache.spark.mllib.linalg.Vector">Vector</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="name">step</span><span class="params">(<span name="data">data: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="breeze.linalg.DenseVector">DenseVector</span>[<span class="extype" name="scala.Double">Double</span>]]</span>)</span><span class="result">: <a href="" class="extype" name="com.github.gradientgmm.GradientGaussianMixture">GradientGaussianMixture</a>.this.type</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.github.gradientgmm.GradientGaussianMixture@step(data:org.apache.spark.streaming.dstream.DStream[org.apache.spark.mllib.linalg.Vector]):Unit" title="Permalink" target="_top">
+      <a href="../../../index.html#com.github.gradientgmm.GradientGaussianMixture@step(data:Array[breeze.linalg.DenseVector[Double]]):GradientGaussianMixture.this.type" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Update model parameters using streaming data</p><div class="fullcomment"><div class="comment cmt"><p>Update model parameters using streaming data</p></div><dl class="paramcmts block"><dt class="param">data</dt><dd class="cmt"><p>Streaming data</p></dd></dl></div>
+      <p class="shortcomment cmt">Perform local gradient descent optimisation</p><div class="fullcomment"><div class="comment cmt"><p>Perform local gradient descent optimisation</p></div><dl class="paramcmts block"><dt class="param">data</dt><dd class="cmt"><p>Training data as an Array of Breeze vectors</p></dd></dl></div>
     </li><li name="com.github.gradientgmm.GradientGaussianMixture#step" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="step(data:org.apache.spark.rdd.RDD[org.apache.spark.mllib.linalg.Vector]):Unit"></a>
-      <a id="step(RDD[Vector]):Unit"></a>
+      <a id="step(data:org.apache.spark.rdd.RDD[org.apache.spark.mllib.linalg.Vector]):GradientGaussianMixture.this.type"></a>
+      <a id="step(RDD[Vector]):GradientGaussianMixture.this.type"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">step</span><span class="params">(<span name="data">data: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="org.apache.spark.mllib.linalg.Vector">Vector</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="name">step</span><span class="params">(<span name="data">data: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="org.apache.spark.mllib.linalg.Vector">Vector</span>]</span>)</span><span class="result">: <a href="" class="extype" name="com.github.gradientgmm.GradientGaussianMixture">GradientGaussianMixture</a>.this.type</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.github.gradientgmm.GradientGaussianMixture@step(data:org.apache.spark.rdd.RDD[org.apache.spark.mllib.linalg.Vector]):Unit" title="Permalink" target="_top">
+      <a href="../../../index.html#com.github.gradientgmm.GradientGaussianMixture@step(data:org.apache.spark.rdd.RDD[org.apache.spark.mllib.linalg.Vector]):GradientGaussianMixture.this.type" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Optimize the mixture parameters given some training data</p><div class="fullcomment"><div class="comment cmt"><p>Optimize the mixture parameters given some training data</p></div><dl class="paramcmts block"><dt class="param">data</dt><dd class="cmt"><p>Training data as an RDD of Spark vectors</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.github.gradientgmm.GradientGaussianMixture">GradientGaussianMixture</a> → <a href="optim/algorithms/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.algorithms.Optimizable">Optimizable</a></dd></dl></div>
-    </li><li name="com.github.gradientgmm.optim.algorithms.Optimizable#step" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <p class="shortcomment cmt">Perform a gradient-based optimization step</p><div class="fullcomment"><div class="comment cmt"><p>Perform a gradient-based optimization step</p></div><dl class="paramcmts block"><dt class="param">data</dt><dd class="cmt"><p>Data to fit the model</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.github.gradientgmm.GradientGaussianMixture">GradientGaussianMixture</a> → <a href="optim/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.Optimizable">Optimizable</a></dd></dl></div>
+    </li><li name="com.github.gradientgmm.optim.Optimizable#step" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="step(data:org.apache.spark.streaming.dstream.DStream[org.apache.spark.mllib.linalg.Vector]):Optimizable.this.type"></a>
+      <a id="step(DStream[Vector]):GradientGaussianMixture.this.type"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">step</span><span class="params">(<span name="data">data: <span class="extype" name="org.apache.spark.streaming.dstream.DStream">DStream</span>[<span class="extype" name="org.apache.spark.mllib.linalg.Vector">Vector</span>]</span>)</span><span class="result">: <a href="" class="extype" name="com.github.gradientgmm.GradientGaussianMixture">GradientGaussianMixture</a>.this.type</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.github.gradientgmm.GradientGaussianMixture@step(data:org.apache.spark.streaming.dstream.DStream[org.apache.spark.mllib.linalg.Vector]):Optimizable.this.type" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Update model parameters using streaming data</p><div class="fullcomment"><div class="comment cmt"><p>Update model parameters using streaming data</p></div><dl class="paramcmts block"><dt class="param">data</dt><dd class="cmt"><p>Streaming data</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="optim/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.Optimizable">Optimizable</a></dd></dl></div>
+    </li><li name="com.github.gradientgmm.optim.Optimizable#step" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="step(data:org.apache.spark.api.java.JavaRDD[org.apache.spark.mllib.linalg.Vector]):Unit"></a>
       <a id="step(JavaRDD[Vector]):Unit"></a>
       <h4 class="signature">
@@ -930,7 +1090,7 @@ full-batch optimization
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Perform a gradient-based optimization step</p><div class="fullcomment"><div class="comment cmt"><p>Perform a gradient-based optimization step</p></div><dl class="paramcmts block"><dt class="param">data</dt><dd class="cmt"><p>Data to fit the model</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="optim/algorithms/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.algorithms.Optimizable">Optimizable</a></dd></dl></div>
+      <p class="shortcomment cmt">Perform a gradient-based optimization step</p><div class="fullcomment"><div class="comment cmt"><p>Perform a gradient-based optimization step</p></div><dl class="paramcmts block"><dt class="param">data</dt><dd class="cmt"><p>Data to fit the model</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="optim/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.Optimizable">Optimizable</a></dd></dl></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
       <a id="synchronized[T0](⇒T0):T0"></a>
@@ -982,8 +1142,8 @@ full-batch optimization
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="com.github.gradientgmm.optim.algorithms.Optimizable#vectorOps" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="vectorOps:com.github.gradientgmm.optim.algorithms.ParameterOperations[breeze.linalg.DenseVector[Double]]"></a>
+    </li><li name="com.github.gradientgmm.optim.Optimizable#vectorOps" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="vectorOps:com.github.gradientgmm.optim.ParameterOperations[breeze.linalg.DenseVector[Double]]"></a>
       <a id="vectorOps:ParameterOperations[DenseVector[Double]]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -991,15 +1151,15 @@ full-batch optimization
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">vectorOps</span><span class="result">: <a href="optim/algorithms/ParameterOperations.html" class="extype" name="com.github.gradientgmm.optim.algorithms.ParameterOperations">ParameterOperations</a>[<span class="extype" name="breeze.linalg.DenseVector">DenseVector</span>[<span class="extype" name="scala.Double">Double</span>]]</span>
+        <span class="name">vectorOps</span><span class="result">: <a href="optim/ParameterOperations.html" class="extype" name="com.github.gradientgmm.optim.ParameterOperations">ParameterOperations</a>[<span class="extype" name="breeze.linalg.DenseVector">DenseVector</span>[<span class="extype" name="scala.Double">Double</span>]]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.github.gradientgmm.GradientGaussianMixture@vectorOps:com.github.gradientgmm.optim.algorithms.ParameterOperations[breeze.linalg.DenseVector[Double]]" title="Permalink" target="_top">
+      <a href="../../../index.html#com.github.gradientgmm.GradientGaussianMixture@vectorOps:com.github.gradientgmm.optim.ParameterOperations[breeze.linalg.DenseVector[Double]]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <p class="shortcomment cmt">Linear Algebra operations necessary for computing updates for the parameters</p><div class="fullcomment"><div class="comment cmt"><p>Linear Algebra operations necessary for computing updates for the parameters</p><p>This is to avoid duplicating code for Gaussian and Weights updates in the optimization
-algorithms' classes</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="optim/algorithms/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.algorithms.Optimizable">Optimizable</a></dd></dl></div>
+algorithms' classes</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="optim/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.Optimizable">Optimizable</a></dd></dl></div>
     </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <a id="wait():Unit"></a>
@@ -1095,8 +1255,8 @@ algorithms' classes</p></div><dl class="attributes block"> <dt>Attributes</dt><d
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="com.github.gradientgmm.optim.algorithms.Optimizable">
-              <h3>Inherited from <a href="optim/algorithms/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.algorithms.Optimizable">Optimizable</a></h3>
+        <div class="parent" name="com.github.gradientgmm.optim.Optimizable">
+              <h3>Inherited from <a href="optim/Optimizable.html" class="extype" name="com.github.gradientgmm.optim.Optimizable">Optimizable</a></h3>
             </div><div class="parent" name="com.github.gradientgmm.UpdatableGaussianMixture">
               <h3>Inherited from <span class="extype" name="com.github.gradientgmm.UpdatableGaussianMixture">UpdatableGaussianMixture</span></h3>
             </div><div class="parent" name="scala.Serializable">
