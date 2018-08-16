@@ -14,7 +14,7 @@ The projectu uses ```scala 2.11.8```, ```spark 2.3.1``` and ```breeze 0.13.2```
 
 To use it as a dependency for other project you can add the following lines to your ```build.sbt``` file
 
-```
+```scala
 lazy val projectIDependOn = RootProject(uri("git://github.com/nestorSag/streaming-gmm#v<latest_version>"))
 
 dependsOn(projectIDependOn)
