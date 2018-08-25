@@ -21,7 +21,7 @@ trait WeightsTransformation extends Serializable {
 	def fromSimplex(weights: BDV[Double]): BDV[Double]
 
 /**
-  * Take a (possibly) arbitrary vector and map it to the weight simplex
+  * Take an arbitrary vector and map it to the weight simplex
   * see [[https://en.wikipedia.org/wiki/Simplex]]
   *
   * @param real vector
@@ -34,8 +34,8 @@ trait WeightsTransformation extends Serializable {
 
   * Because of the functions involved in mapping points from and to the weight simplex
   * sometimes over/underflows can occur and make some weights go to zero or one.
-  * To avoid this, at each iteration this function rescales the weights without affecting
-  * the resulting simplex points, or trim them if necessary, in this case affecting the resulting
+  * To avoid this, at each iteration this function add an offset to the vector without affecting
+  * the resulting simplex points, or bound them if necessary, in this case affecting the resulting
   * weights.
 
   * @param soft (possibly) arbitrary vector that is going to be mapped to a valid weight vector 

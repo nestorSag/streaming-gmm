@@ -3,7 +3,7 @@ package com.github.gradientgmm.optim
 import com.github.gradientgmm.components.AcceleratedGradientUtils
 
 /**
-  * Optimizer that performs stochastic gradient ascent with momentum
+  * Implementation of gradient descent with momentum
 
   * As formulated in ''Goh, "Why Momentum Really Works", Distill, 2017. http://doi.org/10.23915/distill.00006''
   */
@@ -31,7 +31,7 @@ class MomentumGradientAscent extends Optimizer {
 			utils.initializeMomentum
 		}
 		
-		utils.updateMomentum(
+		utils.setMomentum(
 			ops.sum(
 				ops.rescale(utils.momentum.get,beta),
 				grad))

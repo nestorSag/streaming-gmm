@@ -11,7 +11,7 @@ import org.apache.spark.streaming.api.java.JavaDStream
 import org.apache.spark.streaming.dstream.DStream
 
 /**
-  * Contains the basic functionality for an object to be modified by Optimizer
+  * Contains basic functionality for an object that can be modified by Optimizer
 
   */
 trait Optimizable extends Serializable {

@@ -103,14 +103,14 @@ class AggregatorTest extends FlatSpec{
 		val correctValues = clusterDists.map{
 			case dist =>  {
 				//print(points(0) * points(0).t * 0.5 * nPoints.toDouble)
-				0.5/nPoints.toDouble * (points(0) * points(0).t * 0.5 * nPoints.toDouble - dist.paramMat * 0.5 * nPoints.toDouble )
+				0.5/nPoints.toDouble * (points(0) * points(0).t * 0.5 * nPoints.toDouble - dist.paramBlockMatrix * 0.5 * nPoints.toDouble )
 			}
 		}
 
 		val testValues = outerProductsMats.zip(clusterDists.zip(agg.posteriorsAgg.toArray)).map{
 			case (o,(dist,p)) =>  {
 				//print(o)
-				0.5/nPoints.toDouble * (o - p*dist.paramMat)
+				0.5/nPoints.toDouble * (o - p*dist.paramBlockMatrix)
 			}
 		}
 

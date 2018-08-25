@@ -82,7 +82,7 @@
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Conjugate prior regularization for all the mixture's parameters; this means an
+      <p class="shortcomment cmt">Implementation of conjugate prior regularization; this means an
 <a href="https://en.wikipedia.org/wiki/Normal-inverse-Wishart_distribution" target="_blank">Inverse-Wishart</a> prior over the covariance matrices, a Normal prior over the means
 and a <a href="https://en.wikipedia.org/wiki/Dirichlet_distribution" target="_blank">Dirichlet</a> distribution prior over the weights.</p>
     </li><li name="com.github.gradientgmm.optim.GradientAscent" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
@@ -101,7 +101,7 @@ and a <a href="https://en.wikipedia.org/wiki/Dirichlet_distribution" target="_bl
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Optimizer that performs Stochastic Gradient Ascent
+      <p class="shortcomment cmt">Implementation of standard gradient ascent
 </p>
     </li><li name="com.github.gradientgmm.optim.LogBarrier" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="LogBarrierextendsRegularizer"></a>
@@ -136,7 +136,7 @@ and a <a href="https://en.wikipedia.org/wiki/Dirichlet_distribution" target="_bl
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Optimizer that performs stochastic gradient ascent with momentum</p><div class="fullcomment"><div class="comment cmt"><p>Optimizer that performs stochastic gradient ascent with momentum</p><p>As formulated in <i>Goh, &quot;Why Momentum Really Works&quot;, Distill, 2017. http://doi.org/10.23915/distill.00006</i>
+      <p class="shortcomment cmt">Implementation of gradient descent with momentum</p><div class="fullcomment"><div class="comment cmt"><p>Implementation of gradient descent with momentum</p><p>As formulated in <i>Goh, &quot;Why Momentum Really Works&quot;, Distill, 2017. http://doi.org/10.23915/distill.00006</i>
 </p></div></div>
     </li><li name="com.github.gradientgmm.optim.NesterovGradientAscent" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="NesterovGradientAscentextendsOptimizer"></a>
@@ -154,7 +154,7 @@ and a <a href="https://en.wikipedia.org/wiki/Dirichlet_distribution" target="_bl
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Optimizer that performs stochastic gradient ascent with Nesterov's correction
+      <p class="shortcomment cmt">Implementation of gradient ascent with Nesterov's correction
 </p>
     </li><li name="com.github.gradientgmm.optim.Optimizable" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
       <a id="OptimizableextendsSerializable"></a>
@@ -172,8 +172,8 @@ and a <a href="https://en.wikipedia.org/wiki/Dirichlet_distribution" target="_bl
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Contains the basic functionality for an object to be modified by Optimizer</p>
-    </li><li name="com.github.gradientgmm.optim.Optimizer" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <p class="shortcomment cmt">Contains basic functionality for an object that can be modified by Optimizer</p>
+    </li><li name="com.github.gradientgmm.optim.Optimizer" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
       <a id="OptimizerextendsSerializable"></a>
       <a id="Optimizer:Optimizer"></a>
       <h4 class="signature">
@@ -189,9 +189,7 @@ and a <a href="https://en.wikipedia.org/wiki/Dirichlet_distribution" target="_bl
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Optimizer interface that contains base hyperparameters and their getters and setters.</p><div class="fullcomment"><div class="comment cmt"><p>Optimizer interface that contains base hyperparameters and their getters and setters.
-Optimization algorithms like Stochastic Gradient Ascent are implementations of this trait
-</p></div></div>
+      <p class="shortcomment cmt">Contains base hyperparameters with the respective getters and setters.</p>
     </li><li name="com.github.gradientgmm.optim.ParameterOperations" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
       <a id="ParameterOperations[A]extendsSerializable"></a>
       <a id="ParameterOperations[A]:ParameterOperations[A]"></a>
@@ -227,7 +225,7 @@ Its purpose is avoid duplicating code in the optimization algorithms' classes
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Basic functionality for a <a href="https://en.wikipedia.org/wiki/Regularization_(mathematics)" target="_blank">regularization</a> term.</p>
+      <p class="shortcomment cmt">Contains basic functionality for a <a href="https://en.wikipedia.org/wiki/Regularization_(mathematics)" target="_blank">regularization</a> term.</p>
     </li><li name="com.github.gradientgmm.optim.SoftmaxWeightTransformation" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="SoftmaxWeightTransformationextendsWeightsTransformation"></a>
       <a id="SoftmaxWeightTransformation:SoftmaxWeightTransformation"></a>
@@ -244,7 +242,7 @@ Its purpose is avoid duplicating code in the optimization algorithms' classes
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Implements a Softmax mapping to optimize the weight vector</p><div class="fullcomment"><div class="comment cmt"><p>Implements a Softmax mapping to optimize the weight vector</p><p>The precise mapping is w_i =&gt; log(w_i/w_last) and is an implementation of the procedure
+      <p class="shortcomment cmt">Softmax mapping to fit the weights vector</p><div class="fullcomment"><div class="comment cmt"><p>Softmax mapping to fit the weights vector</p><p>The precise mapping is w_i =&gt; log(w_i/w_last) and is an implementation of the procedure
 described <a href="https://arxiv.org/abs/1706.03267" target="_blank">here</a></p></div></div>
     </li><li name="com.github.gradientgmm.optim.WeightsTransformation" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
       <a id="WeightsTransformationextendsSerializable"></a>
@@ -273,18 +271,18 @@ fit the weights of a mixture model</p>
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <a href="ADAM.html"><span class="name deprecated" title="Deprecated: (Since version gradientgmm 1.4) ADAM can be unstable for GMM problems and should not be used">ADAM</span></a><span class="result"> extends <a href="Optimizer.html" class="extype" name="com.github.gradientgmm.optim.Optimizer">Optimizer</a></span>
+        <a href="ADAM.html"><span class="name deprecated" title="Deprecated: (Since version gradientgmm &gt;= 1.4) ADAM can be unstable for GMM problems and should not be used">ADAM</span></a><span class="result"> extends <a href="Optimizer.html" class="extype" name="com.github.gradientgmm.optim.Optimizer">Optimizer</a></span>
       </span>
       </h4><span class="permalink">
       <a href="../../../../index.html#com.github.gradientgmm.optim.package@ADAMextendsOptimizer" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Optimizer that performs gradient ascent using the ADAM algorithm.</p><div class="fullcomment"><div class="comment cmt"><p>Optimizer that performs gradient ascent using the ADAM algorithm. See <i>Adam: A Method for Stochastic Optimization. Kingma, Diederik P.; Ba, Jimmy, 2014</i></p><p>Using it is NOT recommended; you should use SGD or its accelerated versions instead.
+      <p class="shortcomment cmt">Implementation of ADAM.</p><div class="fullcomment"><div class="comment cmt"><p>Implementation of ADAM. See <i>Adam: A Method for Stochastic Optimization. Kingma, Diederik P.; Ba, Jimmy, 2014</i></p><p>Using it is NOT recommended; you should use SGD or its accelerated versions instead.
 </p></div><dl class="attributes block"> <dt>Annotations</dt><dd>
                 <span class="name">@deprecated</span>
               
-        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version gradientgmm 1.4)</i> ADAM can be unstable for GMM problems and should not be used</p></dd></dl></div>
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version gradientgmm &gt;= 1.4)</i> ADAM can be unstable for GMM problems and should not be used</p></dd></dl></div>
     </li><li name="com.github.gradientgmm.optim.ADAMAX" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ADAMAXextendsOptimizer"></a>
       <a id="ADAMAX:ADAMAX"></a>
@@ -294,18 +292,18 @@ fit the weights of a mixture model</p>
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <a href="ADAMAX.html"><span class="name deprecated" title="Deprecated: (Since version gradientgmm 1.4) ADAMAX can be unstable for GMM problems and should not be used">ADAMAX</span></a><span class="result"> extends <a href="Optimizer.html" class="extype" name="com.github.gradientgmm.optim.Optimizer">Optimizer</a></span>
+        <a href="ADAMAX.html"><span class="name deprecated" title="Deprecated: (Since version gradientgmm &gt;= 1.4) ADAMAX can be unstable for GMM problems and should not be used">ADAMAX</span></a><span class="result"> extends <a href="Optimizer.html" class="extype" name="com.github.gradientgmm.optim.Optimizer">Optimizer</a></span>
       </span>
       </h4><span class="permalink">
       <a href="../../../../index.html#com.github.gradientgmm.optim.package@ADAMAXextendsOptimizer" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Optimizer that performs gradient ascent using the ADAMAX algorithm.</p><div class="fullcomment"><div class="comment cmt"><p>Optimizer that performs gradient ascent using the ADAMAX algorithm. See <i>Adam: A Method for Stochastic Optimization. Kingma, Diederik P.; Ba, Jimmy, 2014</i></p><p>Using it is NOT recommended; you should use SGD or its accelerated versions instead.
+      <p class="shortcomment cmt">Implementation of ADAMAX.</p><div class="fullcomment"><div class="comment cmt"><p>Implementation of ADAMAX. See <i>Adam: A Method for Stochastic Optimization. Kingma, Diederik P.; Ba, Jimmy, 2014</i></p><p>Using it is NOT recommended; you should use SGD or its accelerated versions instead.
 </p></div><dl class="attributes block"> <dt>Annotations</dt><dd>
                 <span class="name">@deprecated</span>
               
-        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version gradientgmm 1.4)</i> ADAMAX can be unstable for GMM problems and should not be used</p></dd></dl></div>
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version gradientgmm &gt;= 1.4)</i> ADAMAX can be unstable for GMM problems and should not be used</p></dd></dl></div>
     </li><li name="com.github.gradientgmm.optim.RatioWeightTransformation" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="RatioWeightTransformationextendsWeightsTransformation"></a>
       <a id="RatioWeightTransformation:RatioWeightTransformation"></a>
@@ -315,18 +313,18 @@ fit the weights of a mixture model</p>
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <a href="RatioWeightTransformation.html"><span class="name deprecated" title="Deprecated: (Since version gradientgmm 1.4) This is an experimental, numerically unstable transformation and should not be used">RatioWeightTransformation</span></a><span class="result"> extends <a href="WeightsTransformation.html" class="extype" name="com.github.gradientgmm.optim.WeightsTransformation">WeightsTransformation</a></span>
+        <a href="RatioWeightTransformation.html"><span class="name deprecated" title="Deprecated: (Since version gradientgmm &gt;= 1.4) This is an experimental, numerically unstable transformation and should not be used">RatioWeightTransformation</span></a><span class="result"> extends <a href="WeightsTransformation.html" class="extype" name="com.github.gradientgmm.optim.WeightsTransformation">WeightsTransformation</a></span>
       </span>
       </h4><span class="permalink">
       <a href="../../../../index.html#com.github.gradientgmm.optim.package@RatioWeightTransformationextendsWeightsTransformation" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Implements a ratio mapping to optimize the weight vector</p><div class="fullcomment"><div class="comment cmt"><p>Implements a ratio mapping to optimize the weight vector</p><p>The precise mapping is w_i =&gt; w_i/w_last</p><p>Using it is NOT recommended; use the default Softmax transformation instead.
+      <p class="shortcomment cmt">Ratio mapping to fit the weight vector</p><div class="fullcomment"><div class="comment cmt"><p>Ratio mapping to fit the weight vector</p><p>The precise mapping is w_i =&gt; w_i/w_last</p><p>Using it is NOT recommended; use the default Softmax transformation instead.
 </p></div><dl class="attributes block"> <dt>Annotations</dt><dd>
                 <span class="name">@deprecated</span>
               
-        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version gradientgmm 1.4)</i> This is an experimental, numerically unstable transformation and should not be used</p></dd></dl></div>
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version gradientgmm &gt;= 1.4)</i> This is an experimental, numerically unstable transformation and should not be used</p></dd></dl></div>
     </li></ol>
             </div>
 

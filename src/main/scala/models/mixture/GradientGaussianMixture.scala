@@ -138,14 +138,14 @@ class GradientGaussianMixture private (
 
             //gradient for Gaussian parameters
             val (grad, regValue) = if(bcReg.value.isDefined){
-              (((_Y - w * dist.paramMat) * 0.5 + bcReg.value.get.gaussianGradient(dist)) / _n,
+              (((_Y - w * dist.paramBlockMatrix) * 0.5 + bcReg.value.get.gaussianGradient(dist)) / _n,
                 bcReg.value.get.evaluateDist(dist)/_n)
             }else{
-              (((_Y - w * dist.paramMat) * 0.5 ) / _n, 0.0)
+              (((_Y - w * dist.paramBlockMatrix) * 0.5 ) / _n, 0.0)
             }
 
             val newPars = bcOptim.value.getUpdate(
-                dist.paramMat,
+                dist.paramBlockMatrix,
                 grad,
                 dist.optimUtils)
             
@@ -167,15 +167,15 @@ class GradientGaussianMixture private (
 
             //gradient for Gaussian parameters
             val (grad, regValue) = if(regularizer.isDefined){
-              (((_Y - w * dist.paramMat) * 0.5 + regularizer.get.gaussianGradient(dist)) / _n,
+              (((_Y - w * dist.paramBlockMatrix) * 0.5 + regularizer.get.gaussianGradient(dist)) / _n,
                 regularizer.get.evaluateDist(dist)/_n)
             }else{
-              (((_Y - w * dist.paramMat) * 0.5 ) / _n, 0.0)
+              (((_Y - w * dist.paramBlockMatrix) * 0.5 ) / _n, 0.0)
             }
 
             dist.update(
               optim.getUpdate(
-                dist.paramMat,
+                dist.paramBlockMatrix,
                 grad, //averaged gradient. see line 136
                 dist.optimUtils))
             
@@ -240,7 +240,7 @@ class GradientGaussianMixture private (
 
 
 /**
-* Perform local gradient descent optimisation
+* Perform local sequential gradient descent optimisation
 * @param data Training data as an Array of Breeze vectors 
 
 */
@@ -349,15 +349,15 @@ class GradientGaussianMixture private (
 
             //gradient for Gaussian parameters
             val (grad, regValue) = if(regularizer.isDefined){
-              (((_Y - w * dist.paramMat) * 0.5 + regularizer.get.gaussianGradient(dist)) / _n,
+              (((_Y - w * dist.paramBlockMatrix) * 0.5 + regularizer.get.gaussianGradient(dist)) / _n,
                 regularizer.get.evaluateDist(dist)/_n)
             }else{
-              (((_Y - w * dist.paramMat) * 0.5 ) / _n, 0.0)
+              (((_Y - w * dist.paramBlockMatrix) * 0.5 ) / _n, 0.0)
             }
 
             dist.update(
               optim.getUpdate(
-                dist.paramMat,
+                dist.paramBlockMatrix,
                 grad, //averaged gradient. see line 136
                 dist.optimUtils))
             

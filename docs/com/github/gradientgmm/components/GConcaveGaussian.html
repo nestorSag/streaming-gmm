@@ -49,12 +49,12 @@
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Multivariate Gaussian Distribution reformulation that implies a g-concave loss function in
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Multivariate Gaussian Distribution reformulation that produces a g-concave loss function in
 <a href="https://arxiv.org/abs/1706.03267" target="_blank">An Alternative to EM for Gaussian Mixture Models: Batch and Stochastic Riemannian Optimization<i>]]</i></a></p><p>For an arbitrary Gaussian distribution, its g-concave reformulation have zero mean and an
 augmented covariance matrix which is a function of the original mean, covariance matrix
 and an additional positive scalar s. Original data points x are mapped to
 y = [x 1] to be evaluated under the new distribution. When s = 1, the density
-of the original distirbution and the reformulation are equal for all points.
+of the original distribution and the reformulation coincide.
 </p></div><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><a href="MultivariateGaussian.html" class="extype" name="com.github.gradientgmm.components.MultivariateGaussian">MultivariateGaussian</a>, <span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
@@ -214,19 +214,19 @@ of the original distirbution and the reformulation are equal for all points.
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.github.gradientgmm.components.GConcaveGaussian#computeParamMat" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="computeParamMat:breeze.linalg.DenseMatrix[Double]"></a>
-      <a id="computeParamMat:DenseMatrix[Double]"></a>
+    </li><li name="com.github.gradientgmm.components.GConcaveGaussian#computeParamBlockMatrix" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="computeParamBlockMatrix:breeze.linalg.DenseMatrix[Double]"></a>
+      <a id="computeParamBlockMatrix:DenseMatrix[Double]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">computeParamMat</span><span class="result">: <span class="extype" name="breeze.linalg.DenseMatrix">DenseMatrix</span>[<span class="extype" name="scala.Double">Double</span>]</span>
+        <span class="name">computeParamBlockMatrix</span><span class="result">: <span class="extype" name="breeze.linalg.DenseMatrix">DenseMatrix</span>[<span class="extype" name="scala.Double">Double</span>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.GConcaveGaussian@computeParamMat:breeze.linalg.DenseMatrix[Double]" title="Permalink" target="_top">
+      <a href="../../../../index.html#com.github.gradientgmm.components.GConcaveGaussian@computeParamBlockMatrix:breeze.linalg.DenseMatrix[Double]" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -428,23 +428,23 @@ of the original distirbution and the reformulation are equal for all points.
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="com.github.gradientgmm.components.GConcaveGaussian#invParamMat" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="invParamMat:breeze.linalg.DenseMatrix[Double]"></a>
-      <a id="invParamMat:DenseMatrix[Double]"></a>
+    </li><li name="com.github.gradientgmm.components.GConcaveGaussian#invParamBlockMatrix" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="invParamBlockMatrix:breeze.linalg.DenseMatrix[Double]"></a>
+      <a id="invParamBlockMatrix:DenseMatrix[Double]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">invParamMat</span><span class="result">: <span class="extype" name="breeze.linalg.DenseMatrix">DenseMatrix</span>[<span class="extype" name="scala.Double">Double</span>]</span>
+        <span class="name">invParamBlockMatrix</span><span class="result">: <span class="extype" name="breeze.linalg.DenseMatrix">DenseMatrix</span>[<span class="extype" name="scala.Double">Double</span>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.GConcaveGaussian@invParamMat:breeze.linalg.DenseMatrix[Double]" title="Permalink" target="_top">
+      <a href="../../../../index.html#com.github.gradientgmm.components.GConcaveGaussian@invParamBlockMatrix:breeze.linalg.DenseMatrix[Double]" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Augmented parameter block matrix inverse.</p><div class="fullcomment"><div class="comment cmt"><p>Augmented parameter block matrix inverse. Its blocks are:</p><p>A = sigmaInv</p><p>B = sigmaInv * mu</p><p>C = mu.t * sigmaInv</p><p>D = 1/s + mu.t * sigmaInv * mu</p></div></div>
+      <p class="shortcomment cmt">Augmented parameter block matrix inverse [A B; C D].</p><div class="fullcomment"><div class="comment cmt"><p>Augmented parameter block matrix inverse [A B; C D]. Its blocks are:</p><p>A = sigmaInv</p><p>B = sigmaInv * mu</p><p>C = mu.t * sigmaInv</p><p>D = 1/s + mu.t * sigmaInv * mu</p></div></div>
     </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <a id="isInstanceOf[T0]:Boolean"></a>
@@ -570,19 +570,19 @@ of the original distirbution and the reformulation are equal for all points.
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="com.github.gradientgmm.components.GConcaveGaussian#paramMat" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="paramMat:breeze.linalg.DenseMatrix[Double]"></a>
-      <a id="paramMat:DenseMatrix[Double]"></a>
+    </li><li name="com.github.gradientgmm.components.GConcaveGaussian#paramBlockMatrix" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="paramBlockMatrix:breeze.linalg.DenseMatrix[Double]"></a>
+      <a id="paramBlockMatrix:DenseMatrix[Double]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">var</span>
       </span>
       <span class="symbol">
-        <span class="name">paramMat</span><span class="result">: <span class="extype" name="breeze.linalg.DenseMatrix">DenseMatrix</span>[<span class="extype" name="scala.Double">Double</span>]</span>
+        <span class="name">paramBlockMatrix</span><span class="result">: <span class="extype" name="breeze.linalg.DenseMatrix">DenseMatrix</span>[<span class="extype" name="scala.Double">Double</span>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.GConcaveGaussian@paramMat:breeze.linalg.DenseMatrix[Double]" title="Permalink" target="_top">
+      <a href="../../../../index.html#com.github.gradientgmm.components.GConcaveGaussian@paramBlockMatrix:breeze.linalg.DenseMatrix[Double]" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>

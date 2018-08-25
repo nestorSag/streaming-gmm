@@ -13,10 +13,11 @@ import org.apache.spark.mllib.linalg.{Matrices => SMS, Matrix => SM, DenseMatrix
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, norm, trace, det}
 
 // tests for UpdatableGaussianMixture methods
+// needs to be a running spark local cluster
 trait SparkTester extends FunSuite{
     var sc : SparkContext = _
 
-    val conf = new SparkConf().setAppName("GradientGaussianMixture-test").setMaster("local[4]")
+    val conf = new SparkConf().setAppName("GradientGaussianMixture-test").setMaster("local")
 
     val errorTol = 1e-8
     val k = 3

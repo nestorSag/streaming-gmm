@@ -7,7 +7,6 @@ import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV,
 
 
 // tests for LogBarrier class
-// only testing for shift = 0
 
 class LogBarrierTest extends FlatSpec {
   
@@ -38,8 +37,8 @@ class LogBarrierTest extends FlatSpec {
 
     assert(trace(shouldBeZero.t*shouldBeZero) < errorTol)
 
-    e = umgdist.paramMat(::,umgdist.paramMat.cols - 1)
-    shouldBeZero = logbarrier.gaussianGradient(umgdist) - (umgdist.paramMat - e * e.t) * scale
+    e = umgdist.paramBlockMatrix(::,umgdist.paramBlockMatrix.cols - 1)
+    shouldBeZero = logbarrier.gaussianGradient(umgdist) - (umgdist.paramBlockMatrix - e * e.t) * scale
 
     assert(trace(shouldBeZero.t*shouldBeZero) < errorTol)
 
@@ -49,7 +48,7 @@ class LogBarrierTest extends FlatSpec {
 
     var reg = logbarrier.evaluateDist(umgdist) + logbarrier.evaluateWeights(new BDV(Array(1.0))) // evaluate dist and weight separately
 
-    var diff = reg - scale * (math.log(det(umgdist.paramMat)) - umgdist.getS)
+    var diff = reg - scale * (math.log(det(umgdist.paramBlockMatrix)) - umgdist.getS)
 
     assert(math.pow(diff,2) < errorTol)
     

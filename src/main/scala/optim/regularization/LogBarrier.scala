@@ -44,18 +44,18 @@ class LogBarrier extends Regularizer{
 
 	def gaussianGradient(dist: UpdatableGaussianComponent): BDM[Double] = {
 
-		val lastCol = dist.paramMat(::,dist.paramMat.cols-1)
+		val lastCol = dist.paramBlockMatrix(::,dist.paramBlockMatrix.cols-1)
 
 		// exact calculation when shift >0 can cause numerical overflow if dimensionality is high
 		// that is why the calculation differ in this case
 		// if(shift >0){
 		// 	val detS = dist.detSigma*dist.getS
-		// 	(dist.paramMat*(detS/(detS - shift*dist.getS)) - lastCol*lastCol.t*(1 + shift/(detS - shift*dist.getS))) * scale
+		// 	(dist.paramBlockMatrix*(detS/(detS - shift*dist.getS)) - lastCol*lastCol.t*(1 + shift/(detS - shift*dist.getS))) * scale
 		// }else{
-		// 	(dist.paramMat - lastCol*lastCol.t) * scale
+		// 	(dist.paramBlockMatrix - lastCol*lastCol.t) * scale
 		// }
 
-		(dist.paramMat - lastCol*lastCol.t) * scale
+		(dist.paramBlockMatrix - lastCol*lastCol.t) * scale
 
 	}
 

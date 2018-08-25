@@ -3,11 +3,11 @@ package com.github.gradientgmm.optim
 import com.github.gradientgmm.components.AcceleratedGradientUtils
 
 /**
-  * Optimizer that performs gradient ascent using the ADAMAX algorithm. See ''Adam: A Method for Stochastic Optimization. Kingma, Diederik P.; Ba, Jimmy, 2014''
+  * Implementation of ADAMAX. See ''Adam: A Method for Stochastic Optimization. Kingma, Diederik P.; Ba, Jimmy, 2014''
   
   * Using it is NOT recommended; you should use SGD or its accelerated versions instead.
   */
-@deprecated("ADAMAX can be unstable for GMM problems and should not be used", "gradientgmm 1.4")
+@deprecated("ADAMAX can be unstable for GMM problems and should not be used", "gradientgmm >= 1.4")
 class ADAMAX extends Optimizer {
 
 /**
@@ -66,7 +66,7 @@ class ADAMAX extends Optimizer {
 		utils.initializeAdamInfo
 	}
 	
-	utils.updateMomentum(
+	utils.setMomentum(
 		ops.sum(
 			ops.rescale(utils.momentum.get,beta1), 
 			grad))
@@ -88,7 +88,7 @@ class ADAMAX extends Optimizer {
 		ops.rescale(utils.adamInfo.get,beta2))
 
 	//max(beta2*u,|g|) = 0.5 * (|g| + beta2*u + |beta2*u - |g||) = 0.5*(aux1+aux2)
-	utils.updateAdamInfo(
+	utils.setAdamInfo(
 		ops.rescale(
 			ops.sum(aux1,aux2),
 			0.5))

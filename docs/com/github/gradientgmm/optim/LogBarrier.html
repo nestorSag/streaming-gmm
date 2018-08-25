@@ -1,9 +1,9 @@
 <!DOCTYPE html >
 <html>
         <head>
-          <title>UpdatableWeights - com.github.gradientgmm.components.UpdatableWeights</title>
-          <meta name="description" content="UpdatableWeights - com.github.gradientgmm.components.UpdatableWeights" />
-          <meta name="keywords" content="UpdatableWeights com.github.gradientgmm.components.UpdatableWeights" />
+          <title>LogBarrier - com.github.gradientgmm.optim.LogBarrier</title>
+          <meta name="description" content="LogBarrier - com.github.gradientgmm.optim.LogBarrier" />
+          <meta name="keywords" content="LogBarrier com.github.gradientgmm.optim.LogBarrier" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
@@ -16,7 +16,7 @@
       <script type="text/javascript">
          if(top === self) {
             var url = '../../../../index.html';
-            var hash = 'com.github.gradientgmm.components.UpdatableWeights';
+            var hash = 'com.github.gradientgmm.optim.LogBarrier';
             var anchor = window.location.hash;
             var anchor_opt = '';
             if (anchor.length >= 1)
@@ -29,11 +29,11 @@
         <body class="type">
       <div id="definition">
         <img alt="Class" src="../../../../lib/class_big.png" />
-        <p id="owner"><a href="../../../package.html" class="extype" name="com">com</a>.<a href="../../package.html" class="extype" name="com.github">github</a>.<a href="../package.html" class="extype" name="com.github.gradientgmm">gradientgmm</a>.<a href="package.html" class="extype" name="com.github.gradientgmm.components">components</a></p>
-        <h1>UpdatableWeights</h1><h3><span class="morelinks"><div>Related Doc:
-            <a href="package.html" class="extype" name="com.github.gradientgmm.components">package components</a>
+        <p id="owner"><a href="../../../package.html" class="extype" name="com">com</a>.<a href="../../package.html" class="extype" name="com.github">github</a>.<a href="../package.html" class="extype" name="com.github.gradientgmm">gradientgmm</a>.<a href="package.html" class="extype" name="com.github.gradientgmm.optim">optim</a></p>
+        <h1>LogBarrier</h1><h3><span class="morelinks"><div>Related Doc:
+            <a href="package.html" class="extype" name="com.github.gradientgmm.optim">package optim</a>
           </div></span></h3><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.UpdatableWeights" title="Permalink" target="_top">
+      <a href="../../../../index.html#com.github.gradientgmm.optim.LogBarrier" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -45,14 +45,13 @@
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <span class="name">UpdatableWeights</span><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span> with <a href="VectorParamUpdate.html" class="extype" name="com.github.gradientgmm.components.VectorParamUpdate">VectorParamUpdate</a></span>
+        <span class="name">LogBarrier</span><span class="result"> extends <a href="Regularizer.html" class="extype" name="com.github.gradientgmm.optim.Regularizer">Regularizer</a></span>
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Wrapper class for weights vector.</p><p>It includes functionality to verify simplex constraints and accelerated ascent data structures.</p><p>see <a href="https://en.wikipedia.org/wiki/Simplex" target="_blank">https://en.wikipedia.org/wiki/Simplex</a>
-</p></div><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Regularization term of the form scale*log(det(cov))</p></div><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
-          <div class="superTypes hiddenContent"><a href="VectorParamUpdate.html" class="extype" name="com.github.gradientgmm.components.VectorParamUpdate">VectorParamUpdate</a>, <span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><a href="Regularizer.html" class="extype" name="com.github.gradientgmm.optim.Regularizer">Regularizer</a>, <span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -70,7 +69,7 @@
                 <span class="filtertype">Inherited<br />
                 </span>
                 <ol id="linearization">
-                  <li class="in" name="com.github.gradientgmm.components.UpdatableWeights"><span>UpdatableWeights</span></li><li class="in" name="com.github.gradientgmm.components.VectorParamUpdate"><span>VectorParamUpdate</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                  <li class="in" name="com.github.gradientgmm.optim.LogBarrier"><span>LogBarrier</span></li><li class="in" name="com.github.gradientgmm.optim.Regularizer"><span>Regularizer</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                 </ol>
               </div><div id="ancestors">
             <span class="filtertype"></span>
@@ -89,23 +88,23 @@
         <div id="allMembers">
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
-              <ol><li name="com.github.gradientgmm.components.UpdatableWeights#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="&lt;init&gt;(weights:Array[Double]):com.github.gradientgmm.components.UpdatableWeights"></a>
-      <a id="&lt;init&gt;:UpdatableWeights"></a>
+              <ol><li name="com.github.gradientgmm.optim.LogBarrier#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&lt;init&gt;():com.github.gradientgmm.optim.LogBarrier"></a>
+      <a id="&lt;init&gt;:LogBarrier"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">UpdatableWeights</span><span class="params">(<span name="weights">weights: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Double">Double</span>]</span>)</span>
+        <span class="name">LogBarrier</span><span class="params">()</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.UpdatableWeights@&lt;init&gt;(weights:Array[Double]):com.github.gradientgmm.components.UpdatableWeights" title="Permalink" target="_top">
+      <a href="../../../../index.html#com.github.gradientgmm.optim.LogBarrier@&lt;init&gt;():com.github.gradientgmm.optim.LogBarrier" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">weights</dt><dd class="cmt"><p>weight vector</p></dd></dl></div>
+      
     </li></ol>
             </div>
 
@@ -127,7 +126,7 @@
         <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.UpdatableWeights@!=(x$1:Any):Boolean" title="Permalink" target="_top">
+      <a href="../../../../index.html#com.github.gradientgmm.optim.LogBarrier@!=(x$1:Any):Boolean" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -144,7 +143,7 @@
         <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.UpdatableWeights@##():Int" title="Permalink" target="_top">
+      <a href="../../../../index.html#com.github.gradientgmm.optim.LogBarrier@##():Int" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -161,7 +160,7 @@
         <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.UpdatableWeights@==(x$1:Any):Boolean" title="Permalink" target="_top">
+      <a href="../../../../index.html#com.github.gradientgmm.optim.LogBarrier@==(x$1:Any):Boolean" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -178,7 +177,7 @@
         <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.UpdatableWeights@asInstanceOf[T0]:T0" title="Permalink" target="_top">
+      <a href="../../../../index.html#com.github.gradientgmm.optim.LogBarrier@asInstanceOf[T0]:T0" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -195,7 +194,7 @@
         <span class="name">clone</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.UpdatableWeights@clone():Object" title="Permalink" target="_top">
+      <a href="../../../../index.html#com.github.gradientgmm.optim.LogBarrier@clone():Object" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -206,23 +205,6 @@
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.github.gradientgmm.components.UpdatableWeights#d" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="d:Int"></a>
-      <a id="d:Int"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">d</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.UpdatableWeights@d:Int" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">weight vector dimensionality</p>
     </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a>
       <a id="eq(AnyRef):Boolean"></a>
@@ -235,7 +217,7 @@
         <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.UpdatableWeights@eq(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+      <a href="../../../../index.html#com.github.gradientgmm.optim.LogBarrier@eq(x$1:AnyRef):Boolean" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -252,11 +234,49 @@
         <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.UpdatableWeights@equals(x$1:Any):Boolean" title="Permalink" target="_top">
+      <a href="../../../../index.html#com.github.gradientgmm.optim.LogBarrier@equals(x$1:Any):Boolean" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.github.gradientgmm.optim.LogBarrier#evaluateDist" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="evaluateDist(dist:com.github.gradientgmm.components.UpdatableGaussianComponent):Double"></a>
+      <a id="evaluateDist(UpdatableGaussianComponent):Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">evaluateDist</span><span class="params">(<span name="dist">dist: <a href="../components/UpdatableGaussianComponent.html" class="extype" name="com.github.gradientgmm.components.UpdatableGaussianComponent">UpdatableGaussianComponent</a></span>)</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#com.github.gradientgmm.optim.LogBarrier@evaluateDist(dist:com.github.gradientgmm.components.UpdatableGaussianComponent):Double" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Evaluate regularization term for a Gaussian component
+</p><div class="fullcomment"><div class="comment cmt"><p>Evaluate regularization term for a Gaussian component
+</p></div><dl class="paramcmts block"><dt class="param">dist</dt><dd class="cmt"><p>Mixture component</p></dd><dt>returns</dt><dd class="cmt"><p>regularization value</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.github.gradientgmm.optim.LogBarrier">LogBarrier</a> → <a href="Regularizer.html" class="extype" name="com.github.gradientgmm.optim.Regularizer">Regularizer</a></dd></dl></div>
+    </li><li name="com.github.gradientgmm.optim.LogBarrier#evaluateWeights" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="evaluateWeights(weights:breeze.linalg.DenseVector[Double]):Double"></a>
+      <a id="evaluateWeights(DenseVector[Double]):Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">evaluateWeights</span><span class="params">(<span name="weights">weights: <span class="extype" name="breeze.linalg.DenseVector">DenseVector</span>[<span class="extype" name="scala.Double">Double</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#com.github.gradientgmm.optim.LogBarrier@evaluateWeights(weights:breeze.linalg.DenseVector[Double]):Double" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Evaluate regularization term for the weights vector
+</p><div class="fullcomment"><div class="comment cmt"><p>Evaluate regularization term for the weights vector
+</p></div><dl class="paramcmts block"><dt class="param">weights</dt><dd class="cmt"><p>model weights vector</p></dd><dt>returns</dt><dd class="cmt"><p>regularization value</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.github.gradientgmm.optim.LogBarrier">LogBarrier</a> → <a href="Regularizer.html" class="extype" name="com.github.gradientgmm.optim.Regularizer">Regularizer</a></dd></dl></div>
     </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <a id="finalize():Unit"></a>
@@ -269,7 +289,7 @@
         <span class="name">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.UpdatableWeights@finalize():Unit" title="Permalink" target="_top">
+      <a href="../../../../index.html#com.github.gradientgmm.optim.LogBarrier@finalize():Unit" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -280,6 +300,25 @@
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="com.github.gradientgmm.optim.LogBarrier#gaussianGradient" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="gaussianGradient(dist:com.github.gradientgmm.components.UpdatableGaussianComponent):breeze.linalg.DenseMatrix[Double]"></a>
+      <a id="gaussianGradient(UpdatableGaussianComponent):DenseMatrix[Double]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">gaussianGradient</span><span class="params">(<span name="dist">dist: <a href="../components/UpdatableGaussianComponent.html" class="extype" name="com.github.gradientgmm.components.UpdatableGaussianComponent">UpdatableGaussianComponent</a></span>)</span><span class="result">: <span class="extype" name="breeze.linalg.DenseMatrix">DenseMatrix</span>[<span class="extype" name="scala.Double">Double</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#com.github.gradientgmm.optim.LogBarrier@gaussianGradient(dist:com.github.gradientgmm.components.UpdatableGaussianComponent):breeze.linalg.DenseMatrix[Double]" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Computes the loss function's gradient w.r.t a Gaussian component's parameters
+</p><div class="fullcomment"><div class="comment cmt"><p>Computes the loss function's gradient w.r.t a Gaussian component's parameters
+</p></div><dl class="paramcmts block"><dt class="param">dist</dt><dd class="cmt"><p>Mixture component</p></dd><dt>returns</dt><dd class="cmt"><p>gradient</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.github.gradientgmm.optim.LogBarrier">LogBarrier</a> → <a href="Regularizer.html" class="extype" name="com.github.gradientgmm.optim.Regularizer">Regularizer</a></dd></dl></div>
     </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <a id="getClass():Class[_]"></a>
@@ -292,11 +331,28 @@
         <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.UpdatableWeights@getClass():Class[_]" title="Permalink" target="_top">
+      <a href="../../../../index.html#com.github.gradientgmm.optim.LogBarrier@getClass():Class[_]" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.github.gradientgmm.optim.LogBarrier#getScale" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="getScale:Double"></a>
+      <a id="getScale:Double"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getScale</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#com.github.gradientgmm.optim.LogBarrier@getScale:Double" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
     </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="hashCode():Int"></a>
       <a id="hashCode():Int"></a>
@@ -309,30 +365,11 @@
         <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.UpdatableWeights@hashCode():Int" title="Permalink" target="_top">
+      <a href="../../../../index.html#com.github.gradientgmm.optim.LogBarrier@hashCode():Int" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="com.github.gradientgmm.components.UpdatableWeights#isInSimplex" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="isInSimplex(w:Array[Double]):Boolean"></a>
-      <a id="isInSimplex(Array[Double]):Boolean"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">isInSimplex</span><span class="params">(<span name="w">w: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Double">Double</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.UpdatableWeights@isInSimplex(w:Array[Double]):Boolean" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">Checks whether the given vector is within acceptable distance to the weight simplex
-</p><div class="fullcomment"><div class="comment cmt"><p>Checks whether the given vector is within acceptable distance to the weight simplex
-</p></div><dl class="paramcmts block"><dt class="param">w</dt><dd class="cmt"><p>weight vector</p></dd></dl></div>
     </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <a id="isInstanceOf[T0]:Boolean"></a>
@@ -345,45 +382,11 @@
         <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.UpdatableWeights@isInstanceOf[T0]:Boolean" title="Permalink" target="_top">
+      <a href="../../../../index.html#com.github.gradientgmm.optim.LogBarrier@isInstanceOf[T0]:Boolean" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="com.github.gradientgmm.components.UpdatableWeights#isPositive" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="isPositive(w:Array[Double]):Boolean"></a>
-      <a id="isPositive(Array[Double]):Boolean"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">isPositive</span><span class="params">(<span name="w">w: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Double">Double</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.UpdatableWeights@isPositive(w:Array[Double]):Boolean" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">Checks that the initial weight vector does not contains any single negative or null weight element, in which case it returns false</p><div class="fullcomment"><div class="comment cmt"><p>Checks that the initial weight vector does not contains any single negative or null weight element, in which case it returns false</p></div><dl class="paramcmts block"><dt class="param">w</dt><dd class="cmt"><p>weight vector</p></dd></dl></div>
-    </li><li name="com.github.gradientgmm.components.UpdatableWeights#length" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="length:Int"></a>
-      <a id="length:Int"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">length</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.UpdatableWeights@length:Int" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">returns weigh vector dimensionality</p>
     </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a>
       <a id="ne(AnyRef):Boolean"></a>
@@ -396,7 +399,7 @@
         <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.UpdatableWeights@ne(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+      <a href="../../../../index.html#com.github.gradientgmm.optim.LogBarrier@ne(x$1:AnyRef):Boolean" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -413,7 +416,7 @@
         <span class="name">notify</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.UpdatableWeights@notify():Unit" title="Permalink" target="_top">
+      <a href="../../../../index.html#com.github.gradientgmm.optim.LogBarrier@notify():Unit" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -430,41 +433,24 @@
         <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.UpdatableWeights@notifyAll():Unit" title="Permalink" target="_top">
+      <a href="../../../../index.html#com.github.gradientgmm.optim.LogBarrier@notifyAll():Unit" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="com.github.gradientgmm.components.UpdatableWeights#optimUtils" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="optimUtils:com.github.gradientgmm.components.VectorGradientUtils"></a>
-      <a id="optimUtils:VectorGradientUtils"></a>
+    </li><li name="com.github.gradientgmm.optim.LogBarrier#setScale" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="setScale(scale:Double):LogBarrier.this.type"></a>
+      <a id="setScale(Double):LogBarrier.this.type"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">val</span>
+        <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">optimUtils</span><span class="result">: <a href="VectorGradientUtils.html" class="extype" name="com.github.gradientgmm.components.VectorGradientUtils">VectorGradientUtils</a></span>
+        <span class="name">setScale</span><span class="params">(<span name="scale">scale: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result">: <a href="" class="extype" name="com.github.gradientgmm.optim.LogBarrier">LogBarrier</a>.this.type</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.UpdatableWeights@optimUtils:com.github.gradientgmm.components.VectorGradientUtils" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">accelerated gradient ascent utilities.</p><div class="fullcomment"><div class="comment cmt"><p>accelerated gradient ascent utilities. See <a href="AcceleratedGradientUtils.html" class="extype" name="com.github.gradientgmm.components.AcceleratedGradientUtils">AcceleratedGradientUtils</a></p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.github.gradientgmm.components.UpdatableWeights">UpdatableWeights</a> → <a href="VectorParamUpdate.html" class="extype" name="com.github.gradientgmm.components.VectorParamUpdate">VectorParamUpdate</a></dd></dl></div>
-    </li><li name="com.github.gradientgmm.components.UpdatableWeights#simplexErrorTol" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="simplexErrorTol:Double"></a>
-      <a id="simplexErrorTol:Double"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">var</span>
-      </span>
-      <span class="symbol">
-        <span class="name">simplexErrorTol</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.UpdatableWeights@simplexErrorTol:Double" title="Permalink" target="_top">
+      <a href="../../../../index.html#com.github.gradientgmm.optim.LogBarrier@setScale(scale:Double):LogBarrier.this.type" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -481,7 +467,7 @@
         <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.UpdatableWeights@synchronized[T0](x$1:=&gt;T0):T0" title="Permalink" target="_top">
+      <a href="../../../../index.html#com.github.gradientgmm.optim.LogBarrier@synchronized[T0](x$1:=&gt;T0):T0" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -498,30 +484,11 @@
         <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.UpdatableWeights@toString():String" title="Permalink" target="_top">
+      <a href="../../../../index.html#com.github.gradientgmm.optim.LogBarrier@toString():String" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="com.github.gradientgmm.components.UpdatableWeights#update" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="update(newParam:breeze.linalg.DenseVector[Double]):Unit"></a>
-      <a id="update(DenseVector[Double]):Unit"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">update</span><span class="params">(<span name="newParam">newParam: <span class="extype" name="breeze.linalg.DenseVector">DenseVector</span>[<span class="extype" name="scala.Double">Double</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.UpdatableWeights@update(newParam:breeze.linalg.DenseVector[Double]):Unit" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">Replaces the weight vector  with a new one, checking for correctness beforehand
-</p><div class="fullcomment"><div class="comment cmt"><p>Replaces the weight vector  with a new one, checking for correctness beforehand
-</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.github.gradientgmm.components.UpdatableWeights">UpdatableWeights</a> → <a href="VectorParamUpdate.html" class="extype" name="com.github.gradientgmm.components.VectorParamUpdate">VectorParamUpdate</a></dd></dl></div>
     </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <a id="wait():Unit"></a>
@@ -534,7 +501,7 @@
         <span class="name">wait</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.UpdatableWeights@wait():Unit" title="Permalink" target="_top">
+      <a href="../../../../index.html#com.github.gradientgmm.optim.LogBarrier@wait():Unit" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -557,7 +524,7 @@
         <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.UpdatableWeights@wait(x$1:Long,x$2:Int):Unit" title="Permalink" target="_top">
+      <a href="../../../../index.html#com.github.gradientgmm.optim.LogBarrier@wait(x$1:Long,x$2:Int):Unit" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -580,7 +547,7 @@
         <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.UpdatableWeights@wait(x$1:Long):Unit" title="Permalink" target="_top">
+      <a href="../../../../index.html#com.github.gradientgmm.optim.LogBarrier@wait(x$1:Long):Unit" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -591,23 +558,25 @@
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.github.gradientgmm.components.UpdatableWeights#weights" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="weights:Array[Double]"></a>
-      <a id="weights:Array[Double]"></a>
+    </li><li name="com.github.gradientgmm.optim.LogBarrier#weightsGradient" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="weightsGradient(weights:breeze.linalg.DenseVector[Double]):breeze.linalg.DenseVector[Double]"></a>
+      <a id="weightsGradient(DenseVector[Double]):DenseVector[Double]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">var</span>
+        <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">weights</span><span class="result">: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Double">Double</span>]</span>
+        <span class="name">weightsGradient</span><span class="params">(<span name="weights">weights: <span class="extype" name="breeze.linalg.DenseVector">DenseVector</span>[<span class="extype" name="scala.Double">Double</span>]</span>)</span><span class="result">: <span class="extype" name="breeze.linalg.DenseVector">DenseVector</span>[<span class="extype" name="scala.Double">Double</span>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.UpdatableWeights@weights:Array[Double]" title="Permalink" target="_top">
+      <a href="../../../../index.html#com.github.gradientgmm.optim.LogBarrier@weightsGradient(weights:breeze.linalg.DenseVector[Double]):breeze.linalg.DenseVector[Double]" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">weight vector</p>
+      <p class="shortcomment cmt">Computes the loss function's gradient with respect to the current weights vector
+</p><div class="fullcomment"><div class="comment cmt"><p>Computes the loss function's gradient with respect to the current weights vector
+</p></div><dl class="paramcmts block"><dt class="param">weights</dt><dd class="cmt"><p>current weights vector</p></dd><dt>returns</dt><dd class="cmt"><p>gradient</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.github.gradientgmm.optim.LogBarrier">LogBarrier</a> → <a href="Regularizer.html" class="extype" name="com.github.gradientgmm.optim.Regularizer">Regularizer</a></dd></dl></div>
     </li></ol>
             </div>
 
@@ -617,8 +586,8 @@
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="com.github.gradientgmm.components.VectorParamUpdate">
-              <h3>Inherited from <a href="VectorParamUpdate.html" class="extype" name="com.github.gradientgmm.components.VectorParamUpdate">VectorParamUpdate</a></h3>
+        <div class="parent" name="com.github.gradientgmm.optim.Regularizer">
+              <h3>Inherited from <a href="Regularizer.html" class="extype" name="com.github.gradientgmm.optim.Regularizer">Regularizer</a></h3>
             </div><div class="parent" name="scala.Serializable">
               <h3>Inherited from <span class="extype" name="scala.Serializable">Serializable</span></h3>
             </div><div class="parent" name="java.io.Serializable">

@@ -5,14 +5,14 @@ import com.github.gradientgmm.components.Utils
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV, max, min, sum}
 
 /**
-  * Implements a ratio mapping to optimize the weight vector
+  * Ratio mapping to fit the weight vector
 
   * The precise mapping is w_i => w_i/w_last
 	
 
   * Using it is NOT recommended; use the default Softmax transformation instead.
   */
-@deprecated("This is an experimental, numerically unstable transformation and should not be used", "gradientgmm 1.4")
+@deprecated("This is an experimental, numerically unstable transformation and should not be used", "gradientgmm >= 1.4")
 class RatioWeightTransformation extends WeightsTransformation {
 
 /**

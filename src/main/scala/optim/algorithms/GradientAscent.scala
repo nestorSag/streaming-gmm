@@ -3,7 +3,7 @@ package com.github.gradientgmm.optim
 import com.github.gradientgmm.components.AcceleratedGradientUtils
 
 /**
-  * Optimizer that performs Stochastic Gradient Ascent
+  * Implementation of standard gradient ascent
   */
 class GradientAscent extends Optimizer{ 
 

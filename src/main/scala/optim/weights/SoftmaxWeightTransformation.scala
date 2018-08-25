@@ -7,7 +7,7 @@ import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV, max,
 import breeze.numerics.{exp, log}
 
 /**
-  * Implements a Softmax mapping to optimize the weight vector
+  * Softmax mapping to fit the weights vector
 
   *The precise mapping is w_i => log(w_i/w_last) and is an implementation of the procedure 
   * described [[https://arxiv.org/abs/1706.03267 here]]

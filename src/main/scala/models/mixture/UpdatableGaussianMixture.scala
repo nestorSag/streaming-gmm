@@ -42,7 +42,7 @@ private[gradientgmm] class UpdatableGaussianMixture(
   require(weights.length == gaussians.length, "Length of weight and Gaussian arrays must match")
 
   /**
-  * Cluster membership prediction
+  * predict cluster membership
 
   * @return RDD with the points' labels
  
@@ -53,7 +53,7 @@ private[gradientgmm] class UpdatableGaussianMixture(
   }
 
   /**
-  * Cluster membership prediction
+  * predict cluster membership
 
   * @return vector membership label
  
@@ -64,7 +64,7 @@ private[gradientgmm] class UpdatableGaussianMixture(
   }
 
   /**
-  * Cluster membership prediction
+  * predict cluster membership
 
   * @return RDD with the points' labels
  
@@ -73,7 +73,7 @@ private[gradientgmm] class UpdatableGaussianMixture(
     predict(points.rdd).toJavaRDD().asInstanceOf[JavaRDD[java.lang.Integer]]
 
   /**
-  * Soft cluster membership prediction
+  * predict soft cluster membership
 
   * @return RDD with arrays giving the membership probabilities for each cluster
  
@@ -89,7 +89,7 @@ private[gradientgmm] class UpdatableGaussianMixture(
 
 
   /**
-  * Soft cluster membership prediction
+  * predict soft cluster membership
 
   * @return RDD with arrays giving the membership probabilities for each cluster
  
@@ -104,7 +104,7 @@ private[gradientgmm] class UpdatableGaussianMixture(
   }
 
   /**
-  * Soft cluster membership prediction
+  * predict soft cluster membership
 
   * @return RDD with arrays giving the membership probabilities for each cluster
  
@@ -114,7 +114,7 @@ private[gradientgmm] class UpdatableGaussianMixture(
   }
 
   /**
-  * Soft cluster membership prediction
+  * predict cluster membership
 
   * @return vector membership label
  
@@ -125,7 +125,7 @@ private[gradientgmm] class UpdatableGaussianMixture(
   }
 
   /**
-  * Soft cluster membership prediction
+  * predict soft cluster membership
 
   * @return Array giving the membership probabilities for each cluster
  
@@ -134,13 +134,9 @@ private[gradientgmm] class UpdatableGaussianMixture(
     computeSoftAssignments(point, gaussians, weights.weights, k)
   }
 
-  /**
-  * process individual points to compute soft cluster assignments
- 
-  */
 
 /**
-  * Cluster membership prediction for streaming data
+  * predict cluster membership
   * @param data Streaming data
  
   */
@@ -149,7 +145,7 @@ private[gradientgmm] class UpdatableGaussianMixture(
   }
 
 /**
-  * Soft cluster membership prediction for streaming data
+  * predict soft cluster membership 
   * @param data Streaming data
  
   */

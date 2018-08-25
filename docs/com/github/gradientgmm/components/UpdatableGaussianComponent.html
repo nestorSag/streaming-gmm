@@ -52,7 +52,7 @@
       </h4>
       
           <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Gaussian distribution that implements an updating routine based on its g-concave reformulation
-and contains gradient ascent utilities necessary for accelerated ascent algorithms.
+and contains gradient ascent utilities necessary for accelerated algorithms.
 </p></div><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><a href="MatrixParamUpdate.html" class="extype" name="com.github.gradientgmm.components.MatrixParamUpdate">MatrixParamUpdate</a>, <a href="GConcaveGaussian.html" class="extype" name="com.github.gradientgmm.components.GConcaveGaussian">GConcaveGaussian</a>, <a href="MultivariateGaussian.html" class="extype" name="com.github.gradientgmm.components.MultivariateGaussian">MultivariateGaussian</a>, <span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
@@ -189,19 +189,19 @@ and contains gradient ascent utilities necessary for accelerated ascent algorith
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.github.gradientgmm.components.GConcaveGaussian#computeParamMat" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="computeParamMat:breeze.linalg.DenseMatrix[Double]"></a>
-      <a id="computeParamMat:DenseMatrix[Double]"></a>
+    </li><li name="com.github.gradientgmm.components.GConcaveGaussian#computeParamBlockMatrix" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="computeParamBlockMatrix:breeze.linalg.DenseMatrix[Double]"></a>
+      <a id="computeParamBlockMatrix:DenseMatrix[Double]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">computeParamMat</span><span class="result">: <span class="extype" name="breeze.linalg.DenseMatrix">DenseMatrix</span>[<span class="extype" name="scala.Double">Double</span>]</span>
+        <span class="name">computeParamBlockMatrix</span><span class="result">: <span class="extype" name="breeze.linalg.DenseMatrix">DenseMatrix</span>[<span class="extype" name="scala.Double">Double</span>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.UpdatableGaussianComponent@computeParamMat:breeze.linalg.DenseMatrix[Double]" title="Permalink" target="_top">
+      <a href="../../../../index.html#com.github.gradientgmm.components.UpdatableGaussianComponent@computeParamBlockMatrix:breeze.linalg.DenseMatrix[Double]" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -403,23 +403,23 @@ and contains gradient ascent utilities necessary for accelerated ascent algorith
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="com.github.gradientgmm.components.GConcaveGaussian#invParamMat" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="invParamMat:breeze.linalg.DenseMatrix[Double]"></a>
-      <a id="invParamMat:DenseMatrix[Double]"></a>
+    </li><li name="com.github.gradientgmm.components.GConcaveGaussian#invParamBlockMatrix" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="invParamBlockMatrix:breeze.linalg.DenseMatrix[Double]"></a>
+      <a id="invParamBlockMatrix:DenseMatrix[Double]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">invParamMat</span><span class="result">: <span class="extype" name="breeze.linalg.DenseMatrix">DenseMatrix</span>[<span class="extype" name="scala.Double">Double</span>]</span>
+        <span class="name">invParamBlockMatrix</span><span class="result">: <span class="extype" name="breeze.linalg.DenseMatrix">DenseMatrix</span>[<span class="extype" name="scala.Double">Double</span>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.UpdatableGaussianComponent@invParamMat:breeze.linalg.DenseMatrix[Double]" title="Permalink" target="_top">
+      <a href="../../../../index.html#com.github.gradientgmm.components.UpdatableGaussianComponent@invParamBlockMatrix:breeze.linalg.DenseMatrix[Double]" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Augmented parameter block matrix inverse.</p><div class="fullcomment"><div class="comment cmt"><p>Augmented parameter block matrix inverse. Its blocks are:</p><p>A = sigmaInv</p><p>B = sigmaInv * mu</p><p>C = mu.t * sigmaInv</p><p>D = 1/s + mu.t * sigmaInv * mu</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="GConcaveGaussian.html" class="extype" name="com.github.gradientgmm.components.GConcaveGaussian">GConcaveGaussian</a></dd></dl></div>
+      <p class="shortcomment cmt">Augmented parameter block matrix inverse [A B; C D].</p><div class="fullcomment"><div class="comment cmt"><p>Augmented parameter block matrix inverse [A B; C D]. Its blocks are:</p><p>A = sigmaInv</p><p>B = sigmaInv * mu</p><p>C = mu.t * sigmaInv</p><p>D = 1/s + mu.t * sigmaInv * mu</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="GConcaveGaussian.html" class="extype" name="com.github.gradientgmm.components.GConcaveGaussian">GConcaveGaussian</a></dd></dl></div>
     </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <a id="isInstanceOf[T0]:Boolean"></a>
@@ -562,19 +562,19 @@ and contains gradient ascent utilities necessary for accelerated ascent algorith
       </a>
     </span>
       <p class="shortcomment cmt">accelerated gradient ascent utilities.</p><div class="fullcomment"><div class="comment cmt"><p>accelerated gradient ascent utilities. See <a href="AcceleratedGradientUtils.html" class="extype" name="com.github.gradientgmm.components.AcceleratedGradientUtils">AcceleratedGradientUtils</a></p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.github.gradientgmm.components.UpdatableGaussianComponent">UpdatableGaussianComponent</a> → <a href="MatrixParamUpdate.html" class="extype" name="com.github.gradientgmm.components.MatrixParamUpdate">MatrixParamUpdate</a></dd></dl></div>
-    </li><li name="com.github.gradientgmm.components.GConcaveGaussian#paramMat" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="paramMat:breeze.linalg.DenseMatrix[Double]"></a>
-      <a id="paramMat:DenseMatrix[Double]"></a>
+    </li><li name="com.github.gradientgmm.components.GConcaveGaussian#paramBlockMatrix" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="paramBlockMatrix:breeze.linalg.DenseMatrix[Double]"></a>
+      <a id="paramBlockMatrix:DenseMatrix[Double]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">var</span>
       </span>
       <span class="symbol">
-        <span class="name">paramMat</span><span class="result">: <span class="extype" name="breeze.linalg.DenseMatrix">DenseMatrix</span>[<span class="extype" name="scala.Double">Double</span>]</span>
+        <span class="name">paramBlockMatrix</span><span class="result">: <span class="extype" name="breeze.linalg.DenseMatrix">DenseMatrix</span>[<span class="extype" name="scala.Double">Double</span>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.UpdatableGaussianComponent@paramMat:breeze.linalg.DenseMatrix[Double]" title="Permalink" target="_top">
+      <a href="../../../../index.html#com.github.gradientgmm.components.UpdatableGaussianComponent@paramBlockMatrix:breeze.linalg.DenseMatrix[Double]" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -718,10 +718,18 @@ and contains gradient ascent utilities necessary for accelerated ascent algorith
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Given a matrix, updates the distribution's parameters according to the
-augmented parameter matrix' block structure
-</p><div class="fullcomment"><div class="comment cmt"><p>Given a matrix, updates the distribution's parameters according to the
-augmented parameter matrix' block structure
+      <p class="shortcomment cmt">update parameter values deconstructing the matrix using a block structure [A B;C D]
+where
+A = sigma + s * mu * mu.t
+B = s * mu
+C = s * mu.t
+D = s
+</p><div class="fullcomment"><div class="comment cmt"><p>update parameter values deconstructing the matrix using a block structure [A B;C D]
+where
+A = sigma + s * mu * mu.t
+B = s * mu
+C = s * mu.t
+D = s
 </p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.github.gradientgmm.components.UpdatableGaussianComponent">UpdatableGaussianComponent</a> → <a href="MatrixParamUpdate.html" class="extype" name="com.github.gradientgmm.components.MatrixParamUpdate">MatrixParamUpdate</a></dd></dl></div>
     </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>

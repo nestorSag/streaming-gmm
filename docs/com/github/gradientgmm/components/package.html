@@ -82,9 +82,8 @@
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">A class that wraps necessary object for accelerated gradient ascent methods.</p><div class="fullcomment"><div class="comment cmt"><p>A class that wraps necessary object for accelerated gradient ascent methods.</p><p>Intializes and stores the necessary numeric data structures to calculate ascent directions in
-Momentum gradient ascent and the ADAM algorithm. It only initializes such objects when they
-are called, avoiding storing unecessary information.
+      <p class="shortcomment cmt">Wraps necessary data strctures for accelerated gradient ascent methods.</p><div class="fullcomment"><div class="comment cmt"><p>Wraps necessary data strctures for accelerated gradient ascent methods.</p><p>Intializes and stores the necessary numeric data structures to calculate ascent directions.
+  It only initializes such objects when they are called, avoiding storing unecessary arrays.
 </p></div><dl class="paramcmts block"><dt class="tparam">T</dt><dd class="cmt"><p>The structure data type, e.g., DenseVector or DenseMatrix</p></dd></dl></div>
     </li><li name="com.github.gradientgmm.components.GConcaveGaussian" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="GConcaveGaussianextendsMultivariateGaussian"></a>
@@ -102,13 +101,13 @@ are called, avoiding storing unecessary information.
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Multivariate Gaussian Distribution reformulation that implies a g-concave loss function in
-<a href="https://arxiv.org/abs/1706.03267" target="_blank">An Alternative to EM for Gaussian Mixture Models: Batch and Stochastic Riemannian Optimization<i>]]</i></a></p><div class="fullcomment"><div class="comment cmt"><p>Multivariate Gaussian Distribution reformulation that implies a g-concave loss function in
+      <p class="shortcomment cmt">Multivariate Gaussian Distribution reformulation that produces a g-concave loss function in
+<a href="https://arxiv.org/abs/1706.03267" target="_blank">An Alternative to EM for Gaussian Mixture Models: Batch and Stochastic Riemannian Optimization<i>]]</i></a></p><div class="fullcomment"><div class="comment cmt"><p>Multivariate Gaussian Distribution reformulation that produces a g-concave loss function in
 <a href="https://arxiv.org/abs/1706.03267" target="_blank">An Alternative to EM for Gaussian Mixture Models: Batch and Stochastic Riemannian Optimization<i>]]</i></a></p><p>For an arbitrary Gaussian distribution, its g-concave reformulation have zero mean and an
 augmented covariance matrix which is a function of the original mean, covariance matrix
 and an additional positive scalar s. Original data points x are mapped to
 y = [x 1] to be evaluated under the new distribution. When s = 1, the density
-of the original distirbution and the reformulation are equal for all points.
+of the original distribution and the reformulation coincide.
 </p></div></div>
     </li><li name="com.github.gradientgmm.components.MatrixGradientUtils" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="MatrixGradientUtilsextendsAcceleratedGradientUtils[breeze.linalg.DenseMatrix[Double]]"></a>
@@ -126,7 +125,7 @@ of the original distirbution and the reformulation are equal for all points.
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Implementation of <a href="AcceleratedGradientUtils.html" class="extype" name="com.github.gradientgmm.components.AcceleratedGradientUtils">AcceleratedGradientUtils</a> to allow matrix-like acceleration terms.</p><div class="fullcomment"><div class="comment cmt"><p>Implementation of <a href="AcceleratedGradientUtils.html" class="extype" name="com.github.gradientgmm.components.AcceleratedGradientUtils">AcceleratedGradientUtils</a> to allow matrix-like acceleration terms.</p><p>It uses Breeze's DenseMatrix as the data type</p></div></div>
+      <p class="shortcomment cmt">Implementation of <a href="AcceleratedGradientUtils.html" class="extype" name="com.github.gradientgmm.components.AcceleratedGradientUtils">AcceleratedGradientUtils</a> to allow matrix-like acceleration terms.</p><div class="fullcomment"><div class="comment cmt"><p>Implementation of <a href="AcceleratedGradientUtils.html" class="extype" name="com.github.gradientgmm.components.AcceleratedGradientUtils">AcceleratedGradientUtils</a> to allow matrix-like acceleration terms.</p><p>It uses Breeze's DenseMatrix as data type</p></div></div>
     </li><li name="com.github.gradientgmm.components.MatrixParamUpdate" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
       <a id="MatrixParamUpdateextendsSerializable"></a>
       <a id="MatrixParamUpdate:MatrixParamUpdate"></a>
@@ -181,7 +180,7 @@ and the covariance matrix inverse, are public; many of its parameters are mutabl
       </a>
     </span>
       <p class="shortcomment cmt">Gaussian distribution that implements an updating routine based on its g-concave reformulation
-and contains gradient ascent utilities necessary for accelerated ascent algorithms.</p>
+and contains gradient ascent utilities necessary for accelerated algorithms.</p>
     </li><li name="com.github.gradientgmm.components.UpdatableWeights" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="UpdatableWeightsextendsSerializablewithVectorParamUpdate"></a>
       <a id="UpdatableWeights:UpdatableWeights"></a>
@@ -198,7 +197,7 @@ and contains gradient ascent utilities necessary for accelerated ascent algorith
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Wrapper class for the weights vector.</p><div class="fullcomment"><div class="comment cmt"><p>Wrapper class for the weights vector.</p><p>It includes functionality to check the simplex constraints and perofrm accelerated gradient ascent.</p><p>see <a href="https://en.wikipedia.org/wiki/Simplex" target="_blank">https://en.wikipedia.org/wiki/Simplex</a>
+      <p class="shortcomment cmt">Wrapper class for weights vector.</p><div class="fullcomment"><div class="comment cmt"><p>Wrapper class for weights vector.</p><p>It includes functionality to verify simplex constraints and accelerated ascent data structures.</p><p>see <a href="https://en.wikipedia.org/wiki/Simplex" target="_blank">https://en.wikipedia.org/wiki/Simplex</a>
 </p></div></div>
     </li><li name="com.github.gradientgmm.components.VectorGradientUtils" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="VectorGradientUtilsextendsAcceleratedGradientUtils[breeze.linalg.DenseVector[Double]]"></a>
@@ -216,7 +215,7 @@ and contains gradient ascent utilities necessary for accelerated ascent algorith
         <img src="../../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Implementation of <a href="AcceleratedGradientUtils.html" class="extype" name="com.github.gradientgmm.components.AcceleratedGradientUtils">AcceleratedGradientUtils</a> to allow vector-like acceleration terms.</p><div class="fullcomment"><div class="comment cmt"><p>Implementation of <a href="AcceleratedGradientUtils.html" class="extype" name="com.github.gradientgmm.components.AcceleratedGradientUtils">AcceleratedGradientUtils</a> to allow vector-like acceleration terms.</p><p>It uses Breeze's DenseVector as the data type</p></div></div>
+      <p class="shortcomment cmt">Implementation of <a href="AcceleratedGradientUtils.html" class="extype" name="com.github.gradientgmm.components.AcceleratedGradientUtils">AcceleratedGradientUtils</a> to allow vector-like acceleration terms.</p><div class="fullcomment"><div class="comment cmt"><p>Implementation of <a href="AcceleratedGradientUtils.html" class="extype" name="com.github.gradientgmm.components.AcceleratedGradientUtils">AcceleratedGradientUtils</a> to allow vector-like acceleration terms.</p><p>It uses Breeze's DenseVector as data type</p></div></div>
     </li><li name="com.github.gradientgmm.components.VectorParamUpdate" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
       <a id="VectorParamUpdateextendsSerializable"></a>
       <a id="VectorParamUpdate:VectorParamUpdate"></a>

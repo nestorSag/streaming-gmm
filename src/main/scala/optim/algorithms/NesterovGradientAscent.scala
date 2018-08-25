@@ -5,7 +5,7 @@ import com.github.gradientgmm.components.AcceleratedGradientUtils
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 
 /**
-  * Optimizer that performs stochastic gradient ascent with Nesterov's correction
+  * Implementation of gradient ascent with Nesterov's correction
   */
 
 class NesterovGradientAscent extends Optimizer {
@@ -33,7 +33,7 @@ class NesterovGradientAscent extends Optimizer {
 		         delta,
 		        ops.rescale(utils.momentum.get,gamma/(1+gamma)))
 
-		utils.updateMomentum(delta)
+		utils.setMomentum(delta)
 
 		res
 	}
@@ -41,13 +41,13 @@ class NesterovGradientAscent extends Optimizer {
 	override def getUpdate[A](current: A, grad:A, utils: AcceleratedGradientUtils[A])(implicit ops: ParameterOperations[A]): A = {
     
         if(!utils.momentum.isDefined){
-			utils.updateMomentum(current)
+			utils.setMomentum(current)
 		}
 
 		//val update = (current + direction(grad,utils)(ops)) * (1 + gamma)
 		val update = ops.rescale(ops.sum(current,direction(grad,utils)(ops)),1+gamma)
 
-		utils.updateMomentum(ops.sum(current,utils.momentum.get))
+		utils.setMomentum(ops.sum(current,utils.momentum.get))
 
 		update
 

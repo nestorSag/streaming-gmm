@@ -9,8 +9,7 @@ import org.apache.spark.mllib.linalg.{Vector => SV}
 import org.apache.spark.rdd.RDD
 
 /**
-  * Optimizer interface that contains base hyperparameters and their getters and setters.
-  * Optimization algorithms like Stochastic Gradient Ascent are implementations of this trait
+  * Contains base hyperparameters with the respective getters and setters.
   */
 trait Optimizer extends Serializable{
   
@@ -95,9 +94,9 @@ trait Optimizer extends Serializable{
 
 /**
   * Alternative method to set step size's shrinkage rate. it will be automatically calculated to shrink
-  * the step size by half every n iterations.
+  * the step size by half every m iterations.
   *
-  * @param n positive intger
+  * @param m positive intger
   * @return this
   */
   def halveStepSizeEvery(m: Int): this.type = {

@@ -7,7 +7,7 @@ import org.apache.spark.mllib.stat.distribution.{MultivariateGaussian => SMVG}
 
 /**
   * Gaussian distribution that implements an updating routine based on its g-concave reformulation 
-  * and contains gradient ascent utilities necessary for accelerated ascent algorithms. 
+  * and contains gradient ascent utilities necessary for accelerated algorithms. 
 
   * @param _s Positive scalar
   * @param _mu Mean vector
@@ -26,10 +26,14 @@ class UpdatableGaussianComponent private(
   val optimUtils = new MatrixGradientUtils(d+1)
 
 /**
-  * Given a matrix, updates the distribution's parameters according to the 
-  * augmented parameter matrix' block structure
+  * update parameter values deconstructing the matrix using a block structure [A B;C D]
+  * where
+  * A = sigma + s * mu * mu.t
+  * B = s * mu
+  * C = s * mu.t
+  * D = s
 
-  * @param newParamMat Matrix with new parameters
+  * @param newparamBlockMatrix Matrix with new parameters
  
   */
   def update(newParam: BDM[Double]): Unit = {
@@ -37,7 +41,7 @@ class UpdatableGaussianComponent private(
     this.s = newParam(d,d)
     this.mu = newParam(0 to d-1,d)/s
     this.sigma = newParam(0 to d-1,0 to d-1) - (mu)*(mu).t*s
-    this.paramMat = computeParamMat
+    this.paramBlockMatrix = computeParamBlockMatrix
   
     var (rootSigmaInv_,u_) = calculateCovarianceConstants
 

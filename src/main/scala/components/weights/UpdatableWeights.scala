@@ -4,9 +4,9 @@ import breeze.linalg.{DenseVector => BDV, sum}
 
 
 /**
-  * Wrapper class for the weights vector.
+  * Wrapper class for weights vector.
 
-  * It includes functionality to check the simplex constraints and perofrm accelerated gradient ascent.
+  * It includes functionality to verify simplex constraints and accelerated ascent data structures.
   
   * see [[https://en.wikipedia.org/wiki/Simplex]]
   
@@ -20,10 +20,6 @@ class UpdatableWeights(var weights: Array[Double]) extends Serializable with Vec
   require(isPositive(weights), "some weights are negative or equal to zero")
   require(isInSimplex(weights) ,s"new weights don't sum 1: ${weights.mkString(",")}")
 
-/**
-  * Allowed deviation from 1 of the weight vector's sum
- 
-  */
 
 /**
   * weight vector dimensionality
@@ -52,10 +48,8 @@ class UpdatableWeights(var weights: Array[Double]) extends Serializable with Vec
     // recenter soft weights to avoid under or overflow
     val newW = newParam.toArray
     require(isInSimplex(newW),s"new weights don't sum 1: ${newW.mkString(",")}")
-    //val berror = (sum(newParam) - 1.0)*(sum(newParam) - 1.0)
-    //val aerror = (newW.sum-1.0)*(newW.sum-1.0)
-    //require(isInSimplex(newW),s"new weights don't sum 1: ${newW.mkString(",")}, berror: ${berror}, aerror: ${aerror}")
-    weights = newW
+    
+     weights = newW
 
   }
 

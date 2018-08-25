@@ -5,7 +5,7 @@ import com.github.gradientgmm.components.UpdatableGaussianComponent
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 
 /**
-  * Basic functionality for a [[https://en.wikipedia.org/wiki/Regularization_(mathematics) regularization]] term.
+  * Contains basic functionality for a [[https://en.wikipedia.org/wiki/Regularization_(mathematics) regularization]] term.
   * 
   *
   * 
@@ -14,7 +14,7 @@ import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, Vector => BV}
 trait Regularizer extends Serializable {
 
 /**
-  * Computes the loss function's gradient w.r.t a component's parameters
+  * Computes the loss function's gradient w.r.t a Gaussian component's parameters
   *
   * @param dist Mixture component
   * @return gradient
@@ -24,7 +24,7 @@ trait Regularizer extends Serializable {
 
 
 /**
-  * Computes the loss function's gradient w.r.t the current weight vector
+  * Computes the loss function's gradient with respect to the current weights vector
   *
   * @param weights current weights vector
   * @return gradient
@@ -34,7 +34,7 @@ trait Regularizer extends Serializable {
 
 
 /**
-  * Evaluate regularization term for a mixture component
+  * Evaluate regularization term for a Gaussian component
   *
   * @param dist Mixture component
   * @return regularization value

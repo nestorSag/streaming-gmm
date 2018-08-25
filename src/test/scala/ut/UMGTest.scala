@@ -68,13 +68,13 @@ class UMGTest extends FlatSpec {
 
 
   "the parameter matrix" should "be well-formed" in {
-  	val paramMat = umgdist.paramMat
+  	val paramBlockMatrix = umgdist.paramBlockMatrix
   	
   	val lcv = BDV(Array.fill(covdim)(0.0) ++ Array(1.0)) // last canonical vector e_d = (0,...,0,1)
 
   	// check that last diagonal element equals s
 
-  	assert(math.pow(lcv.t * paramMat * lcv - umgdist.getS,2) < errorTol)
+  	assert(math.pow(lcv.t * paramBlockMatrix * lcv - umgdist.getS,2) < errorTol)
 
   	//check that the principal submatrix is well-formed
 
@@ -84,25 +84,25 @@ class UMGTest extends FlatSpec {
   		reshaper(i,i) = 1
   	}
 
-  	val principalSubmatrix = reshaper.t * umgdist.paramMat * reshaper
+  	val principalSubmatrix = reshaper.t * umgdist.paramBlockMatrix * reshaper
   	val matdiff = principalSubmatrix - (umgdist.getSigma + umgdist.getMu * umgdist.getMu.t * umgdist.getS)
 
   	assert(trace(matdiff.t * matdiff) < errorTol)
 
   	// check that last row contains mu (concatenated with s)
-  	var vecdiff = (lcv.t * paramMat * reshaper).t - umgdist.getMu
+  	var vecdiff = (lcv.t * paramBlockMatrix * reshaper).t - umgdist.getMu
 
   	assert(math.pow(norm(vecdiff),2) < errorTol)
 
   	// check that last col contains mu (concatenated with s)
-    vecdiff = (reshaper.t * paramMat * lcv) - umgdist.getMu
+    vecdiff = (reshaper.t * paramBlockMatrix * lcv) - umgdist.getMu
 
   	assert(math.pow(norm(vecdiff),2) < errorTol)
   }
 
-  "invParamMat" should "give paramMat inverse" in {
+  "invparamBlockMatrix" should "give paramBlockMatrix inverse" in {
     
-    var shouldBeZeroMat = umgdist.paramMat*umgdist.invParamMat - BDM.eye[Double](covdim+1)
+    var shouldBeZeroMat = umgdist.paramBlockMatrix*umgdist.invParamBlockMatrix - BDM.eye[Double](covdim+1)
 
     assert(trace(shouldBeZeroMat.t*shouldBeZeroMat) < errorTol)
     
@@ -110,12 +110,12 @@ class UMGTest extends FlatSpec {
 
   "update()" should "correctly map updated matrix to new params" in {
     
-    val paramMat = umgdist.paramMat.copy
-    // var newdist = umgdist.update(paramMat)
+    val paramBlockMatrix = umgdist.paramBlockMatrix.copy
+    // var newdist = umgdist.update(paramBlockMatrix)
 
-    // val shouldBeZeroMat = paramMat - newdist.paramMat
-    umgdist.update(paramMat)
-    val dif = paramMat - umgdist.paramMat
+    // val shouldBeZeroMat = paramBlockMatrix - newdist.paramBlockMatrix
+    umgdist.update(paramBlockMatrix)
+    val dif = paramBlockMatrix - umgdist.paramBlockMatrix
     //assert(true)
     assert(trace(dif.t*dif) < errorTol)
     

@@ -5,12 +5,12 @@ import com.github.gradientgmm.components.AcceleratedGradientUtils
 import breeze.numerics.sqrt
 
 /**
-  * Optimizer that performs gradient ascent using the ADAM algorithm. See ''Adam: A Method for Stochastic Optimization. Kingma, Diederik P.; Ba, Jimmy, 2014''
+  * Implementation of ADAM. See ''Adam: A Method for Stochastic Optimization. Kingma, Diederik P.; Ba, Jimmy, 2014''
   
   * Using it is NOT recommended; you should use SGD or its accelerated versions instead.
   */
 
-@deprecated("ADAM can be unstable for GMM problems and should not be used", "gradientgmm 1.4")
+@deprecated("ADAM can be unstable for GMM problems and should not be used", "gradientgmm >= 1.4")
 class ADAM extends Optimizer {
 
 /**
@@ -24,12 +24,12 @@ class ADAM extends Optimizer {
 	var eps = 1e-8
 
 /**
-  * Exponential smoothing parameter for the first raw moment estimator 
+  * Exponential smoothing parameter for the first moment estimator 
   */
 	var beta1 = 0.5
 
 /**
-  * Exponential smoothing parameter for the second raw moment estimator 
+  * Exponential smoothing parameter for the second non-central moment estimator 
   */
 	var beta2 = 0.1
 	
@@ -80,12 +80,12 @@ class ADAM extends Optimizer {
 			utils.initializeAdamInfo
 		}
 		
-		utils.updateMomentum(
+		utils.setMomentum(
 			ops.sum(
 				ops.rescale(utils.momentum.get,beta1), 
 				ops.rescale(grad,1.0-beta1)))
 
-		utils.updateAdamInfo(
+		utils.setAdamInfo(
 			ops.sum(
 				ops.rescale(utils.adamInfo.get,beta2), 
 				ops.rescale(ops.ewProd(grad,grad),1.0-beta2)))

@@ -9,10 +9,10 @@ import com.github.fommil.netlib.{BLAS => NetlibBLAS, F2jBLAS}
 import com.github.fommil.netlib.BLAS.{getInstance => NativeBLAS}
 
 /**
-  * Distributed aggregator of relevant statistics
+  * Distributed aggregator of necessary statistics
   *
   * In each worker it computes and aggregates the current batch log-likelihood,
-  * and the terms that will later be used to compte the gradient. The class structure is based on
+  * and the terms that will later be used to compute the gradient. The class structure is based on
   * Spark's [[https://github.com/apache/spark/blob/master/mllib/src/main/scala/org/apache/spark/mllib/clustering/GaussianMixture.scala ExpectationSum]]
 
   * @param weightsGradient Aggregated posterior responsability for each component
@@ -38,7 +38,7 @@ class MetricAggregator(
 /**
   * Adder for other MetricAggregator instances
   *
-  * Used for further aggregation between each worker's object
+  * Used for further aggregation between each worker's aggregates
  
   */
   val m = outerProductsAgg(0).length

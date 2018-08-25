@@ -7,12 +7,12 @@ import com.github.gradientgmm.optim.ParameterOperations
 import breeze.linalg.{diag, eigSym, max, DenseMatrix => BDM, DenseVector => BDV, Vector => BV, trace, sum}
 import breeze.numerics.{sqrt, exp, log, abs => bAbs}
 
-
+//deffines minimal set of variables necessary to test the project's classes
 
 trait OptimTestSpec extends FlatSpec{
 	
 	
-	var dim = 2
+	var dim = 5
 	var niter = 5
 	var errorTol = 1e-8
 	var k = 5
@@ -25,7 +25,7 @@ trait OptimTestSpec extends FlatSpec{
 
 	val mu = BDV.rand(dim)
 
-	val targetParamMat: BDM[Double] = {
+	val targetParamBlockMatrix: BDM[Double] = {
     // build target parameter matrix
 	    val lastRow = new BDV[Double](mu.toArray ++ Array[Double](1))
 
@@ -54,6 +54,7 @@ trait OptimTestSpec extends FlatSpec{
         log(x/x(d-1))
     }
 
+  //copy-pasted from Optimizable 
 	protected implicit val vectorOps = new ParameterOperations[BDV[Double]] {
     def sum(x: BDV[Double], y: BDV[Double]): BDV[Double] = {x + y}
     def sumScalar(x: BDV[Double], z: Double): BDV[Double] = {x + z}

@@ -10,7 +10,7 @@ import org.apache.log4j.Logger
 
 
 /**
-  * Conjugate prior regularization for all the mixture's parameters; this means an 
+  * Implementation of conjugate prior regularization; this means an 
   * [[https://en.wikipedia.org/wiki/Normal-inverse-Wishart_distribution Inverse-Wishart]] prior over the covariance matrices, a Normal prior over the means
   * and a [[https://en.wikipedia.org/wiki/Dirichlet_distribution Dirichlet]] distribution prior over the weights.
 
@@ -23,13 +23,13 @@ class ConjugatePrior(val dim: Int, val k: Int) extends Regularizer{
 	require(k>0,"number of clusters must be a positive integer")
 
 /**
-  * prior mean for components' mean vector
+  * prior mean for mean vectors
 
   */
 	private var normalMean: BDV[Double] = BDV.zeros[Double](dim)
 
 /**
-  * prior mean for components' covariance matrix
+  * prior mean for covariance matrices
 
   */
 	private var iwMean: BDM[Double] = BDM.eye[Double](dim)
@@ -41,20 +41,20 @@ class ConjugatePrior(val dim: Int, val k: Int) extends Regularizer{
 	private var df: Double = dim
 
 /**
-  * Concentration parameter for the weight vector prior
+  * Concentration parameter for the weights vector prior
 
   */
 	private var dirichletParam: Double = 1.0/k
 
 /**
-  * degrees of freedom for the Inverse-Wishart prior
+  * set degrees of freedom for the Inverse-Wishart prior
 
   * @param df Degrees of freedom
 
   */
 	def setDf(df: Double): this.type = {
 		//require(df>iwMean.cols-1,"degrees of freedom must me greater than dim(iwMean)")
-		require(df>dim-1,"degrees of freedom must me greater than dim-1")
+		require(df>dim-1,s"degrees of freedom must me greater than ${dim}-1")
 		this.df = df
 		this.regularizingMatrix = buildRegMatrix(df,normalMean,iwMean)
 		this
@@ -63,8 +63,8 @@ class ConjugatePrior(val dim: Int, val k: Int) extends Regularizer{
 	def getDf = this.df
 
 /**
-  * Set mean and covariance parameters' prior means. 
-  * The Gaussian parameter prior means must be set at the same time to check correctness, since their dimension must match
+  * Set Gaussian parameters' prior means. 
+  * The Gaussian parameter prior means must be set at the same time to check that the dimensions match
   
   * @param normalMean Expected value vector for the prior Normal distribution
   * @param iwMean Expected value matrix for the prior Inverse-Wishart distribution
@@ -100,7 +100,7 @@ class ConjugatePrior(val dim: Int, val k: Int) extends Regularizer{
 
 
 /**
-  * Parameter block matrix [A B; C D]. The blocks are:
+  * Block matrix of prior parameters [A B; C D]. The blocks are:
 
   * A = iwMean + kappa * normalMean * normalMean.t
 
@@ -119,7 +119,7 @@ class ConjugatePrior(val dim: Int, val k: Int) extends Regularizer{
 
 	def gaussianGradient(dist:UpdatableGaussianComponent): BDM[Double] = {
 		val kappa = df+dim+2
-		(this.regularizingMatrix - dist.paramMat * kappa)*0.5
+		(this.regularizingMatrix - dist.paramBlockMatrix * kappa)*0.5
 	}
 
 	def weightsGradient(weights: BDV[Double]): BDV[Double] = {
@@ -128,7 +128,7 @@ class ConjugatePrior(val dim: Int, val k: Int) extends Regularizer{
 
 	def evaluateDist(dist: UpdatableGaussianComponent): Double = {
 		val kappa = df + dim + 2
-		- 0.5*(kappa*(dist.logDetSigma + math.log(dist.getS)) + symProdTrace(regularizingMatrix,dist.invParamMat))
+		- 0.5*(kappa*(dist.logDetSigma + math.log(dist.getS)) + symProdTrace(regularizingMatrix,dist.invParamBlockMatrix))
 	}
 
 	def evaluateWeights(weights: BDV[Double]): Double = {
@@ -136,7 +136,7 @@ class ConjugatePrior(val dim: Int, val k: Int) extends Regularizer{
 	}
 	
 /**
-  * Build parameter block matrix [A B; C D]. The blocks are:
+  * Build block matrix of prior parameters block matrix [A B; C D]. The blocks are:
 
   * A = iwMean + kappa * normalMean * normalMean.t
 

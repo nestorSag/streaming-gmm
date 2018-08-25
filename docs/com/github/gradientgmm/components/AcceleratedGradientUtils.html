@@ -49,9 +49,8 @@
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>A class that wraps necessary object for accelerated gradient ascent methods.</p><p>Intializes and stores the necessary numeric data structures to calculate ascent directions in
-Momentum gradient ascent and the ADAM algorithm. It only initializes such objects when they
-are called, avoiding storing unecessary information.
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Wraps necessary data strctures for accelerated gradient ascent methods.</p><p>Intializes and stores the necessary numeric data structures to calculate ascent directions.
+  It only initializes such objects when they are called, avoiding storing unecessary arrays.
 </p></div><dl class="paramcmts block"><dt class="tparam">T</dt><dd class="cmt"><p>The structure data type, e.g., DenseVector or DenseMatrix</p></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
@@ -479,6 +478,41 @@ are called, avoiding storing unecessary information.
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="com.github.gradientgmm.components.AcceleratedGradientUtils#setAdamInfo" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="setAdamInfo(x:T):Unit"></a>
+      <a id="setAdamInfo(T):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">setAdamInfo</span><span class="params">(<span name="x">x: <span class="extype" name="com.github.gradientgmm.components.AcceleratedGradientUtils.T">T</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#com.github.gradientgmm.components.AcceleratedGradientUtils@setAdamInfo(x:T):Unit" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Set the ADAM term equal to x.</p><div class="fullcomment"><div class="comment cmt"><p>Set the ADAM term equal to x. See <a href="../optim/ADAM.html" class="extype" name="com.github.gradientgmm.optim.ADAM">com.github.gradientgmm.optim.ADAM</a>
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>returns this object</p></dd></dl></div>
+    </li><li name="com.github.gradientgmm.components.AcceleratedGradientUtils#setMomentum" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="setMomentum(x:T):Unit"></a>
+      <a id="setMomentum(T):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">setMomentum</span><span class="params">(<span name="x">x: <span class="extype" name="com.github.gradientgmm.components.AcceleratedGradientUtils.T">T</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#com.github.gradientgmm.components.AcceleratedGradientUtils@setMomentum(x:T):Unit" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Set the momentum term equal to x.</p><div class="fullcomment"><div class="comment cmt"><p>Set the momentum term equal to x. See <a href="../optim/MomentumGradientAscent.html" class="extype" name="com.github.gradientgmm.optim.MomentumGradientAscent">com.github.gradientgmm.optim.MomentumGradientAscent</a></p></div></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
       <a id="synchronized[T0](⇒T0):T0"></a>
@@ -513,41 +547,6 @@ are called, avoiding storing unecessary information.
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="com.github.gradientgmm.components.AcceleratedGradientUtils#updateAdamInfo" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="updateAdamInfo(x:T):Unit"></a>
-      <a id="updateAdamInfo(T):Unit"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">updateAdamInfo</span><span class="params">(<span name="x">x: <span class="extype" name="com.github.gradientgmm.components.AcceleratedGradientUtils.T">T</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.AcceleratedGradientUtils@updateAdamInfo(x:T):Unit" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">Set the ADAM term equal to x.</p><div class="fullcomment"><div class="comment cmt"><p>Set the ADAM term equal to x. See <a href="../optim/ADAM.html" class="extype" name="com.github.gradientgmm.optim.ADAM">com.github.gradientgmm.optim.ADAM</a>
-</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>returns this object</p></dd></dl></div>
-    </li><li name="com.github.gradientgmm.components.AcceleratedGradientUtils#updateMomentum" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="updateMomentum(x:T):Unit"></a>
-      <a id="updateMomentum(T):Unit"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">updateMomentum</span><span class="params">(<span name="x">x: <span class="extype" name="com.github.gradientgmm.components.AcceleratedGradientUtils.T">T</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../../index.html#com.github.gradientgmm.components.AcceleratedGradientUtils@updateMomentum(x:T):Unit" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">Set the momentum term equal to x.</p><div class="fullcomment"><div class="comment cmt"><p>Set the momentum term equal to x. See <a href="../optim/MomentumGradientAscent.html" class="extype" name="com.github.gradientgmm.optim.MomentumGradientAscent">com.github.gradientgmm.optim.MomentumGradientAscent</a></p></div></div>
     </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <a id="wait():Unit"></a>

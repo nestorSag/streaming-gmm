@@ -4,11 +4,10 @@ import breeze.linalg.{DenseVector => BDV, DenseMatrix => BDM}
 
 
 /**
-  * A class that wraps necessary object for accelerated gradient ascent methods.
+  * Wraps necessary data strctures for accelerated gradient ascent methods.
   *
-  * Intializes and stores the necessary numeric data structures to calculate ascent directions in
-  * Momentum gradient ascent and the ADAM algorithm. It only initializes such objects when they
-  * are called, avoiding storing unecessary information.
+  * Intializes and stores the necessary numeric data structures to calculate ascent directions. 
+  It only initializes such objects when they are called, avoiding storing unecessary arrays.
 
   * @tparam T The structure data type, e.g., DenseVector or DenseMatrix
   * @param zeroGenerator Function that initialize the data structures to zero.
@@ -35,7 +34,7 @@ abstract class AcceleratedGradientUtils[T <: Any](val zeroGenerator: Int => T, v
   *
   */
 
-  def updateMomentum(x: T): Unit = {
+  def setMomentum(x: T): Unit = {
     momentum = Option(x)
   }
 
@@ -45,7 +44,7 @@ abstract class AcceleratedGradientUtils[T <: Any](val zeroGenerator: Int => T, v
   * @return returns this object
   */
 
-  def updateAdamInfo(x: T): Unit = {
+  def setAdamInfo(x: T): Unit = {
     adamInfo = Option(x)
   }
 
@@ -85,7 +84,7 @@ abstract class AcceleratedGradientUtils[T <: Any](val zeroGenerator: Int => T, v
   * Implementation of [[AcceleratedGradientUtils]] to allow vector-like acceleration terms.
   *
 
-  * It uses Breeze's DenseVector as the data type
+  * It uses Breeze's DenseVector as data type
   * @param d Vector length
  
   */
@@ -109,7 +108,7 @@ trait VectorParamUpdate extends Serializable{
   * Implementation of [[AcceleratedGradientUtils]] to allow matrix-like acceleration terms.
   *
 
-  * It uses Breeze's DenseMatrix as the data type
+  * It uses Breeze's DenseMatrix as data type
   * @param d Square matrix size
  
   */

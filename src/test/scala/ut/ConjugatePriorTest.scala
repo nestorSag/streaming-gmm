@@ -35,7 +35,7 @@ class ConjugatePriorTest extends FlatSpec {
 
   "regularizingMatrix" should "be well-formed" in { 
 
-    // same kind of structure as dist.ParamMat
+    // same kind of structure as dist.paramBlockMatrix
     
     var prior = new ConjugatePrior(dim,k)
       .setDf(df)
@@ -72,33 +72,33 @@ class ConjugatePriorTest extends FlatSpec {
     //regularization term: 
     // r = kappa *logdet(S) - tr(Psi * S^{-1})
 
-    // -df/2*log det paramMat - 0.5*trace(psi*sInv)
+    // -df/2*log det paramBlockMatrix - 0.5*trace(psi*sInv)
     var prior = new ConjugatePrior(dim,k)
       .setDf(df)
       .setMeanAndCovExpVals(mu,cov)
       .setDirichletParam(1.0/k)
 
-    var testdist = UpdatableGaussianComponent(kappa,mu,cov) // when paramMat = regularizingMatrix
+    var testdist = UpdatableGaussianComponent(kappa,mu,cov) // when paramBlockMatrix = regularizingMatrix
 
     val vectorWeight = new BDV(Array(1.0))
 
-    var shouldBe = (-0.5*(prior.getDf+dim+2)*logdet(testdist.paramMat) - 0.5*(dim+1))
+    var shouldBe = (-0.5*(prior.getDf+dim+2)*logdet(testdist.paramBlockMatrix) - 0.5*(dim+1))
 
     var shouldBeZero = prior.evaluateDist(testdist) + prior.evaluateWeights(vectorWeight) - shouldBe
     
     assert(math.pow(shouldBeZero,2) < errorTol)
 
     // try moving the weight 
-    shouldBe = (-0.5*(prior.getDf+dim+2)*logdet(testdist.paramMat) - 0.5*(dim+1) + prior.getDirichletParam*math.log(0.5))
+    shouldBe = (-0.5*(prior.getDf+dim+2)*logdet(testdist.paramBlockMatrix) - 0.5*(dim+1) + prior.getDirichletParam*math.log(0.5))
 
     shouldBeZero = prior.evaluateDist(testdist) + prior.evaluateWeights(vectorWeight*0.5) - shouldBe
     
     assert(math.pow(shouldBeZero,2) < errorTol)
 
-    // when paramMat = identity, logdet should cancel out
+    // when paramBlockMatrix = identity, logdet should cancel out
     testdist = UpdatableGaussianComponent(BDV.zeros[Double](dim),BDM.eye[Double](dim))
 
-    //logdet(paramMat) = log(1) = 0
+    //logdet(paramBlockMatrix) = log(1) = 0
     shouldBe = (- 0.5*trace(prior.regularizingMatrix))
 
     shouldBeZero = prior.evaluateDist(testdist) + prior.evaluateWeights(vectorWeight) - shouldBe
@@ -106,7 +106,7 @@ class ConjugatePriorTest extends FlatSpec {
     assert(math.pow(shouldBeZero,2) < errorTol)
 
 
-    // when paramMat = identity and regularizingMatrix = almost identity (last diagonal entry = kappa, which cant equal one
+    // when paramBlockMatrix = identity and regularizingMatrix = almost identity (last diagonal entry = kappa, which cant equal one
     // if regularization is a true conjugate prior unless the problem's dimensionality is one)
     prior = new ConjugatePrior(dim,k)
       .setDf(dim)
